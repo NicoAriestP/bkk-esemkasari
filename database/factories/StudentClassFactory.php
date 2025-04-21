@@ -16,14 +16,8 @@ class StudentClassFactory extends Factory
      */
     public function definition(): array
     {
-        $majors = ['RPL', 'DKV', 'TKR', 'AK', 'TPM', 'TL'];
-        $class = ['X', 'XI', 'XII'];
-        $class = $this->faker->randomElement($class);
-        $major = $this->faker->randomElement($majors);
-        $className = $class . ' ' . $major;
-
         return [
-            'name' => $className,
+            //
         ];
     }
 }
