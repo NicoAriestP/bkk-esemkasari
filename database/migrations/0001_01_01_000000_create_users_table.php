@@ -34,6 +34,7 @@ return new class extends Migration
             $table->tinyInteger('is_leader')->default(0);
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
