@@ -26,11 +26,11 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
 
-            $table->foreignId('kelas_id')
-                ->nullable()
-                ->constrained('kelas')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
+            // $table->foreignId('kelas_id')
+            //     ->nullable()
+            //     ->constrained('kelas')
+            //     ->onUpdate('cascade')
+            //     ->onDelete('restrict');
 
             $table->string('name', 50);
             $table->string('nisn', 50);
@@ -47,6 +47,7 @@ return new class extends Migration
             $table->tinyInteger('is_graduated')->default(0);
             $table->tinyInteger('is_married')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
