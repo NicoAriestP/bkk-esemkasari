@@ -42,10 +42,14 @@ class DatabaseSeeder extends Seeder
         // Call the seeders
         $this->call([
             UserSeeder::class,
+            PartnerSeeder::class,
             StudentClassSeeder::class,
             StudentSeeder::class,
             VacancySeeder::class,
-            PartnerSeeder::class,
+            QuestionnaireSeeder::class,
+            QuestionnaireQuestionSeeder::class,
+            QuestionOptionSeeder::class,
+            QuestionAnswerSeeder::class,
         ]);
     }
 }
