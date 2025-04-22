@@ -28,7 +28,7 @@ return new class extends Migration
 
             $table->string('title');
             $table->text('description');
-            $table->date('due_at');
+            $table->date('due_at')->nullable();
             $table->enum('gender', ['laki-laki', 'perempuan']);
             $table->string('location', 100);
             $table->string('file', 2048)->nullable();
