@@ -27,7 +27,7 @@ return new class extends Migration
                 ->onDelete('restrict');
 
             $table->string('name', 50);
-            $table->string('phone', 20);
+            $table->string('phone', 20)->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
