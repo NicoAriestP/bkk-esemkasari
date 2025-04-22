@@ -26,11 +26,11 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
 
-            // $table->foreignId('kelas_id')
-            //     ->nullable()
-            //     ->constrained('kelas')
-            //     ->onUpdate('cascade')
-            //     ->onDelete('restrict');
+            $table->foreignId('student_class_id')
+                ->nullable()
+                ->constrained('student_classes')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
 
             $table->string('name', 50);
             $table->string('nisn', 50);
