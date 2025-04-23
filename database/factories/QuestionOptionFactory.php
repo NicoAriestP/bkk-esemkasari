@@ -17,7 +17,7 @@ class QuestionOptionFactory extends Factory
     public function definition(): array
     {
         return [
-            'question_id' => fake()->unique()->numberBetween(1, 10),
+            'question_id' => fake()->numberBetween(1, 10),
             'option_label' => fake()->word(),
         ];
     }

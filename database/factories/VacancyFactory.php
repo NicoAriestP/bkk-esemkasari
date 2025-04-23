@@ -23,7 +23,7 @@ class VacancyFactory extends Factory
             'gender' => fake()->randomElement(['laki-laki', 'perempuan']),
             'location' => fake()->address(),
             'file' => fake()->imageUrl(640, 480),
-            'created_by' => fake()->unique()->numberBetween(1, 10),
+            'created_by' => fake()->numberBetween(1, 10),
         ];
     }
 }
