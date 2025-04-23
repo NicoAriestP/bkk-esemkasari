@@ -16,6 +16,7 @@ class StudentClassSeeder extends Seeder
         $majors = ['TKR', 'RPL', 'DKV', 'TL', 'AK', 'TP'];
         $grades = ['X', 'XI', 'XII'];
         $currentYear = Carbon::now()->year;
+        $firstYear = 2020; // Tahun pertama di DatabaseSeeder
 
         $classes = [];
 
@@ -27,7 +28,8 @@ class StudentClassSeeder extends Seeder
                     'XII' => -2,
                 };
 
-                $yearId = $currentYear + $yearOffset;
+                $targetYear = $currentYear + $yearOffset;
+                $yearId = ($targetYear - $firstYear) + 1;
 
                 $classes[] = [
                     'year_id' => $yearId,
