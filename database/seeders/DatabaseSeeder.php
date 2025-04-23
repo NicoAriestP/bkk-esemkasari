@@ -50,6 +50,7 @@ class DatabaseSeeder extends Seeder
             QuestionnaireQuestionSeeder::class,
             QuestionOptionSeeder::class,
             QuestionAnswerSeeder::class,
+            AnnouncementSeeder::class,
         ]);
     }
 }
