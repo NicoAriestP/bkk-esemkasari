@@ -39,6 +39,7 @@ return new class extends Migration
                 ->onDelete('set null');
 
             $table->text('text_answer')->nullable();
+            $table->date('date_answer')->nullable();
             $table->tinyInteger('is_selected')->default(0);
 
             $table->timestamps();
