@@ -19,7 +19,13 @@ class QuestionnaireFactory extends Factory
         return [
             'title' => fake()->sentence(3),
             'description' => fake()->paragraph(3),
-            'type' => fake()->randomElement(['single', 'multiple']),
+            'type' => fake()->randomElement([
+                'questionnaire',
+                'detail_activity',
+                'feedback',
+                'student_activity',
+                'student_working'
+            ]),
             'due_at' => fake()->dateTimeBetween('+1 week', '+2 week'),
         ];
     }
