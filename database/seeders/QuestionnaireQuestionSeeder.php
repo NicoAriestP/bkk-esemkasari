@@ -12,6 +12,6 @@ class QuestionnaireQuestionSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\QuestionnaireQuestion::factory(30)->create();
+        \App\Models\QuestionnaireQuestion::factory(50)->create();
     }
 }
