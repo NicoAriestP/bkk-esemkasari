@@ -36,6 +36,7 @@ return new class extends Migration
             $table->string('nisn', 50);
             $table->string('phone', 20);
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('gender', ['laki-laki', 'perempuan']);
             $table->date('born_date');
@@ -46,6 +47,7 @@ return new class extends Migration
             $table->text('address');
             $table->tinyInteger('is_graduated')->default(0);
             $table->tinyInteger('is_married')->default(0);
+            $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
         });
