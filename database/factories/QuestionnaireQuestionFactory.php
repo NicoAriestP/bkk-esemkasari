@@ -19,7 +19,7 @@ class QuestionnaireQuestionFactory extends Factory
         return [
             'questionnaire_id' => fake()->numberBetween(1, 10),
             'question' => fake()->sentence(3),
-            'type' => fake()->randomElement(['options', 'fillable']),
+            'type' => fake()->randomElement(['options', 'fillable', 'date']),
             'notes' => fake()->paragraph(3),
             'is_multiple_answers' => fake()->boolean(),
         ];
