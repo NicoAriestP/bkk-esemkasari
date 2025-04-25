@@ -1,0 +1,12 @@
+- Always respond in Bahasa Indonesia
+- Project location is in `~/laragon/www/bkk-esemkasari`
+- This project is named BKK Esemkasari, a system information app for 'specialized job fair' organization in SMKN Purwosari Bojonegoro which have main feature of tracer study, announcement, questionnaire, and job vacancies (screening).
+- This project is using laravel 12 with vue 3, inertia, and prime vue for UI library
+- Connect to local mysql database using credentials user: root and password: and host: localhost:3306
+- BKK Esemkasari project database name is `bkk_esemkasari`
+- project goal is to create system information app for 'specialized job fair' organization with features:
+    - Tracer study
+    - Announcement
+    - Questionnaire
+    - Job vacancies (screening)
+- Always use  script setup for vue files
