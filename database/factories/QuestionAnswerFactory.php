@@ -18,10 +18,13 @@ class QuestionAnswerFactory extends Factory
     {
         $question = \App\Models\QuestionnaireQuestion::inRandomOrder()->first() ?? \Database\Factories\QuestionnaireQuestionFactory::new()->create();
         $isOption = $question->type === 'options';
+        $isDate = $question->type === 'date';
+
         return [
             'question_id' => $question->id,
             'question_option_id' => $isOption ? (\App\Models\QuestionOption::where('question_id', $question->id)->inRandomOrder()->first()?->id ?? null) : null,
             'text_answer' => $isOption ? null : fake()->paragraph(3),
+            'date_answer' => $isDate ? null : fake()->date(),
             'is_selected' => $isOption ? fake()->boolean() : 0,
         ];
     }
