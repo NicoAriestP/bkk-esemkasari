@@ -49,6 +49,7 @@ return new class extends Migration
             $table->tinyInteger('is_married')->default(0);
             $table->rememberToken();
             $table->timestamps();
+            $table->timestamp('updated_by_student_at')->nullable();
             $table->softDeletes();
         });
     }
