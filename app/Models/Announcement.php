@@ -4,14 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Model\Blameable;
 
 class Announcement extends Model
 {
-    use HasFactory;
+    use HasFactory, Blameable;
 
     protected $fillable = [
-        'created_by',
-        'updated_by',
         'title',
         'content',
         'file'
