@@ -17,7 +17,7 @@ class CreateAnnouncementFormRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'file' => 'nullable|file',
+            'file' => 'nullable|file|max:4096',
         ];
     }
 }
