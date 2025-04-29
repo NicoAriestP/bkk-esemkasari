@@ -2,6 +2,8 @@
 
 @import "tw-animate-css";
 
+@import 'primeicons/primeicons.css';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -185,3 +187,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Add this to your global or scoped styles */
+.p-datatable .p-datatable-tbody > tr:hover {
+    cursor: pointer;
+  }
