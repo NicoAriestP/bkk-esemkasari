@@ -12,3 +12,4 @@
 - Always use  script setup for vue files
 - Always try to make the frontend codes is separated to components so that easy to maintain
 - Automatically add or create new types that required for vue typescript codes
+- Consider the theming of the app is the same as laravel starter kit, or can use the components that already created from laravel starter kit
