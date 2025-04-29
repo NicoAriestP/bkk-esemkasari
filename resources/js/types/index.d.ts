@@ -36,4 +36,11 @@ export interface User {
     updated_at: string;
 }
 
+export interface UserForm {
+    name: string;
+    email: string;
+    phone?: string;
+    password?: string;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;
