@@ -12,7 +12,7 @@ import AppLogo from './AppLogo.vue';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: '/',
         icon: LayoutDashboard, // Ikon umum untuk dashboard
     },
     {
