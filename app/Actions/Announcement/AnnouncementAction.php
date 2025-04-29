@@ -17,9 +17,9 @@ class AnnouncementAction
 
         $model = new Announcement($validated);
 
-        // if (isset($request->validated()['image'])) {
-        //     $model->updateImage($request->validated()['image']);
-        // }
+        if (isset($request->validated()['file'])) {
+            $model->updateFile($request->validated()['file']);
+        }
 
         $model->save();
 
@@ -32,6 +32,10 @@ class AnnouncementAction
         unset($validated['file']);
 
         $model->update($validated);
+
+        if (isset($request->validated()['file'])) {
+            $model->updateFile($request->validated()['file']);
+        }
 
         return $model;
     }
