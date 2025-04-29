@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Requests\Announcement\CreateAnnouncementFormRequest;
 use App\Http\Requests\Announcement\EditAnnouncementFormRequest;
-use App\Http\Resources\Announcement\AnnouncementCollection;
 use App\Actions\Announcement\AnnouncementAction;
 
 class AnnouncementController extends Controller
@@ -15,24 +14,17 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search', '');
-        $sort = $request->input('sort', 'created_at');
-        $order = $request->input('order', 'desc');
-        $perPage = $request->input('per_page', 10);
 
         $announcements = Announcement::query()
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%$search%");
             })
             ->with('createdBy')
-            ->orderBy($sort, $order)
-            ->paginate($perPage)
-            ->withQueryString();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return Inertia::render('announcement/List', [
-            'models' => new AnnouncementCollection($announcements),
-            'filters' => [
-                'search' => $search,
-            ],
+            'models' => $announcements,
         ]);
     }
 
