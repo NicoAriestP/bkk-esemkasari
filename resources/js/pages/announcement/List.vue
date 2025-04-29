@@ -18,7 +18,7 @@ dayjs.locale('id');
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Pengumuman',
-        href: '/announcement',
+        href: '/announcements',
     },
 ];
 
