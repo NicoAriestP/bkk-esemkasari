@@ -37,20 +37,23 @@ trait HasFeaturedFile
 
     public function updateFile(UploadedFile $file)
     {
-        tap($this->file, function ($previousFile) use ($file) {
-            $folder = $this->getFileSaveFolder();
-            $this->fill([
-                'file' => $file->storePublicly(
-                    $folder,
-                    ['disk' => config('filesystems.default', 'public')]
-                ),
-            ])->save();
+        $folder = $this->getFileSaveFolder();
 
-            if ($previousFile) {
-                $previousFile = str_replace(Storage::url('/'), '', $previousFile);
-                Storage::disk(config('filesystems.default', 'public'))->delete($previousFile);
-            }
-        });
+        // Delete previous file if exists
+        if ($this->file) {
+            $previousFile = str_replace(Storage::url('/'), '', $this->file);
+            Storage::disk(config('filesystems.default', 'public'))->delete($previousFile);
+        }
+
+        // Store new file with original name
+        $fileName = $file->getClientOriginalName();
+        $path = $file->storeAs(
+            $folder,
+            $fileName,
+            ['disk' => config('filesystems.default', 'public')]
+        );
+
+        $this->fill(['file' => $path])->save();
     }
 
     public function deleteFile()
