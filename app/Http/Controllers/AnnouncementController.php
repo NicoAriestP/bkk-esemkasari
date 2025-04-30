@@ -60,7 +60,7 @@ class AnnouncementController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, Announcement $model)
+    public function edit(Announcement $model)
     {
         return Inertia::render('announcement/Form', [
             'model' => $model,
@@ -82,10 +82,7 @@ class AnnouncementController extends Controller
     ) {
         $action->update($model, $request);
 
-        return Inertia::render('announcement/Form', [
-            'model' => $model,
-            'isNewRecord' => false,
-        ]);
+        return redirect()->route('announcements.edit', $model->id);
     }
 
     /**
