@@ -16,4 +16,14 @@ class StudentClass extends Model
         'year_id',
         'name'
     ];
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
+    public function year()
+    {
+        return $this->belongsTo(Year::class);
+    }
 }
