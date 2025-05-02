@@ -32,7 +32,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Siswa',
-        href: '/students',
+        href: '/student-classes',
         icon: Users, // Ikon orang banyak cocok untuk siswa
     },
     {
