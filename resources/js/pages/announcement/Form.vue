@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, router, useForm, usePage } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 
 import { BreadcrumbItem } from '@/types';
@@ -39,7 +39,7 @@ const form = useForm({
     _method: props.isNewRecord ? 'POST' : 'PUT',
     title: props.model?.title,
     content: props.model?.content,
-    file: props.model?.file,
+    file: null as File | null,
 });
 
 const handleFileChange = (event: Event) => {
