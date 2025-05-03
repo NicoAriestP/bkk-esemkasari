@@ -36,7 +36,7 @@ const mainNavItems: NavItem[] = [
         icon: Users, // Ikon orang banyak cocok untuk siswa
     },
     {
-        title: 'Mitra',
+        title: 'Mitra DU/DI',
         href: '/partners',
         icon: Briefcase, // Representasi profesional/kerjasama
     },
