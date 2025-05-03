@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\PartnerController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
@@ -41,4 +42,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/students/{model}/edit', [StudentController::class, 'edit'])->name('students.edit');
     Route::put('/students/{model}', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/students/{model}', [StudentController::class, 'destroy'])->name('students.destroy');
+
+    // Partner
+    Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
+    Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
+    Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
+    Route::get('/partners/{model}/edit', [PartnerController::class, 'edit'])->name('partners.edit');
+    Route::put('/partners/{model}', [PartnerController::class, 'update'])->name('partners.update');
+    Route::delete('/partners/{model}', [PartnerController::class, 'destroy'])->name('partners.destroy');
 });
