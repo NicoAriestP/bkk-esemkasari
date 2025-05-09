@@ -184,9 +184,12 @@ const openStudentClassPage = (model: any) => {
                         <Button label="Tambah" @click="openCreateModal" variant="primary" icon="pi pi-plus" />
                     </div>
                 </template>
-                <template #empty> No data found. </template>
+                <template #empty>
+                    <span class="text-center">No data found.</span>
+                </template>
 
                 <Column field="year" sortable header="Tahun Angkatan" />
+                <Column field="student_classes_count" sortable header="Jumlah Kelas" />
                 <Column header="Aksi" body-style="text-align: right;" header-style="text-align: center !important;" style="width: 10%">
                     <template #body="slotProps">
                         <div class="flex justify-center">

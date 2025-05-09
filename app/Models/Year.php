@@ -14,4 +14,18 @@ class Year extends Model
         'updated_by',
         'year'
     ];
+
+    protected $appends = [
+        'student_classes_count'
+    ];
+
+    public function getStudentClassesCountAttribute()
+    {
+        return $this->studentClasses()->count();
+    }
+
+    public function studentClasses()
+    {
+        return $this->hasMany(StudentClass::class);
+    }
 }
