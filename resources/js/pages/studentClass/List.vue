@@ -163,7 +163,7 @@ const deleteStudentClass = (id: number) => {
 
 const openStudentsPage = (model: any) => {
     router.get(route('students.index', { year: model.year_id, studentClass: model.id }));
-}
+};
 </script>
 
 <template>
@@ -187,9 +187,12 @@ const openStudentsPage = (model: any) => {
                         <Button label="Tambah" @click="openCreateModal" variant="primary" icon="pi pi-plus" />
                     </div>
                 </template>
-                <template #empty> No data found. </template>
+                <template #empty>
+                    <span class="text-center">No data found.</span>
+                </template>
 
                 <Column field="name" sortable header="Nama Kelas" />
+                <Column field="students_count" sortable header="Jumlah Siswa" />
                 <Column header="Aksi" body-style="text-align: right;" header-style="text-align: center !important;" style="width: 10%">
                     <template #body="slotProps">
                         <div class="flex justify-center">

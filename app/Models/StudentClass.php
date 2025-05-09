@@ -17,6 +17,15 @@ class StudentClass extends Model
         'name'
     ];
 
+    protected $appends = [
+        'students_count'
+    ];
+
+    public function getStudentsCountAttribute()
+    {
+        return $this->students()->count();
+    }
+
     public function students()
     {
         return $this->hasMany(Student::class);
