@@ -56,7 +56,9 @@ watch(filters, (newValue) => {
                     <Button label="Tambah" @click="openCreatePage" variant="primary" icon="pi pi-plus" />
                 </div>
             </template>
-            <template #empty> No data found. </template>
+            <template #empty>
+                <span class="text-center">No data found.</span>
+            </template>
 
             <Column field="name" sortable header="Nama"></Column>
             <Column field="email" sortable header="Email"></Column>

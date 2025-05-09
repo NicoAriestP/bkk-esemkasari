@@ -61,7 +61,9 @@ watch(filters, (newValue) => {
                     <Button label="Tambah" @click="openCreatePage" variant="primary" icon="pi pi-plus" />
                 </div>
             </template>
-            <template #empty> No data found. </template>
+            <template #empty>
+                <span class="text-center">No data found.</span>
+            </template>
 
             <Column field="created_at" sortable header="Tanggal Dibuat">
                 <template #body="slotProps">
