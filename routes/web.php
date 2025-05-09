@@ -7,6 +7,7 @@ use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\YearController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
@@ -28,35 +29,33 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/announcements/{model}', [AnnouncementController::class, 'update'])->name('announcements.update');
     Route::delete('/announcements/{model}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 
+    // Year
+    Route::get('/years', [YearController::class, 'index'])->name('years.index');
+    Route::post('/years', [YearController::class, 'store'])->name('years.store');
+    Route::put('/years/{model}', [YearController::class, 'update'])->name('years.update');
+    Route::delete('/years/{model}', [YearController::class, 'destroy'])->name('years.destroy');
+
     // Student Class
-    Route::get('/student-classes', [StudentClassController::class, 'index'])->name('student-classes.index');
-    Route::get('/student-classes/create', [StudentClassController::class, 'create'])->name('student-classes.create');
-    Route::post('/student-classes', [StudentClassController::class, 'store'])->name('student-classes.store');
-    Route::get('/student-classes/{model}/edit', [StudentClassController::class, 'edit'])->name('student-classes.edit');
-    Route::put('/student-classes/{model}', [StudentClassController::class, 'update'])->name('student-classes.update');
-    Route::delete('/student-classes/{model}', [StudentClassController::class, 'destroy'])->name('student-classes.destroy');
+    Route::get('/years/{year}/student-classes', [StudentClassController::class, 'index'])->name('student-classes.index');
+    Route::post('/years/{year}/student-classes', [StudentClassController::class, 'store'])->name('student-classes.store');
+    Route::put('/years/{year}/student-classes/{model}', [StudentClassController::class, 'update'])->name('student-classes.update');
+    Route::delete('/years/{year}/student-classes/{model}', [StudentClassController::class, 'destroy'])->name('student-classes.destroy');
 
     // Student
-    Route::get('/student-classes/{model}/students', [StudentController::class, 'index'])->name('students.index');
-    Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
-    Route::post('/students', [StudentController::class, 'store'])->name('students.store');
-    Route::get('/students/{model}/edit', [StudentController::class, 'edit'])->name('students.edit');
-    Route::put('/students/{model}', [StudentController::class, 'update'])->name('students.update');
-    Route::delete('/students/{model}', [StudentController::class, 'destroy'])->name('students.destroy');
+    Route::get('/years/{year}/student-classes/{studentClass}/students', [StudentController::class, 'index'])->name('students.index');
+    Route::post('/years/{year}/student-classes/{studentClass}/students', [StudentController::class, 'store'])->name('students.store');
+    Route::put('/years/{year}/student-classes/{studentClass}/students/{model}', [StudentController::class, 'update'])->name('students.update');
+    Route::delete('/years/{year}/student-classes/{studentClass}/students/{model}', [StudentController::class, 'destroy'])->name('students.destroy');
 
     // Partner
     Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
-    Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
     Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
-    Route::get('/partners/{model}/edit', [PartnerController::class, 'edit'])->name('partners.edit');
     Route::put('/partners/{model}', [PartnerController::class, 'update'])->name('partners.update');
     Route::delete('/partners/{model}', [PartnerController::class, 'destroy'])->name('partners.destroy');
 
     // User
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::get('/users/{model}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{model}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{model}', [UserController::class, 'destroy'])->name('users.destroy');
 });
