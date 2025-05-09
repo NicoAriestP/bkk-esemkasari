@@ -134,13 +134,13 @@ const save = () => {
     <Head :title="model?.id ? 'Ubah Pengumuman' : 'Tambah Pengumuman'" />
     <Toast />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="mx-auto p-6">
+        <div class="mx-auto p-2 lg:p-6">
             <div class="mb-6 flex items-center justify-between">
                 <h1 class="text-foreground text-2xl font-bold">
                     {{ model?.id ? 'Ubah Pengumuman' : 'Tambah Pengumuman' }}
                 </h1>
                 <div v-if="!isNewRecord" class="flex gap-2">
-                    <Button label="Hapus" severity="danger" icon="pi pi-trash" @click="deleteAnnouncement" class="px-4 py-2" size="small" />
+                    <Button label="Hapus" severity="danger" icon="pi pi-trash" @click="deleteAnnouncement"/>
                 </div>
             </div>
             <form @submit.prevent="save">
@@ -210,11 +210,9 @@ const save = () => {
                         label="Reset"
                         severity="secondary"
                         icon="pi pi-refresh"
-                        class="px-6 py-2"
-                        size="small"
                         @click="form.reset()"
                     />
-                    <Button type="submit" label="Simpan" severity="primary" icon="pi pi-check" class="px-6 py-2" size="small" />
+                    <Button type="submit" label="Simpan" severity="primary" icon="pi pi-check" />
                 </div>
             </form>
         </div>
