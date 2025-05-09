@@ -9,10 +9,11 @@ use App\Http\Requests\Student\CreateStudentFormRequest;
 use App\Http\Requests\Student\EditStudentFormRequest;
 use App\Actions\Student\StudentAction;
 use App\Models\StudentClass;
+use App\Models\Year;
 
 class StudentController extends Controller
 {
-    public function index(StudentClass $studentClass, Request $request)
+    public function index(Year $year, StudentClass $studentClass, Request $request)
     {
         $search = $request->input('search', '');
 
@@ -28,45 +29,39 @@ class StudentController extends Controller
             ->get();
 
         return Inertia::render('student/List', [
+            'year' => $year,
             'studentClass' => $studentClass,
             'models' => $students,
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render('student/Form', [
-            'model' => new Student(),
-            'isNewRecord' => true,
-        ]);
-    }
-
-    public function store(CreateStudentFormRequest $request, StudentAction $action)
+    public function store(Year $year, StudentClass $studentClass, CreateStudentFormRequest $request, StudentAction $action)
     {
         $model = $action->save($request);
 
-        return redirect()->route('student.edit', $model->id);
-    }
-
-    public function edit(Student $model)
-    {
-        return Inertia::render('student/Form', [
-            'model' => $model,
-            'isNewRecord' => false,
+        return redirect()->route('students.index', [
+            'year' => $year->id,
+            'studentClass' => $studentClass->id,
         ]);
     }
 
-    public function update(EditStudentFormRequest $request, Student $model, StudentAction $action)
+    public function update(Year $year, StudentClass $studentClass, EditStudentFormRequest $request, Student $model, StudentAction $action)
     {
         $action->update($model, $request);
 
-        return redirect()->route('student.edit', $model->id);
+        return redirect()->route('students.index', [
+            'year' => $year->id,
+            'studentClass' => $studentClass->id,
+        ]);
     }
 
-    public function destroy(Student $model)
+    public function destroy(Year $year, StudentClass $studentClass, Student $model)
     {
         $model->delete();
 
-        return redirect()->route('student.index');
+        return redirect()->route('students.index', [
+            'year' => $year->id,
+            'studentClass' => $studentClass->id,
+        ]);
     }
 }
