@@ -31,34 +31,18 @@ class UserController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render('user/Form', [
-            'model' => new User(),
-            'isNewRecord' => true,
-        ]);
-    }
-
     public function store(CreateUserFormRequest $request, UserAction $action)
     {
         $model = $action->save($request);
 
-        return redirect()->route('users.index');
-    }
-
-    public function edit(User $model)
-    {
-        return Inertia::render('user/Form', [
-            'model' => $model,
-            'isNewRecord' => false,
-        ]);
+        return redirect()->route('users.edit', $model->id);
     }
 
     public function update(EditUserFormRequest $request, User $model, UserAction $action)
     {
         $action->update($model, $request);
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.edit', $model->id);
     }
 
     public function destroy(User $model)
