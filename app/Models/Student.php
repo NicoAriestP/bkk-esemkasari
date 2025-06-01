@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Student extends Authenticatable
 {
@@ -42,6 +43,11 @@ class Student extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'is_graduated_label',
+        'is_married_label',
+    ];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -52,7 +58,23 @@ class Student extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_graduated' => 'boolean',
+            'is_married' => 'boolean',
         ];
+    }
+
+    protected function isGraduatedLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->is_graduated == true ? 'Lulus' : 'Belum Lulus',
+        );
+    }
+
+    protected function isMarriedLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->is_married == true ? 'Menikah' : 'Belum Menikah',
+        );
     }
 
     public function studentClass()
