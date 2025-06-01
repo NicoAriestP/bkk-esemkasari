@@ -83,7 +83,11 @@ const saveStudentClass = () => {
     if (dialogMode.value === 'add') {
         form._method = 'POST';
 
-        form.post(route('student-classes.store'), {
+        const routeParams = {
+            year: props.year.id,
+        };
+
+        form.post(route('student-classes.store', routeParams), {
             errorBag: 'Kelas',
             preserveScroll: true,
             onSuccess: () => {
@@ -107,9 +111,12 @@ const saveStudentClass = () => {
     } else if (dialogMode.value === 'edit') {
         form._method = 'PUT';
 
-        const routeIdParam = form.id as number;
+        const routeParams = {
+            year: props.year.id,
+            model: form.id,
+        }
 
-        form.post(route('student-classes.update', routeIdParam), {
+        form.post(route('student-classes.update', routeParams), {
             errorBag: 'Kelas',
             preserveScroll: true,
             onSuccess: () => {
@@ -136,7 +143,10 @@ const saveStudentClass = () => {
 
 // Function to delete data
 const deleteStudentClass = (id: number) => {
-    form.delete(route('student-classes.destroy', id), {
+    form.delete(route('student-classes.destroy', {
+        year: props.year.id,
+        model: id,
+    }), {
         errorBag: 'Kelas',
         preserveScroll: true,
         onSuccess: () => {
