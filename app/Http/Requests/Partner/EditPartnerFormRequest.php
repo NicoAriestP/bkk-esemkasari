@@ -17,7 +17,7 @@ class EditPartnerFormRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:50',
-            'email' => 'required|email|max:255|unique:partners,email,' . $this->route('partner'),
+            'email' => 'required|email|max:255|unique:partners,email,' . $this->route('model')->id,
             'password' => 'nullable|string|min:8',
             'address' => 'nullable|string|max:255',
         ];
