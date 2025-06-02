@@ -24,6 +24,11 @@ class UserAction
     {
         $validated = $request->validated();
 
+        // Jika password kosong, hapus dari array validated
+        if (empty($validated['password'])) {
+            unset($validated['password']);
+        }
+
         $model->update($validated);
 
         return $model;
