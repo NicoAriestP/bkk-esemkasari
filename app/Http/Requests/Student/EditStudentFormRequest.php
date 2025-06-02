@@ -19,7 +19,7 @@ class EditStudentFormRequest extends FormRequest
             'name' => 'required|string|max:50',
             'nisn' => 'required|string|max:50',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:255|unique:students,email,' . $this->route('student'),
+            'email' => 'required|email|max:255|unique:students,email,' . $this->route('model')->id,
             'password' => 'nullable|string|min:8',
             'gender' => 'required|in:laki-laki,perempuan',
             'born_date' => 'required|date',

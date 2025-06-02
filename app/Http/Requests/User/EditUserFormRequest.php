@@ -15,11 +15,12 @@ class EditUserFormRequest extends FormRequest
     public function rules(): array
     {
         $id = $this->segment(2);
+
         return [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:50',
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => 'nullable|string|min:8',
         ];
     }
 }
