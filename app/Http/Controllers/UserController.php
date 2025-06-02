@@ -21,8 +21,8 @@ class UserController extends Controller
                     ->orWhere('email', 'like', "%$search%")
                     ->orWhere('phone', 'like', "%$search%");
             })
-            ->whereNot('id', auth()->user()->id)
-            ->whereNot('is_leader', true)
+            // ->whereNot('id', auth()->user()->id)
+            // // ->whereNot('is_leader', true)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -35,14 +35,14 @@ class UserController extends Controller
     {
         $model = $action->save($request);
 
-        return redirect()->route('users.edit', $model->id);
+        return redirect()->route('users.index');
     }
 
     public function update(EditUserFormRequest $request, User $model, UserAction $action)
     {
         $action->update($model, $request);
 
-        return redirect()->route('users.edit', $model->id);
+        return redirect()->route('users.index');
     }
 
     public function destroy(User $model)
