@@ -174,7 +174,7 @@ const updateStudent = () => {
     form.put(route('students.update', {
         year: props.year.id,
         studentClass: props.studentClass.id,
-        model: selectedStudent.value.id,
+        model: form.id,
     }), {
         errorBag: 'student',
         preserveScroll: true,
@@ -503,6 +503,7 @@ watch(filters, (newValue) => {
                                 class="mt-1"
                                 :class="{ 'p-invalid': form.errors.password }"
                                 :feedback="true"
+                                min-length="8"
                                 toggleMask
                             />
                             <small v-if="form.errors.password" class="p-error text-xs">{{ form.errors.password }}</small>
@@ -598,7 +599,7 @@ watch(filters, (newValue) => {
             <template #footer>
                 <Button label="Batal" icon="pi pi-times" class="p-button-text p-button-secondary" @click="dialogVisible = false" />
                 <Button
-                    :label="dialogMode === 'add' ? 'Simpan' : 'Perbarui'"
+                    :label="dialogMode === 'add' ? 'Simpan' : 'Update'"
                     icon="pi pi-check"
                     class="p-button-success"
                     @click="dialogMode === 'add' ? createStudent() : updateStudent()"
