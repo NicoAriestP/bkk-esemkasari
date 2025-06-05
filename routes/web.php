@@ -46,6 +46,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/years/{year}/student-classes/{studentClass}/students', [StudentController::class, 'store'])->name('students.store');
     Route::put('/years/{year}/student-classes/{studentClass}/students/{model}', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/years/{year}/student-classes/{studentClass}/students/{model}', [StudentController::class, 'destroy'])->name('students.destroy');
+    Route::post('/years/{year}/student-classes/{studentClass}/students/import', [StudentController::class, 'import'])->name('students.import');
+    Route::post('/years/{year}/student-classes/{studentClass}/students/export', [StudentController::class, 'export'])->name('students.export');
 
     // Partner
     Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');

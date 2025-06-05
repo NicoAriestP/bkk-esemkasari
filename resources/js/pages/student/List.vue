@@ -21,6 +21,7 @@ import Textarea from 'primevue/textarea';
 import Select from 'primevue/select';
 import DatePicker from 'primevue/datepicker';
 import Password from 'primevue/password';
+import SplitButton from 'primevue/splitbutton';
 
 // Set locale ke Indonesia
 dayjs.locale('id');
@@ -65,12 +66,35 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const splitButtonItems = [
+    {
+        label: 'Import',
+        icon: 'pi pi-upload',
+        command: () => {
+            importStudent();
+        },
+    },
+    {
+        label: 'Export',
+        icon: 'pi pi-download',
+        command: () => {
+            // exportStudent();
+        },
+    },
+];
+
 const filters = ref();
 const selectedStudent = ref<any>(null);
 const displayDrawer = ref(false);
 const displayDeleteDialog = ref(false);
 const dialogVisible = ref(false);
 const dialogMode = ref(''); // add | edit
+const displayImportDialog = ref(false);
+const importForm = useForm({
+    file: null as File | null,
+});
+const importLoading = ref(false);
+const fileInput = ref<HTMLInputElement | null>(null);
 
 const form = useForm({
     id: null,
@@ -107,6 +131,66 @@ const detailStudent = (student: any) => {
 
 const confirmDelete = () => {
     displayDeleteDialog.value = true;
+};
+
+const importStudent = () => {
+    displayImportDialog.value = true;
+};
+
+const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files[0]) {
+        importForm.file = target.files[0];
+    }
+};
+
+const submitImport = () => {
+    if (!importForm.file) {
+        toast.add({
+            severity: 'warn',
+            summary: 'Peringatan',
+            detail: 'Silakan pilih file Excel yang akan diimport',
+            life: 5000,
+        });
+        return;
+    }
+
+    importLoading.value = true;
+
+    const formData = new FormData();
+    formData.append('file', importForm.file);
+
+    router.post(route('students.import', {
+        year: props.year.id,
+        studentClass: props.studentClass.id,
+    }), formData, {
+        forceFormData: true,
+        preserveScroll: true,
+        onSuccess: () => {
+            toast.add({
+                severity: 'success',
+                summary: 'Sukses',
+                detail: 'Data siswa berhasil diimport',
+                life: 5000,
+            });
+            displayImportDialog.value = false;
+            importForm.reset();
+            if (fileInput.value) {
+                fileInput.value.value = '';
+            }
+        },
+        onError: (errors) => {
+            toast.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: errors.message || 'Terjadi kesalahan saat mengimport data',
+                life: 5000,
+            });
+        },
+        onFinish: () => {
+            importLoading.value = false;
+        },
+    });
 };
 
 const deleteStudent = () => {
@@ -285,7 +369,7 @@ watch(filters, (newValue) => {
             <template #header>
                 <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
                     <InputText class="w-full lg:w-72" v-model="filters" placeholder="Search ..." />
-                    <Button label="Tambah" @click="openCreateDialog" variant="primary" icon="pi pi-plus" />
+                    <SplitButton label="Tambah" @click="openCreateDialog" variant="primary" icon="pi pi-plus" :model="splitButtonItems" />
                 </div>
             </template>
             <template #empty>
@@ -303,8 +387,8 @@ watch(filters, (newValue) => {
             <Column style="width: 10%">
                 <template #body="slotProps">
                     <div class="flex justify-center">
-                        <Button style="color: #eab308 !important" icon="pi pi-pencil" variant="link" severity="warn" @click="openEditDialog(slotProps.data)" />
-                        <Button icon="pi pi-angle-right" variant="link" severity="secondary" @click="detailStudent(slotProps.data)" />
+                        <Button class="hover:!opacity-50" style="color: #eab308 !important" icon="pi pi-pencil" variant="link" severity="warn" @click="openEditDialog(slotProps.data)" />
+                        <Button class="hover:!opacity-50" icon="pi pi-angle-right" variant="link" severity="secondary" @click="detailStudent(slotProps.data)" />
                     </div>
                 </template>
             </Column>
@@ -603,6 +687,63 @@ watch(filters, (newValue) => {
                     icon="pi pi-check"
                     class="p-button-success"
                     @click="dialogMode === 'add' ? createStudent() : updateStudent()"
+                />
+            </template>
+        </Dialog>
+
+        <!-- Dialog Import -->
+        <Dialog v-model:visible="displayImportDialog" modal header="Import Data Siswa" :style="{ width: '450px' }">
+            <div class="flex flex-col gap-y-4 p-2 lg:p-4">
+                <div class="text-center">
+                    <i class="pi pi-file-excel text-5xl text-green-500 mb-4"></i>
+                    <p class="mb-4">Silakan unggah file Excel yang berisi data siswa</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        Pastikan format file Excel sesuai dengan template yang disediakan.
+                        <a href="/templates/template_import_siswa.xlsx" class="text-primary-500 hover:underline">
+                            Unduh Template
+                        </a>
+                    </p>
+                </div>
+
+                <div class="flex flex-col items-center justify-center w-full">
+                    <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="pi pi-upload text-2xl text-gray-500 dark:text-gray-400 mb-2"></i>
+                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                <span class="font-semibold">Klik untuk mengunggah</span> atau drag & drop
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                CSV, XLS, XLSX (MAX. 10MB)
+                            </p>
+                        </div>
+                        <input
+                            id="dropzone-file"
+                            ref="fileInput"
+                            type="file"
+                            class="hidden"
+                            accept=".csv, .xls, .xlsx"
+                            @change="handleFileChange"
+                        />
+                    </label>
+                    <p v-if="importForm.file" class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                        File: {{ importForm.file?.name }}
+                    </p>
+                </div>
+            </div>
+            <template #footer>
+                <Button
+                    label="Batal"
+                    icon="pi pi-times"
+                    class="p-button-text p-button-secondary"
+                    :disabled="importLoading"
+                    @click="displayImportDialog = false"
+                />
+                <Button
+                    label="Import"
+                    icon="pi pi-upload"
+                    class="p-button-primary"
+                    :loading="importLoading"
+                    @click="submitImport"
                 />
             </template>
         </Dialog>
