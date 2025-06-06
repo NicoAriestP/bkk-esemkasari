@@ -45,6 +45,7 @@ return new class extends Migration
             $table->string('province', 50);
             $table->string('city', 50);
             $table->text('address');
+            $table->string('cv_file', 255)->nullable();
             $table->tinyInteger('is_graduated')->default(0);
             $table->tinyInteger('is_married')->default(0);
             $table->rememberToken();
