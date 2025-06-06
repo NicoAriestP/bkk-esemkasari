@@ -15,13 +15,13 @@ use App\Http\Controllers\YearController;
 
 Route::get('/', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth:web,student,partner', 'verified'])->name('dashboard');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 
 // Announcement
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:web,student,partner'])->group(function () {
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
     Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
     Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');

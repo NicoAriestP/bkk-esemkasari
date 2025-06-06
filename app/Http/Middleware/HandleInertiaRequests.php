@@ -6,6 +6,7 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use Illuminate\Support\Facades\Auth;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -39,13 +40,29 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $auth = [
+            'user' => null, // Default user
+            'student' => null,
+            'partner' => null,
+            'activeGuard' => null,
+        ];
+
+        if (Auth::guard('web')->check()) {
+            $auth['user'] = Auth::guard('web')->user(); // Or just Auth::user()
+            $auth['activeGuard'] = 'web';
+        } elseif (Auth::guard('student')->check()) {
+            $auth['student'] = Auth::guard('student')->user();
+            $auth['activeGuard'] = 'student';
+        } elseif (Auth::guard('partner')->check()) {
+            $auth['partner'] = Auth::guard('partner')->user();
+            $auth['activeGuard'] = 'partner';
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
-            'auth' => [
-                'user' => $request->user(),
-            ],
+            'auth' => $auth,
             'tinymce' => [
                 'api_key' => config('tinymce.api_key'),
             ],

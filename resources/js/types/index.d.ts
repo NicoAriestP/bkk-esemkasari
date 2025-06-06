@@ -4,6 +4,9 @@ import type { Config } from 'ziggy-js';
 
 export interface Auth {
     user: User;
+    student: User;
+    partner: User;
+    activeGuard: string;
 }
 
 export interface BreadcrumbItem {
@@ -22,6 +25,7 @@ export interface SharedData extends PageProps {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    tinymce: { api_key: string };
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
 }
