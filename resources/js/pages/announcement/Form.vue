@@ -199,7 +199,7 @@ const save = () => {
                             </span>
                         </div>
 
-                        <small class="text-gray-500"> Max 4MB (PDF, DOC, XLS, PPT, TXT, CSV, JPG, PNG, GIF) </small>
+                        <small class="text-gray-500"> Max 4MB (PDF, JPG, JPEG, PNG) </small>
 
                         <InputError :message="form.errors.file" />
                     </div>
