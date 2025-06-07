@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Vacancy;
+use App\Traits\Model\Blameable;
 
 class Partner extends Authenticatable
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes, Notifiable, Blameable;
 
     protected $fillable = [
         'created_by',
@@ -42,5 +44,10 @@ class Partner extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function vacancies()
+    {
+        return $this->hasMany(Vacancy::class);
     }
 }
