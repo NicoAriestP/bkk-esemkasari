@@ -18,20 +18,19 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('partners')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onDelete('cascade');
 
             $table->foreignId('updated_by')
                 ->nullable()
                 ->constrained('partners')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onDelete('cascade');
 
             $table->string('title');
             $table->text('description');
             $table->date('due_at')->nullable();
-            $table->enum('gender', ['laki-laki', 'perempuan']);
             $table->string('location', 100);
-            $table->string('file', 2048)->nullable();
+            $table->string('file', 4096)->nullable();
 
             $table->timestamps();
         });

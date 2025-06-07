@@ -31,6 +31,11 @@ const mainNavItems: NavItem[] = [
         icon: FileText, // Representasi formulir atau dokumen
     },
     {
+        title: 'Lowongan Kerja',
+        href: '/vacancies',
+        icon: Briefcase, // Representasi profesional/kerjasama
+    },
+    {
         title: 'Siswa',
         href: '/years',
         icon: Users, // Ikon orang banyak cocok untuk siswa

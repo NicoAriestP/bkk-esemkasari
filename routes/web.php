@@ -8,6 +8,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\YearController;
+use App\Http\Controllers\VacancyController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
@@ -54,6 +55,14 @@ Route::middleware(['auth:web,student,partner'])->group(function () {
     Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
     Route::put('/partners/{model}', [PartnerController::class, 'update'])->name('partners.update');
     Route::delete('/partners/{model}', [PartnerController::class, 'destroy'])->name('partners.destroy');
+
+    //Vacancy
+    Route::get('/vacancies', [VacancyController::class, 'index'])->name('vacancies.index');
+    Route::get('/vacancies/create', [VacancyController::class, 'create'])->name('vacancies.create');
+    Route::post('/vacancies', [VacancyController::class, 'store'])->name('vacancies.store');
+    Route::get('/vacancies/{model}/edit', [VacancyController::class, 'edit'])->name('vacancies.edit');
+    Route::put('/vacancies/{model}', [VacancyController::class, 'update'])->name('vacancies.update');
+    Route::delete('/vacancies/{model}', [VacancyController::class, 'destroy'])->name('vacancies.destroy');
 
     // User
     Route::get('/users', [UserController::class, 'index'])->name('users.index');

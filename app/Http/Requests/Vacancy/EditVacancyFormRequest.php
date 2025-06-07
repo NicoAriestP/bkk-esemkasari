@@ -18,9 +18,8 @@ class EditVacancyFormRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'due_at' => 'required|date',
-            'gender' => 'nullable|string|max:10',
             'location' => 'nullable|string|max:255',
-            'file' => 'nullable|file',
+            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
         ];
     }
 }

@@ -20,7 +20,6 @@ class VacancyFactory extends Factory
             'title' => fake()->jobTitle(),
             'description' => fake()->paragraph(3),
             'due_at' => fake()->dateTimeBetween('+1 week', '+2 week'),
-            'gender' => fake()->randomElement(['laki-laki', 'perempuan']),
             'location' => fake()->address(),
             'file' => fake()->imageUrl(640, 480),
             'created_by' => fake()->numberBetween(1, 10),

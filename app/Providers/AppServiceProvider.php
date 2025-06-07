@@ -27,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Student::observe(\App\Observers\StudentObserver::class);
         \App\Models\StudentClass::observe(\App\Observers\StudentClassObserver::class);
         \App\Models\Year::observe(\App\Observers\YearObserver::class);
+        \App\Models\Partner::observe(\App\Observers\PartnerObserver::class);
+        \App\Models\Vacancy::observe(\App\Observers\VacancyObserver::class);
 
         Inertia::share([
             'auth' => fn () => [
