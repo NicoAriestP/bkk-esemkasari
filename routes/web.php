@@ -8,7 +8,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\YearController;
-use App\Http\Controllers\VacancyController;
+use App\Http\Controllers\VacancyPartnerController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
@@ -21,14 +21,21 @@ Route::get('/', function () {
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 
-// Announcement
+
 Route::middleware(['auth:web,student,partner'])->group(function () {
+    // Announcement
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
     Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
     Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
     Route::get('/announcements/{model}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
     Route::put('/announcements/{model}', [AnnouncementController::class, 'update'])->name('announcements.update');
     Route::delete('/announcements/{model}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+    // Announcement (Student)
+    Route::get('/announcements/student', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('announcements.student.index');
+    Route::get('/announcements/{model}', [AnnouncementController::class, 'detailAnnouncementStudent'])->name('announcements.student.detail');
+
+
 
     // Year
     Route::get('/years', [YearController::class, 'index'])->name('years.index');
@@ -56,13 +63,13 @@ Route::middleware(['auth:web,student,partner'])->group(function () {
     Route::put('/partners/{model}', [PartnerController::class, 'update'])->name('partners.update');
     Route::delete('/partners/{model}', [PartnerController::class, 'destroy'])->name('partners.destroy');
 
-    //Vacancy
-    Route::get('/vacancies', [VacancyController::class, 'index'])->name('vacancies.index');
-    Route::get('/vacancies/create', [VacancyController::class, 'create'])->name('vacancies.create');
-    Route::post('/vacancies', [VacancyController::class, 'store'])->name('vacancies.store');
-    Route::get('/vacancies/{model}/edit', [VacancyController::class, 'edit'])->name('vacancies.edit');
-    Route::put('/vacancies/{model}', [VacancyController::class, 'update'])->name('vacancies.update');
-    Route::delete('/vacancies/{model}', [VacancyController::class, 'destroy'])->name('vacancies.destroy');
+    //Vacancy (Partner)
+    Route::get('/partners/vacancies', [VacancyPartnerController::class, 'index'])->name('partners.vacancies.index');
+    Route::get('/partners/vacancies/create', [VacancyPartnerController::class, 'create'])->name('partners.vacancies.create');
+    Route::post('/partners/vacancies', [VacancyPartnerController::class, 'store'])->name('partners.vacancies.store');
+    Route::get('/partners/vacancies/{model}/edit', [VacancyPartnerController::class, 'edit'])->name('partners.vacancies.edit');
+    Route::put('/partners/vacancies/{model}', [VacancyPartnerController::class, 'update'])->name('partners.vacancies.update');
+    Route::delete('/partners/vacancies/{model}', [VacancyPartnerController::class, 'destroy'])->name('partners.vacancies.destroy');
 
     // User
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
