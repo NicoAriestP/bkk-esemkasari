@@ -4,53 +4,94 @@ import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { type SharedData } from '@/types';
 // import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
 import { Briefcase, FileText, GraduationCap, LayoutDashboard, Megaphone, ShieldCheck, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
+const page = usePage<SharedData>();
+// const user = page.props.auth.user ?? page.props.auth.student ?? page.props.auth.partner as User;
+const isStaff = !!page.props.auth.user;
+const isPartner = !!page.props.auth.partner;
+const isStudent = !!page.props.auth.student;
+
+// Menu yang tersedia untuk semua pengguna
+const commonNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/',
-        icon: LayoutDashboard, // Ikon umum untuk dashboard
+        icon: LayoutDashboard,
     },
+];
+
+// Menu khusus untuk staff
+const staffNavItems: NavItem[] = [
     {
         title: 'Pengumuman',
         href: '/announcements',
-        icon: Megaphone, // Cocok untuk pengumuman
-    },
-    {
-        title: 'Tracer Study',
-        href: '/tracer-study',
-        icon: GraduationCap, // Simbol pendidikan/kelulusan
+        icon: Megaphone,
     },
     {
         title: 'Kuisioner',
         href: '/questionnaires',
-        icon: FileText, // Representasi formulir atau dokumen
-    },
-    {
-        title: 'Lowongan Kerja',
-        href: '/vacancies',
-        icon: Briefcase, // Representasi profesional/kerjasama
+        icon: FileText,
     },
     {
         title: 'Siswa',
         href: '/years',
-        icon: Users, // Ikon orang banyak cocok untuk siswa
+        icon: Users,
     },
     {
         title: 'Mitra DU/DI',
         href: '/partners',
-        icon: Briefcase, // Representasi profesional/kerjasama
+        icon: Briefcase,
     },
     {
         title: 'Karyawan',
         href: '/users',
-        icon: ShieldCheck, // Bisa sebagai representasi staf / akses
+        icon: ShieldCheck,
     },
 ];
+
+const partnerNavItems: NavItem[] = [
+    {
+        title: 'Lowongan Kerja',
+        description: 'Halaman CRUD Lowongan Kerja untuk Mitra DU/DI',
+        href: '/partners/vacancies',
+        icon: Briefcase,
+    },
+];
+
+const studentNavItems: NavItem[] = [
+    {
+        title: 'Pengumuman',
+        description: 'Halaman Pengumuman untuk Siswa',
+        href: '/announcements/student',
+        icon: Megaphone,
+    },
+    {
+        title: 'Tracer Study',
+        description: 'Halaman Tracer Study untuk Siswa',
+        href: '/tracer-study',
+        icon: GraduationCap,
+    },
+    {
+        title: 'Lowongan Kerja',
+        description: 'Halaman Lowongan Kerja untuk Siswa',
+        href: '/partners/vacancies',
+        icon: Briefcase,
+    },
+];
+
+// Gabungkan menu berdasarkan role user
+const mainNavItems = isStaff
+    ? [...commonNavItems, ...staffNavItems]
+    : isPartner
+    ? [...commonNavItems, ...partnerNavItems]
+    : isStudent
+    ? [...commonNavItems, ...studentNavItems]
+    : commonNavItems;
 
 // const footerNavItems: NavItem[] = [
 //     {
