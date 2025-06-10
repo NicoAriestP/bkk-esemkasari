@@ -28,6 +28,47 @@ class AnnouncementController extends Controller
         ]);
     }
 
+    public function indexAnnouncementStudent(Request $request)
+    {
+        $searchQuery = $request->input('search', '');
+        $itemsPerPage = 20; // Tentukan jumlah item per halaman/permintaan
+
+        // Buat query dasar yang bisa dipakai ulang
+        $query = Announcement::query()
+            ->when($searchQuery, function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->orderBy('created_at', 'desc');
+
+        // Cek jika ini adalah permintaan untuk lazy load dari frontend
+        if ($request->has('lazy_load')) {
+            $offset = $request->input('first', 0);
+            $items = (clone $query)->skip($offset)->take($itemsPerPage)->get();
+
+            // Kembalikan data dalam format JSON
+            return response()->json(['models' => $items]);
+        }
+
+        // Untuk permintaan awal (saat halaman di-load pertama kali)
+        return Inertia::render('announcement/student/List', [
+            // FIX: Tambahkan prop 'totalRecords' yang wajib ada
+            'totalRecords' => (clone $query)->count(),
+
+            // Kirim potongan data pertama saja
+            'models' => (clone $query)->take($itemsPerPage)->get(),
+
+            // Kirim filter agar nilai pencarian tidak hilang saat reload
+            'filters' => $request->only(['search']),
+        ]);
+    }
+
+    public function detailAnnouncementStudent(Request $request, Announcement $model)
+    {
+        return Inertia::render('announcement/student/Detail', [
+            'model' => $model,
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
