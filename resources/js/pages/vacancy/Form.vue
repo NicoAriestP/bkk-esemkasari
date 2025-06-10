@@ -12,6 +12,9 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Toast from 'primevue/toast';
 import DatePicker from 'primevue/datepicker';
+import { watch } from 'vue';
+import dayjs from 'dayjs';
+import { ref } from 'vue';
 
 const TINYMCE_API_KEY = (usePage().props as any).tinymce.api_key;
 
@@ -55,6 +58,23 @@ const getFileName = (path: string | File | null): string => {
     if (path instanceof File) return path.name;
     return path.split('/').pop() || path.split('\\').pop() || '';
 };
+
+// Create a reactive reference specifically for the DatePicker's modelValue.
+// It should be initialized with a Date object if born_date exists, otherwise null.
+const datePickerValue = ref<Date | null>(
+    form.due_at ? dayjs(form.due_at).toDate() : null
+);
+
+
+// Watch for changes from the DatePicker (datePickerValue)
+watch(datePickerValue, (newValue) => {
+    if (newValue instanceof Date) { // Ensure it's a Date object before formatting
+        form.due_at = dayjs(newValue).format('YYYY-MM-DD');
+    } else {
+        // If the DatePicker value becomes null (e.g., user clears the date)
+        form.due_at = '';
+    }
+}, { immediate: true }); // Use immediate to run the watch on initial load if born_date is present
 
 const deleteVacancy = () => {
     if (confirm('Apakah Anda yakin ingin menghapus lowongan kerja ini?')) {
@@ -156,7 +176,7 @@ const save = () => {
                     </div>
                     <div class="col-span-1 flex flex-col gap-2">
                         <label for="due_at" class="text-foreground block text-sm font-medium">Tenggat Waktu</label>
-                        <DatePicker id="due_at" v-model="form.due_at" required class="lg:w-full" placeholder="Tenggat Waktu" />
+                        <DatePicker id="due_at" v-model="datePickerValue" required class="lg:w-full" placeholder="Tenggat Waktu" />
                         <InputError :message="form.errors.due_at" />
                     </div>
                     <div class="col-span-3 flex flex-col gap-2">
