@@ -31,7 +31,7 @@ const props = defineProps({
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Lowongan Kerja',
-        href: '/vacancies',
+        href: 'partners/vacancies',
     },
     {
         title: props.isNewRecord ? 'Tambah Lowongan Kerja' : 'Ubah Lowongan Kerja',
@@ -78,7 +78,7 @@ watch(datePickerValue, (newValue) => {
 
 const deleteVacancy = () => {
     if (confirm('Apakah Anda yakin ingin menghapus lowongan kerja ini?')) {
-        form.delete(route('vacancies.destroy', props.model?.id), {
+        form.delete(route('partners.vacancies.destroy', props.model?.id), {
             errorBag: 'Lowongan Kerja',
             preserveScroll: true,
             onSuccess: () => {
@@ -103,7 +103,7 @@ const deleteVacancy = () => {
 
 const save = () => {
     if (props.isNewRecord) {
-        form.post(route('vacancies.store'), {
+        form.post(route('partners.vacancies.store'), {
             errorBag: 'Lowongan Kerja',
             preserveScroll: true,
             onSuccess: () => {
@@ -125,7 +125,7 @@ const save = () => {
         });
     } else {
         form._method = 'PUT';
-        form.post(route('vacancies.update', props.model?.id), {
+        form.post(route('partners.vacancies.update', props.model?.id), {
             errorBag: 'Lowongan Kerja',
             preserveScroll: true,
             onSuccess: () => {

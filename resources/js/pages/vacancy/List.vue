@@ -18,7 +18,7 @@ dayjs.locale('id');
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Lowongan Kerja',
-        href: '/vacancies',
+        href: '/partners/vacancies',
     },
 ];
 
@@ -32,15 +32,15 @@ const props = defineProps({
 const filters = ref();
 
 const openCreatePage = () => {
-    router.get(route('vacancies.create'));
+    router.get(route('partners.vacancies.create'));
 }
 
 const openEditPage = (id: number) => {
-    router.get(route('vacancies.edit', id));
+    router.get(route('partners.vacancies.edit', id));
 }
 
 watch(filters, (newValue) => {
-    router.get(route("vacancies.index"), { search: newValue }, {
+    router.get(route("partners.vacancies.index"), { search: newValue }, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
