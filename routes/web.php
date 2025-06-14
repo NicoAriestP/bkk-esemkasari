@@ -9,6 +9,7 @@ use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\YearController;
 use App\Http\Controllers\VacancyPartnerController;
+use App\Http\Controllers\TracerStudyController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
@@ -56,6 +57,10 @@ Route::middleware(['auth:web,student,partner'])->group(function () {
     Route::delete('/years/{year}/student-classes/{studentClass}/students/{model}', [StudentController::class, 'destroy'])->name('students.destroy');
     Route::post('/years/{year}/student-classes/{studentClass}/students/import', [StudentController::class, 'import'])->name('students.import');
     Route::post('/years/{year}/student-classes/{studentClass}/students/export', [StudentController::class, 'export'])->name('students.export');
+
+    // Tracer Study
+    Route::get('/tracer-study', [TracerStudyController::class, 'tracerStudy'])->name('tracer-study');
+    Route::post('/tracer-study', [TracerStudyController::class, 'saveTracerStudy'])->name('tracer-study.store');
 
     // Partner
     Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
