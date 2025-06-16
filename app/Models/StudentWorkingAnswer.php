@@ -15,4 +15,9 @@ class StudentWorkingAnswer extends Model
         'student_id',
         'answers',
     ];
+
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
 }

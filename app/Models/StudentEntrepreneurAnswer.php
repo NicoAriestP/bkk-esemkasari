@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DetailActivityAnswer extends Model
+class StudentEntrepreneurAnswer extends Model
 {
-    /** @use HasFactory<\Database\Factories\DetailActivityAnswerFactory> */
+    /** @use HasFactory<\Database\Factories\StudentEntrepreneurAnswerFactory> */
+    use HasFactory;
 
-    protected $table = 'detail_activity_answers';
+    protected $table = 'student_entrepreneur_answers';
 
     protected $fillable = [
         'student_id',
