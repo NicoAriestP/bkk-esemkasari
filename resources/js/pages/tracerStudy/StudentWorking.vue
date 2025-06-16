@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import Fieldset from 'primevue/fieldset';
 import RadioButton from 'primevue/radiobutton';
 import InputText from 'primevue/inputtext';
@@ -9,16 +9,23 @@ import Checkbox from 'primevue/checkbox';
 const props = defineProps<{
     modelValue: Record<string, any>
 }>();
-
 const emit = defineEmits(['update:modelValue']);
 
-// Data dikelola melalui computed property yang terhubung ke props
+// Data dikelola melalui computed property
 const formData = computed({
     get: () => props.modelValue,
     set: (value) => {
         emit('update:modelValue', value);
     }
 });
+
+// Watcher untuk mereset input teks "Lainnya"
+watch(() => formData.value.howFoundFirstJob, (newValue) => {
+    if (newValue && !newValue.includes('hfj-other')) {
+        formData.value.otherJobSourceText = '';
+    }
+}, { deep: true });
+
 
 // --- Opsi untuk Form ---
 const salaryOptions = [
@@ -72,7 +79,7 @@ const jobRelevanceOptions = [
                 </div>
             </div>
 
-             <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-3">
                 <p>Berapa kali Anda ganti pekerjaan sejak lulus dari SMK?</p>
                 <div class="flex flex-col gap-3 mt-1">
                     <div v-for="option in jobChangeOptions" :key="option.key" class="flex items-center">
@@ -97,7 +104,7 @@ const jobRelevanceOptions = [
                         <InputText
                             v-model="formData.otherJobSourceText"
                             class="flex-grow w-full sm:w-auto"
-                            :disabled="!formData.howFoundFirstJob.includes('hfj-other')"
+                            :disabled="!formData.howFoundFirstJob?.includes('hfj-other')"
                             placeholder="Tuliskan cara lainnya di sini..."
                         />
                     </div>

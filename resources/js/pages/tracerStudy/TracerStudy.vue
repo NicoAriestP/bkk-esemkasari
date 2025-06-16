@@ -1,55 +1,104 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import { useToast } from 'primevue/usetoast';
 
-// Import komponen untuk Step 2
+// Import komponen untuk setiap step
 import ActivityDetails from '@/pages/tracerStudy/ActivityDetails.vue';
 import StudentFeedback from '@/pages/tracerStudy/StudentFeedback.vue';
 
-// Import komponen PrimeVue
+// Import komponen PrimeVue dan Toast
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import Fieldset from 'primevue/fieldset';
 import InputText from 'primevue/inputtext';
 import RadioButton from 'primevue/radiobutton';
 import Steps from 'primevue/steps';
+import Textarea from 'primevue/textarea';
+import Toast from 'primevue/toast';
 
-// --- State untuk Form ---
+// Inisialisasi Toast
+const toast = useToast();
 
-// Navigasi & Stepper
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Tracer Study', href: '/tracer-study' }];
+// --- Props dari Controller ---
+const props = defineProps({
+    student: { type: Object, required: true },
+    studentActivityAnswer: { type: Object, default: () => ({}) },
+    detailActivityAnswer: { type: Object, default: () => ({}) },
+    studentUniversityAnswer: { type: Object, default: () => ({}) },
+    studentWorkingAnswer: { type: Object, default: () => ({}) },
+    studentEntrepreneurAnswer: { type: Object, default: () => ({}) },
+    feedbackAnswer: { type: Object, default: () => ({}) },
+});
+
+
+// --- PERBAIKAN: Helper function untuk mem-parsing JSON dengan aman ---
+const parseAnswers = (prop: any) => {
+    // Cek jika prop ada, memiliki properti 'answers', dan 'answers' adalah string
+    if (prop && prop.answers && typeof prop.answers === 'string') {
+        try {
+            // Jika ya, parse string JSON menjadi objek
+            return JSON.parse(prop.answers);
+        } catch (e) {
+            console.error("Gagal mem-parsing JSON dari prop:", prop.answers, e);
+            return {}; // Kembalikan objek kosong jika parsing gagal
+        }
+    }
+    // Jika sudah berupa objek atau tidak ada, kembalikan apa adanya
+    return prop?.answers || {};
+};
+
+
+// --- State & Navigasi ---
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Tracer Study', href: '#'}];
 const activeStep = ref(0);
 const stepItems = ref([{ label: 'Data Lulusan' }, { label: 'Detail Aktivitas' }, { label: 'Umpan Balik' }]);
-
-// --- State untuk Step 1 ---
-
-// Data Pribadi
-const marriageStatus = ref(0);
-const province = ref('');
-const city = ref('');
-const email = ref('');
-const phone = ref('');
-const cvFile = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
-// Aktivitas Lulusan (tetap di sini, di Step 1)
-const isStudying = ref<string | null>(null);
-const isWorking = ref<string | null>(null);
-const workType = ref('');
+// --- Form State dengan useForm ---
+const form = useForm({
+    is_married: props.student?.is_married ?? false,
+    province: props.student?.province ?? '',
+    city: props.student?.city ?? '',
+    email: props.student?.email ?? '',
+    phone: props.student?.phone ?? '',
+    address: props.student?.address ?? '',
+    height: props.student?.height ?? '',
+    weight: props.student?.weight ?? '',
+    cv_file: props.student?.cv_file ?? null,
+    student_activity_answers: '',
+    detail_activity_answers: '',
+    student_working_answers: '',
+    student_university_answers: '',
+    student_entrepreneur_answers: '',
+    student_feedback_answers: '',
+});
 
-// --- State untuk Step 2 ---
-const mainActivity = ref<string | null>(null);
-const studentFeedback = ref<string | null>(null);
+// Gunakan helper function untuk menginisialisasi state reaktif
+const studentActivityData = ref({
+    isStudying: null,
+    isWorking: null,
+    workType: '',
+    ...parseAnswers(props.studentActivityAnswer)
+});
+
+const activityDetailsData = ref({
+    mainActivity: parseAnswers(props.detailActivityAnswer)?.mainActivity || null,
+    workingData: parseAnswers(props.studentWorkingAnswer) || {},
+    universityData: parseAnswers(props.studentUniversityAnswer) || {},
+    entrepreneurData: parseAnswers(props.studentEntrepreneurAnswer) || {},
+});
+
+const feedbackData = ref(parseAnswers(props.feedbackAnswer) || {});
 
 
-// --- Fungsi & Logika ---
-
+// --- Logika & Fungsi ---
 const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
-        cvFile.value = target.files[0];
+        form.cv_file = target.files[0];
     }
 };
 
@@ -59,18 +108,26 @@ const getFileName = (file: File | string | null | undefined): string => {
     return file.name;
 };
 
-// Logika Kondisional untuk Step 1
-watch(isStudying, () => {
-    isWorking.value = null;
-    workType.value = '';
+watch(() => studentActivityData.value.isStudying, () => {
+    studentActivityData.value.isWorking = null;
+    studentActivityData.value.workType = '';
 });
-watch(isWorking, (newValue) => {
+watch(() => studentActivityData.value.isWorking, (newValue) => {
     if (newValue !== 'Ya') {
-        workType.value = '';
+        studentActivityData.value.workType = '';
     }
 });
 
-// Fungsi Navigasi Stepper
+watch(() => activityDetailsData.value.mainActivity, (newValue) => {
+    const labelMap: Record<string, string> = {
+        bekerja: 'Lulusan Bekerja',
+        kuliah: 'Lulusan Kuliah',
+        wirausaha: 'Lulusan Wirausaha',
+    };
+    stepItems.value[1].label = labelMap[newValue as string] || 'Detail Aktivitas';
+}, { immediate: true });
+
+
 const nextStep = () => {
     if (activeStep.value < stepItems.value.length - 1) {
         activeStep.value++;
@@ -82,10 +139,39 @@ const prevStep = () => {
     }
 };
 
-// Opsi Form
+const saveTracerStudy = () => {
+    form.student_activity_answers = JSON.stringify(studentActivityData.value);
+    form.detail_activity_answers = JSON.stringify({ mainActivity: activityDetailsData.value.mainActivity });
+    form.student_working_answers = JSON.stringify(activityDetailsData.value.workingData);
+    form.student_university_answers = JSON.stringify(activityDetailsData.value.universityData);
+    form.student_entrepreneur_answers = JSON.stringify(activityDetailsData.value.entrepreneurData);
+    form.student_feedback_answers = JSON.stringify(feedbackData.value);
+
+    form.post(route('tracer-study.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            toast.add({
+                severity: 'success',
+                summary: 'Sukses',
+                detail: 'Data Tracer Study berhasil disimpan!',
+                life: 5000,
+            });
+        },
+        onError: (errors) => {
+            console.error("Error saving tracer study:", errors);
+            toast.add({
+                severity: 'error',
+                summary: 'Gagal Menyimpan',
+                detail: 'Terjadi kesalahan. Periksa kembali isian Anda.',
+                life: 5000,
+            });
+        },
+    });
+};
+
 const marriageStatusOptions = ref([
-    { label: 'Belum Menikah', value: 0 },
-    { label: 'Menikah', value: 1 }
+    { label: 'Belum Menikah', value: false },
+    { label: 'Menikah', value: true }
 ]);
 const workTypeOptions = ref([
     'Berwirausaha sendiri tanpa dibantu orang lain',
@@ -99,15 +185,14 @@ const workTypeOptions = ref([
 
 <template>
     <Head title="Tracer Study" />
-
+    <Toast/>
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-4 sm:p-6 lg:p-8">
-            <!-- Stepper Navigasi -->
             <div class="card mb-8">
                 <Steps :model="stepItems" :active-step="activeStep" :readonly="true" />
             </div>
 
-            <!-- Konten Step 1: Data Pribadi & Aktivitas Lulusan -->
+            <!-- Konten Step 1 -->
             <div v-if="activeStep === 0">
                 <Fieldset legend="Update Data Pribadi" :toggleable="true" class="!mb-8">
                     <div class="space-y-6 p-6">
@@ -115,23 +200,15 @@ const workTypeOptions = ref([
                         <div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-3">
                             <div class="flex flex-col gap-2">
                                 <label for="marriage-status">Status Pernikahan</label>
-                                <Select
-                                    id="marriage-status"
-                                    v-model="marriageStatus"
-                                    :options="marriageStatusOptions"
-                                    optionLabel="label"
-                                    optionValue="value"
-                                    placeholder="Pilih status"
-                                    class="w-full"
-                                />
+                                <Select id="marriage-status" v-model="form.is_married" :options="marriageStatusOptions" optionLabel="label" optionValue="value" placeholder="Pilih status" class="w-full" />
                             </div>
                             <div class="flex flex-col gap-2">
                                 <label for="province">Tempat tinggal sekarang - Provinsi</label>
-                                <InputText id="province" v-model="province" type="text" placeholder="Masukkan provinsi" />
+                                <InputText id="province" v-model="form.province" type="text" placeholder="Masukkan provinsi" />
                             </div>
                             <div class="flex flex-col gap-2">
                                 <label for="city">Tempat tinggal sekarang - Kabupaten/Kota</label>
-                                <InputText id="city" v-model="city" type="text" placeholder="Masukkan kab/kota" />
+                                <InputText id="city" v-model="form.city" type="text" placeholder="Masukkan kab/kota" />
                             </div>
                         </div>
 
@@ -139,36 +216,42 @@ const workTypeOptions = ref([
                         <div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
                             <div class="flex flex-col gap-2">
                                 <label for="email">Email</label>
-                                <InputText id="email" v-model="email" type="email" placeholder="contoh: contoh.email@gmail.com" />
+                                <InputText id="email" v-model="form.email" type="email" placeholder="contoh: contoh.email@gmail.com" />
                             </div>
                             <div class="flex flex-col gap-2">
                                 <label for="phone">No. Telepon</label>
-                                <InputText id="phone" v-model="phone" type="text" placeholder="08xxxxxxxxxx" />
+                                <InputText id="phone" v-model="form.phone" type="text" placeholder="08xxxxxxxxxx" />
                             </div>
                         </div>
 
-                        <!-- Baris 3: Upload CV -->
+                        <!-- Baris 3: Berat dan Tinggi Badan -->
+                        <div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+                            <div class="flex flex-col gap-2">
+                                <label for="weight">Berat Badan (kg)</label>
+                                <InputText id="weight" v-model="form.weight" type="number" placeholder="Contoh: 65" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label for="height">Tinggi Badan (cm)</label>
+                                <InputText id="height" v-model="form.height" type="number" placeholder="Contoh: 170" />
+                            </div>
+                        </div>
+
+                        <!-- Baris 4: Alamat -->
+                        <div class="flex flex-col gap-2">
+                            <label for="address">Alamat Tempat Tinggal Sekarang</label>
+                            <Textarea id="address" v-model="form.address" rows="3" placeholder="Masukkan alamat lengkap..." autoResize />
+                        </div>
+
+                        <!-- Baris 5: Upload CV -->
                         <div class="flex flex-col gap-2">
                             <label for="cv" class="text-foreground block font-medium">Upload CV</label>
                             <div class="relative w-full lg:w-1/2">
-                                <input
-                                    ref="fileInput"
-                                    type="file"
-                                    id="cv"
-                                    name="cv"
-                                    @change="handleFileChange"
-                                    class="hidden"
-                                    accept=".pdf"
-                                />
-                                <button
-                                    type="button"
-                                    @click="fileInput?.click()"
-                                    class="bg-green-500 text-foreground hover:bg-green-600 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition"
-                                >
-                                    📁 {{ cvFile ? 'Ubah' : 'Pilih' }} File CV
+                                <input ref="fileInput" type="file" id="cv" name="cv" @change="handleFileChange" class="hidden" accept=".pdf" />
+                                <button type="button" @click="fileInput?.click()" class="bg-green-500 text-foreground hover:bg-green-600 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition">
+                                    📁 {{ form.cv_file ? 'Ubah' : 'Pilih' }} File CV
                                 </button>
                                 <span class="mx-2 my-2 text-sm text-foreground">
-                                    {{ cvFile ? getFileName(cvFile) : 'Belum ada file yang dipilih' }}
+                                    {{ form.cv_file ? getFileName(form.cv_file) : 'Belum ada file yang dipilih' }}
                                 </span>
                             </div>
                             <small class="text-foreground">Hanya file PDF, ukuran maksimal 2MB.</small>
@@ -178,40 +261,35 @@ const workTypeOptions = ref([
 
                 <Fieldset legend="Aktivitas Lulusan" :toggleable="true" class="!mb-8">
                     <div class="space-y-8 p-6">
-                        <!-- Pertanyaan Studi -->
                         <div class="flex flex-col gap-3">
                             <p>Apakah Anda sedang melanjutkan studi di perguruan tinggi?</p>
                             <div class="flex items-center gap-6">
                                 <div class="flex items-center">
-                                    <RadioButton v-model="isStudying" inputId="studyYes" name="isStudying" value="Ya" />
+                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyYes" name="isStudying" value="Ya" />
                                     <label for="studyYes" class="ml-2">Ya</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <RadioButton v-model="isStudying" inputId="studyNo" name="isStudying" value="Tidak" />
+                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyNo" name="isStudying" value="Tidak" />
                                     <label for="studyNo" class="ml-2">Tidak</label>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Tampilkan hanya jika TIDAK sedang studi -->
-                        <template v-if="isStudying === 'Tidak'">
+                        <template v-if="studentActivityData.isStudying === 'Tidak'">
                             <div class="flex flex-col gap-3">
                                 <p>Dalam seminggu terakhir, apakah Anda sedang bekerja atau berwirausaha?</p>
                                 <div class="flex items-center gap-6">
                                     <div class="flex items-center">
-                                        <RadioButton v-model="isWorking" inputId="workYes" name="isWorking" value="Ya" />
+                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workYes" name="isWorking" value="Ya" />
                                         <label for="workYes" class="ml-2">Ya</label>
                                     </div>
                                     <div class="flex items-center">
-                                        <RadioButton v-model="isWorking" inputId="workNo" name="isWorking" value="Tidak" />
+                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workNo" name="isWorking" value="Tidak" />
                                         <label for="workNo" class="ml-2">Tidak</label>
                                     </div>
                                 </div>
                             </div>
                         </template>
-
-                        <!-- Tampilkan hanya jika TIDAK sedang studi DAN sedang bekerja -->
-                        <template v-if="isStudying === 'Tidak' && isWorking === 'Ya'">
+                        <template v-if="studentActivityData.isStudying === 'Tidak' && studentActivityData.isWorking === 'Ya'">
                             <div class="flex flex-col gap-3">
                                 <p>
                                     Apa bentuk kegiatan/pekerjaan yang Anda lakukan?
@@ -220,7 +298,7 @@ const workTypeOptions = ref([
                                 </p>
                                 <div class="mt-2 flex flex-col gap-3">
                                     <div v-for="option in workTypeOptions" :key="option" class="flex items-center">
-                                        <RadioButton v-model="workType" :inputId="option" name="workType" :value="option" />
+                                        <RadioButton v-model="studentActivityData.workType" :inputId="option" name="workType" :value="option" />
                                         <label :for="option" class="ml-2">{{ option }}</label>
                                     </div>
                                 </div>
@@ -232,31 +310,20 @@ const workTypeOptions = ref([
 
             <!-- Konten Step 2 -->
             <div v-if="activeStep === 1">
-                <ActivityDetails v-model="mainActivity" />
+                <ActivityDetails v-model="activityDetailsData" />
             </div>
 
             <!-- Konten Step 3 -->
             <div v-if="activeStep === 2">
-                <StudentFeedback v-model="studentFeedback" />
+                <StudentFeedback v-model="feedbackData" />
             </div>
 
             <!-- Tombol Aksi -->
             <div class="flex justify-between mt-8">
-                <Button
-                    v-if="activeStep > 0"
-                    label="Kembali"
-                    icon="pi pi-arrow-left"
-                    @click="prevStep"
-                    severity="secondary"
-                />
+                <Button v-if="activeStep > 0" label="Kembali" icon="pi pi-arrow-left" @click="prevStep" severity="secondary" />
                 <div v-else></div>
-                <Button
-                    class="w-full lg:w-auto"
-                    :label="activeStep === stepItems.length - 1 ? 'Selesai' : 'Lanjut'"
-                    icon="pi pi-arrow-right"
-                    iconPos="right"
-                    @click="nextStep"
-                />
+                <Button v-if="activeStep < stepItems.length - 1" class="w-full lg:w-auto" label="Lanjut" icon="pi pi-arrow-right" iconPos="right" @click="nextStep" />
+                <Button v-else class="w-full lg:w-auto" label="Selesai" icon="pi pi-check" severity="success" :loading="form.processing" @click="saveTracerStudy" />
             </div>
         </div>
     </AppLayout>
@@ -276,6 +343,14 @@ const workTypeOptions = ref([
     border: none;
     padding: 0.75rem 1.25rem;
 }
+
+:deep(.p-fieldset .p-fieldset-legend):hover {
+    background-color: #1d4ed8;
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.25rem;
+}
+
 :deep(.p-fieldset-toggler) {
     color: #ffffff !important;
 }

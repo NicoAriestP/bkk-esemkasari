@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+
+// Import komponen PrimeVue
 import Fieldset from 'primevue/fieldset';
 import RadioButton from 'primevue/radiobutton';
 import InputText from 'primevue/inputtext';
@@ -37,16 +39,19 @@ const businessIncomeOptions = [
 <template>
     <Fieldset legend="Form Lulusan Wirausaha" class="!mb-8">
         <div class="p-6 space-y-8">
+            <!-- Pertanyaan Nama Usaha -->
             <div class="flex flex-col gap-2">
                 <label for="business-name">Apa nama usaha yang Anda rintis?</label>
                 <InputText id="business-name" v-model="formData.businessName" type="text" placeholder="Contoh: Maju Jaya Digital Printing" />
             </div>
 
+            <!-- Pertanyaan Bidang Usaha -->
             <div class="flex flex-col gap-2">
                 <label for="business-field">Apa bidang usaha Anda?</label>
                 <InputText id="business-field" v-model="formData.businessField" type="text" placeholder="Contoh: Percetakan, Kuliner, Jasa Digital" />
             </div>
 
+            <!-- Pertanyaan Skala Usaha -->
             <div class="flex flex-col gap-3">
                 <p>Termasuk dalam skala apakah usaha Anda saat ini?</p>
                 <Select
@@ -59,6 +64,7 @@ const businessIncomeOptions = [
                 />
             </div>
 
+            <!-- Pertanyaan Pendapatan Rata-rata -->
             <div class="flex flex-col gap-3">
                 <p>Berapa rata-rata pendapatan bersih (keuntungan) usaha Anda per bulan?</p>
                 <div class="flex flex-col gap-3 mt-1">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { watch, computed } from 'vue';
 
 // Import komponen PrimeVue
 import Fieldset from 'primevue/fieldset';
@@ -8,46 +8,66 @@ import RadioButton from 'primevue/radiobutton';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 
-// --- State Internal untuk Form ---
+// --- Props & Emits ---
+const props = defineProps<{
+    modelValue: Record<string, any>
+}>();
+const emit = defineEmits(['update:modelValue']);
 
-// Pertanyaan 1: Alasan memilih SMK
-const smkReasons = ref<string[]>([]);
+// Inisialisasi data secara defensif untuk mencegah error
+watch(() => props.modelValue, (currentValue) => {
+    const needsUpdate = !currentValue || !currentValue.pklQuality || !currentValue.certificates;
 
-// Pertanyaan 2: Durasi PKL
-const pklDuration = ref<string | null>(null);
+    if (needsUpdate) {
+        const completeData = {
+            smkReasons: currentValue?.smkReasons || [],
+            pklDuration: currentValue?.pklDuration || null,
+            pklQuality: {
+                location: null,
+                taskRelevance: null,
+                guidance: null,
+                monitoring: null,
+                ...currentValue?.pklQuality,
+            },
+            hasCertificate: currentValue?.hasCertificate || null,
+            certificates: currentValue?.certificates && currentValue.certificates.length > 0
+                ? currentValue.certificates
+                : [{ id: 1, name: '' }],
+        };
+        emit('update:modelValue', completeData);
+    }
+}, { immediate: true, deep: true });
 
-// Pertanyaan 3: Kualitas PKL (dikelompokkan dalam satu objek)
-const pklQuality = ref({
-    location: null,
-    taskRelevance: null,
-    guidance: null,
-    monitoring: null,
+// Data dikelola melalui computed property
+const formData = computed({
+    get: () => props.modelValue || {},
+    set: (value) => {
+        emit('update:modelValue', value);
+    }
 });
 
-// Pertanyaan 4 & 5: Sertifikat Kompetensi
-const hasCertificate = ref<string | null>(null);
-const certificates = ref<{ id: number; name: string }[]>([{ id: 1, name: '' }]);
 
 // --- Fungsi untuk menambah & menghapus sertifikat ---
 const addCertificate = () => {
-    certificates.value.push({ id: Date.now(), name: '' });
+    if (!Array.isArray(formData.value.certificates)) {
+        formData.value.certificates = [];
+    }
+    formData.value.certificates.push({ id: Date.now(), name: '' });
 };
 
 const removeCertificate = (id: number) => {
-    certificates.value = certificates.value.filter(cert => cert.id !== id);
-    // Jika semua sudah dihapus, tambahkan satu baris kosong kembali
-    if (certificates.value.length === 0) {
+    formData.value.certificates = formData.value.certificates.filter((cert: { id: number }) => cert.id !== id);
+    if (formData.value.certificates.length === 0) {
         addCertificate();
     }
 };
 
 // Watcher untuk mereset daftar sertifikat jika user memilih "Tidak"
-watch(hasCertificate, (newValue) => {
+watch(() => formData.value.hasCertificate, (newValue) => {
     if (newValue === 'Tidak') {
-        certificates.value = [{ id: 1, name: '' }];
+        formData.value.certificates = [{ id: 1, name: '' }];
     }
 });
-
 
 // --- Opsi untuk Form ---
 const smkReasonOptions = [
@@ -77,14 +97,14 @@ const qualityRatingOptions = [
         <div class="p-6 space-y-8">
             <!-- Pertanyaan 1: Alasan memilih SMK -->
             <div class="flex flex-col gap-3">
-                <p>Apa alasan Anda memilih pendidikan di SMK? <small class="text-gray-500 dark:text-gray-400">(boleh pilih lebih dari satu)</small></p>
+                <p>Apa alasan Anda memilih pendidikan di SMK? <small class="text-gray-500">(boleh pilih lebih dari satu)</small></p>
                 <div class="flex flex-col gap-3 mt-1">
                     <div v-for="option in smkReasonOptions" :key="option.key" class="flex items-center">
-                        <Checkbox v-model="smkReasons" :inputId="option.key" name="smkReason" :value="option.text" />
+                        <Checkbox v-model="formData.smkReasons" :inputId="option.key" name="smkReason" :value="option.text" />
                         <label :for="option.key" class="ml-2">{{ option.text }}</label>
                     </div>
                      <div class="flex items-center">
-                        <Checkbox v-model="smkReasons" :inputId="'r-other'" name="smkReason" value="Lainnya" />
+                        <Checkbox disabled inputId="r-other" />
                         <label for="r-other" class="ml-2 text-gray-400">Lainnya</label>
                     </div>
                 </div>
@@ -95,91 +115,85 @@ const qualityRatingOptions = [
                 <p>Berapa total durasi/lama Anda melaksanakan Prakerin/PKL sewaktu di SMK?</p>
                 <div class="flex flex-col gap-3 mt-1">
                     <div v-for="option in pklDurationOptions" :key="option.key" class="flex items-center">
-                        <RadioButton v-model="pklDuration" :inputId="option.key" name="pklDuration" :value="option.key" />
+                        <RadioButton v-model="formData.pklDuration" :inputId="option.key" name="pklDuration" :value="option.key" />
                         <label :for="option.key" class="ml-2">{{ option.text }}</label>
                     </div>
                 </div>
             </div>
 
             <!-- Pertanyaan 3: Kualitas PKL -->
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-4" v-if="formData.pklQuality">
                 <p>Kualitas program Prakerin/PKL yang diselenggarakan di SMK:</p>
-                <!-- a. Kualitas tempat -->
                 <div class="pl-4 border-l-2">
                     <p class="mb-3">a. Kualitas tempat Prakerin/PKL</p>
                     <div class="flex flex-wrap gap-x-6 gap-y-3">
                         <div v-for="option in qualityRatingOptions" :key="option.key" class="flex items-center">
-                            <RadioButton v-model="pklQuality.location" :inputId="`loc-${option.key}`" name="pklLocation" :value="option.key" />
+                            <RadioButton v-model="formData.pklQuality.location" :inputId="`loc-${option.key}`" name="pklLocation" :value="option.key" />
                             <label :for="`loc-${option.key}`" class="ml-2">{{ option.text }}</label>
                         </div>
                     </div>
                 </div>
-                 <!-- b. Kesesuaian tugas -->
                 <div class="pl-4 border-l-2">
                     <p class="mb-3">b. Kesesuaian tugas Prakerin/PKL dengan bidang/program keahlian</p>
                     <div class="flex flex-wrap gap-x-6 gap-y-3">
                         <div v-for="option in qualityRatingOptions" :key="option.key" class="flex items-center">
-                            <RadioButton v-model="pklQuality.taskRelevance" :inputId="`task-${option.key}`" name="pklTask" :value="option.key" />
+                            <RadioButton v-model="formData.pklQuality.taskRelevance" :inputId="`task-${option.key}`" name="pklTask" :value="option.key" />
                             <label :for="`task-${option.key}`" class="ml-2">{{ option.text }}</label>
                         </div>
                     </div>
                 </div>
-                <!-- c. Bimbingan -->
                 <div class="pl-4 border-l-2">
                     <p class="mb-3">c. Bimbingan selama Prakerin/PKL</p>
                     <div class="flex flex-wrap gap-x-6 gap-y-3">
                         <div v-for="option in qualityRatingOptions" :key="option.key" class="flex items-center">
-                            <RadioButton v-model="pklQuality.guidance" :inputId="`guid-${option.key}`" name="pklGuidance" :value="option.key" />
+                            <RadioButton v-model="formData.pklQuality.guidance" :inputId="`guid-${option.key}`" name="pklGuidance" :value="option.key" />
                             <label :for="`guid-${option.key}`" class="ml-2">{{ option.text }}</label>
                         </div>
                     </div>
                 </div>
-                <!-- d. Monitoring -->
                  <div class="pl-4 border-l-2">
                     <p class="mb-3">d. Monitoring/kunjungan guru selama Prakerin/PKL</p>
                     <div class="flex flex-wrap gap-x-6 gap-y-3">
                         <div v-for="option in qualityRatingOptions" :key="option.key" class="flex items-center">
-                            <RadioButton v-model="pklQuality.monitoring" :inputId="`mon-${option.key}`" name="pklMonitoring" :value="option.key" />
+                            <RadioButton v-model="formData.pklQuality.monitoring" :inputId="`mon-${option.key}`" name="pklMonitoring" :value="option.key" />
                             <label :for="`mon-${option.key}`" class="ml-2">{{ option.text }}</label>
                         </div>
                     </div>
                 </div>
             </div>
 
-             <!-- Pertanyaan 4: Punya Sertifikat? -->
             <div class="flex flex-col gap-3">
                 <p>Apakah Anda memiliki sertifikat kompetensi yang dikeluarkan oleh industri/Lembaga Sertifikasi Profesi (LSP) saat menempuh pendidikan di SMK?</p>
                 <div class="flex items-center gap-6">
                     <div class="flex items-center">
-                        <RadioButton v-model="hasCertificate" inputId="certYes" name="hasCert" value="Ya" />
+                        <RadioButton v-model="formData.hasCertificate" inputId="certYes" name="hasCert" value="Ya" />
                         <label for="certYes" class="ml-2">Ya</label>
                     </div>
                     <div class="flex items-center">
-                        <RadioButton v-model="hasCertificate" inputId="certNo" name="hasCert" value="Tidak" />
+                        <RadioButton v-model="formData.hasCertificate" inputId="certNo" name="hasCert" value="Tidak" />
                         <label for="certNo" class="ml-2">Tidak</label>
                     </div>
                 </div>
             </div>
 
-            <!-- Pertanyaan 5: Daftar Sertifikat (Kondisional) -->
-            <template v-if="hasCertificate === 'Ya'">
+            <template v-if="formData.hasCertificate === 'Ya' && formData.certificates">
                 <div class="flex flex-col gap-3">
                     <label>Tuliskan nama sertifikat kompetensi yang dimiliki!</label>
-                    <small class="text-gray-500 dark:text-gray-400 -mt-2">(Misal: Sertifikat Keahlian Teknik Komputer Jaringan)</small>
-                    <div v-for="(cert, index) in certificates" :key="cert.id" class="flex items-center gap-2">
+                    <small class="text-gray-500 -mt-2">(Misal: Sertifikat Keahlian Teknik Komputer Jaringan)</small>
+                    <div v-for="(cert, index) in formData.certificates" :key="cert.id" class="flex items-center gap-2">
                         <InputText v-model="cert.name" class="flex-grow" placeholder="Nama sertifikat..." />
                         <Button
                             icon="pi pi-plus"
                             severity="success"
                             @click="addCertificate"
-                            v-if="index === certificates.length - 1"
+                            v-if="index === formData.certificates.length - 1"
                             aria-label="Tambah Sertifikat"
                         />
                          <Button
                             icon="pi pi-trash"
                             severity="danger"
                             @click="removeCertificate(cert.id)"
-                            v-if="certificates.length > 1"
+                            v-if="formData.certificates.length > 1"
                             aria-label="Hapus Sertifikat"
                         />
                     </div>
