@@ -14,7 +14,6 @@ class AnnouncementAction
         $validated = $request->validated();
         unset($validated['file']);
 
-
         $model = new Announcement($validated);
 
         if (isset($request->validated()['file'])) {
