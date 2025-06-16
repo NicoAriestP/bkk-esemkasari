@@ -64,6 +64,7 @@ class StudentController extends Controller
 
     public function destroy(Year $year, StudentClass $studentClass, Student $model)
     {
+        $model->deleteCvFile();
         $model->delete();
 
         return redirect()->route('students.index', [
