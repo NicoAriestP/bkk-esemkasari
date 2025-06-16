@@ -39,7 +39,7 @@ const form = useForm({
     _method: props.isNewRecord ? 'POST' : 'PUT',
     title: props.model?.title,
     content: props.model?.content,
-    file: null as File | null,
+    file: props.model?.file ?? null,
 });
 
 const handleFileChange = (event: Event) => {
