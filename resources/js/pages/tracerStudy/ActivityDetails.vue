@@ -44,7 +44,7 @@ const activityOptions = [
 
 <template>
     <div>
-        <Fieldset legend="Detail Aktivitas Saat Ini" class="!mb-8">
+        <Fieldset toggleable legend="Detail Aktivitas Saat Ini" class="!mb-8">
             <div class="p-6">
                 <div class="flex flex-col gap-3">
                     <p class="font-semibold text-lg">Apa aktivitas utama Anda saat ini?</p>

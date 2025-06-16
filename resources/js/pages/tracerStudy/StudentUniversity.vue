@@ -48,7 +48,7 @@ const majorRelevanceOptions = [
 </script>
 
 <template>
-    <Fieldset legend="Form Lulusan Kuliah" class="!mb-8">
+    <Fieldset toggleable legend="Form Lulusan Kuliah" class="!mb-8">
         <div class="p-6 space-y-8">
             <!-- Pertanyaan Nama Perguruan Tinggi -->
             <div class="flex flex-col gap-2">

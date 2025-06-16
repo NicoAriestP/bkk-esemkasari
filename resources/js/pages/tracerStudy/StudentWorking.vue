@@ -62,7 +62,7 @@ const jobRelevanceOptions = [
 </script>
 
 <template>
-    <Fieldset legend="Form Lulusan Bekerja" class="!mb-8">
+    <Fieldset toggleable legend="Form Lulusan Bekerja" class="!mb-8">
         <div class="p-6 space-y-8">
             <div class="flex flex-col gap-2">
                 <label for="working-hours">Berapa rata-rata jam kerja Anda per minggu?</label>

@@ -93,7 +93,7 @@ const qualityRatingOptions = [
 </script>
 
 <template>
-    <Fieldset legend="Umpan Balik" class="!mb-8">
+    <Fieldset toggleable legend="Umpan Balik" class="!mb-8">
         <div class="p-6 space-y-8">
             <!-- Pertanyaan 1: Alasan memilih SMK -->
             <div class="flex flex-col gap-3">
