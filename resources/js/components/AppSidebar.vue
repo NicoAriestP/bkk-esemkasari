@@ -79,7 +79,7 @@ const studentNavItems: NavItem[] = [
     {
         title: 'Lowongan Kerja',
         description: 'Halaman Lowongan Kerja untuk Siswa',
-        href: '/partners/vacancies',
+        href: '/students/vacancies',
         icon: Briefcase,
     },
 ];

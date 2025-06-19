@@ -28,21 +28,21 @@ class VacancyPartnerController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return Inertia::render('vacancy/List', [
+        return Inertia::render('vacancy/partner/List', [
             'models' => $vacancies,
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('vacancy/Form', [
+        return Inertia::render('vacancy/partner/Form', [
             'isNewRecord' => true,
         ]);
     }
 
     public function edit(Vacancy $model)
     {
-        return Inertia::render('vacancy/Form', [
+        return Inertia::render('vacancy/partner/Form', [
             'isNewRecord' => false,
             'model' => $model,
         ]);
@@ -52,20 +52,20 @@ class VacancyPartnerController extends Controller
     {
         $model = $action->save($request);
 
-        return redirect()->route('vacancies.edit', $model->id);
+        return redirect()->route('partners.vacancies.edit', $model->id);
     }
 
     public function update(EditVacancyFormRequest $request, Vacancy $model, VacancyAction $action)
     {
         $action->update($model, $request);
 
-        return redirect()->route('vacancies.edit', $model->id);
+        return redirect()->route('partners.vacancies.edit', $model->id);
     }
 
     public function destroy(Vacancy $model)
     {
         $model->delete();
 
-        return redirect()->route('vacancies.index');
+        return redirect()->route('partners.vacancies.index');
     }
 }

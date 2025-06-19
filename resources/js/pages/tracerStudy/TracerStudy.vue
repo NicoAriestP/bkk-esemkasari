@@ -319,7 +319,7 @@ const workTypeOptions = ref([
             </div>
 
             <!-- Tombol Aksi -->
-            <div class="flex justify-between mt-8">
+            <div class="flex lg:flex-row flex-col lg:justify-between space-y-2 lg:space-y-0 mt-8">
                 <Button v-if="activeStep > 0" label="Kembali" icon="pi pi-arrow-left" @click="prevStep" severity="secondary" />
                 <div v-else></div>
                 <Button v-if="activeStep < stepItems.length - 1" class="w-full lg:w-auto" label="Lanjut" icon="pi pi-arrow-right" iconPos="right" @click="nextStep" />

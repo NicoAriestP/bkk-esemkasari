@@ -36,8 +36,6 @@ Route::middleware(['auth:web,student,partner'])->group(function () {
     Route::get('/announcements/student', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('announcements.student.index');
     Route::get('/announcements/{model}', [AnnouncementController::class, 'detailAnnouncementStudent'])->name('announcements.student.detail');
 
-
-
     // Year
     Route::get('/years', [YearController::class, 'index'])->name('years.index');
     Route::post('/years', [YearController::class, 'store'])->name('years.store');
@@ -68,13 +66,17 @@ Route::middleware(['auth:web,student,partner'])->group(function () {
     Route::put('/partners/{model}', [PartnerController::class, 'update'])->name('partners.update');
     Route::delete('/partners/{model}', [PartnerController::class, 'destroy'])->name('partners.destroy');
 
-    //Vacancy (Partner)
+    // Vacancy (Partner)
     Route::get('/partners/vacancies', [VacancyPartnerController::class, 'index'])->name('partners.vacancies.index');
     Route::get('/partners/vacancies/create', [VacancyPartnerController::class, 'create'])->name('partners.vacancies.create');
     Route::post('/partners/vacancies', [VacancyPartnerController::class, 'store'])->name('partners.vacancies.store');
     Route::get('/partners/vacancies/{model}/edit', [VacancyPartnerController::class, 'edit'])->name('partners.vacancies.edit');
     Route::put('/partners/vacancies/{model}', [VacancyPartnerController::class, 'update'])->name('partners.vacancies.update');
     Route::delete('/partners/vacancies/{model}', [VacancyPartnerController::class, 'destroy'])->name('partners.vacancies.destroy');
+
+    // Vacancy (Student)
+    Route::get('/students/vacancies', [VacancyStudentController::class, 'index'])->name('students.vacancies.index');
+    Route::post('/students/vacancies', [VacancyStudentController::class, 'applyVacancy'])->name('students.vacancies.apply');
 
     // User
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
