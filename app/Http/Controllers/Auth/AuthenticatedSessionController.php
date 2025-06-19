@@ -33,7 +33,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // LoginRequest->redirectPath() sekarang mengembalikan URL dari named route
         return redirect()->intended($request->redirectPath());
     }
 

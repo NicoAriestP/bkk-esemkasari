@@ -92,11 +92,12 @@ const loginAsOptions = [
                     <InputError :message="form.errors.password" />
                 </div>
 
-                <!-- <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between">
                     <Label for="remember" class="flex items-center space-x-3">
-                        <Checkbox id="remember" v-model:checked="form.remember" :tabindex="4" /> <span>Ingat saya</span>
+                        <Checkbox id="remember" v-model="form.remember" :tabindex="4" />
+                        <span>Ingat saya</span>
                     </Label>
-                </div> -->
+                </div>
 
                 <Button type="submit" class="mt-4 w-full" :tabindex="5" :disabled="form.processing">
                     <LoaderCircle v-if="form.processing" class="mr-2 h-4 w-4 animate-spin" /> Log in

@@ -27,6 +27,7 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
         $guard = $this->getGuardName();
+
         if (! Auth::guard($guard)->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
@@ -61,6 +62,7 @@ class LoginRequest extends FormRequest
     public function getGuardName(): string
     {
         $loginAs = $this->input('login_as');
+
         switch ($loginAs) {
             case 'student':
                 return 'student';
@@ -78,6 +80,7 @@ class LoginRequest extends FormRequest
     public function redirectPath(): string
     {
         $loginAs = $this->input('login_as');
+
         switch ($loginAs) {
             case 'student':
                 return route('dashboard'); // Menggunakan nama route
