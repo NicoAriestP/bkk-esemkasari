@@ -65,7 +65,7 @@ watch(filters, (newValue) => {
                 <span class="text-center">No data found.</span>
             </template>
 
-            <Column field="created_by" sortable header="Pembuat">
+            <Column field="created_by" sortable header="Mitra DU/DI">
                 <template #body="slotProps">
                     {{ slotProps.data.created_by?.name }}
                 </template>

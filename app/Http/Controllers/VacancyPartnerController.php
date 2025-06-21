@@ -17,10 +17,10 @@ class VacancyPartnerController extends Controller
 
         $vacancies = Vacancy::query()
             ->with('createdBy')
-            ->when($search, function ($query, $search) {
+            ->when($search, function ($query) use ($search) {
                 $query->where('title', 'like', "%$search%")
                 ->orWhere('location', 'like', "%$search%")
-                ->orWhereHas('createdBy', function ($query, $search) {
+                ->orWhereHas('createdBy', function ($query) use ($search) {
                     $query->where('name', 'like', "%$search%");
                 });
             })
