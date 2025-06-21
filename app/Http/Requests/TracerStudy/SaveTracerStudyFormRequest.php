@@ -23,7 +23,7 @@ class SaveTracerStudyFormRequest extends FormRequest
             'address' => 'required|string',
             'height' => 'required|numeric',
             'weight' => 'required|numeric',
-            'cv_file' => 'required|file|mimes:pdf|max:2048',
+            'cv_file' => 'nullable|file|mimes:pdf|max:2048',
             'student_activity_answers' => 'required|json',
             'detail_activity_answers' => 'required|json',
             'student_working_answers' => 'nullable|json',
