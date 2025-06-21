@@ -31,7 +31,7 @@ class AnnouncementController extends Controller
     public function indexAnnouncementStudent(Request $request)
     {
         $searchQuery = $request->input('search', '');
-        $itemsPerPage = 20; // Tentukan jumlah item per halaman/permintaan
+        $itemsPerPage = 10; // Tentukan jumlah item per halaman/permintaan
 
         // Buat query dasar yang bisa dipakai ulang
         $query = Announcement::query()
