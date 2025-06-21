@@ -65,16 +65,16 @@ const partnerNavItems: NavItem[] = [
 
 const studentNavItems: NavItem[] = [
     {
-        title: 'Pengumuman',
-        description: 'Halaman Pengumuman untuk Siswa',
-        href: '/announcements/student',
-        icon: Megaphone,
-    },
-    {
         title: 'Tracer Study',
         description: 'Halaman Tracer Study untuk Siswa',
         href: '/tracer-study',
         icon: GraduationCap,
+    },
+    {
+        title: 'Pengumuman',
+        description: 'Halaman Pengumuman untuk Siswa',
+        href: '/announcements/student',
+        icon: Megaphone,
     },
     {
         title: 'Lowongan Kerja',
