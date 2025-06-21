@@ -9,6 +9,7 @@ use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\YearController;
 use App\Http\Controllers\VacancyPartnerController;
+use App\Http\Controllers\VacancyStudentController;
 use App\Http\Controllers\TracerStudyController;
 
 // Route::get('/', function () {
@@ -76,6 +77,7 @@ Route::middleware(['auth:web,student,partner'])->group(function () {
 
     // Vacancy (Student)
     Route::get('/students/vacancies', [VacancyStudentController::class, 'index'])->name('students.vacancies.index');
+    Route::get('/students/vacancies/{model}', [VacancyStudentController::class, 'show'])->name('students.vacancies.show');
     Route::post('/students/vacancies', [VacancyStudentController::class, 'applyVacancy'])->name('students.vacancies.apply');
 
     // User
