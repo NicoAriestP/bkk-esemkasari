@@ -73,9 +73,8 @@ const goBack = () => {
 
             <!-- Content Section -->
             <!-- Using v-html to render content from WYSIWYG editor -->
-            <!-- 'prose' classes from Tailwind Typography provide default styling for rendered HTML -->
             <div
-                class="prose prose-lg dark:prose-invert max-w-none"
+                class="prose max-w-none"
                 v-html="props.model.content"
             >
             </div>
@@ -83,41 +82,3 @@ const goBack = () => {
         </div>
     </AppLayout>
 </template>
-
-<style>
-/* Basic styling for content rendered from v-html */
-/* This ensures that common HTML tags from the editor look good */
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-    margin-bottom: 0.75em;
-}
-
-.prose p {
-    margin-bottom: 1em;
-    line-height: 1.75;
-}
-
-.prose ul, .prose ol {
-    margin-left: 1.5em;
-    margin-bottom: 1em;
-}
-
-.prose li {
-    margin-bottom: 0.5em;
-}
-
-.prose a {
-    color: #3b82f6; /* text-blue-500 */
-    text-decoration: underline;
-}
-.prose a:hover {
-    color: #2563eb; /* text-blue-600 */
-}
-
-.dark .prose-invert a {
-    color: #60a5fa; /* text-blue-400 */
-}
-
-.dark .prose-invert a:hover {
-    color: #93c5fd; /* text-blue-300 */
-}
-</style>
