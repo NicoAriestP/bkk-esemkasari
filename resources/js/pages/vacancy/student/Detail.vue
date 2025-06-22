@@ -93,7 +93,7 @@ const handleApplyJob = () => {
 
                     <!-- Deskripsi dari WYSIWYG Editor -->
                     <h2 class="mb-4 text-xl font-semibold">Deskripsi Pekerjaan</h2>
-                    <div class="prose prose-lg dark:prose-invert max-w-none" v-html="props.model.description"></div>
+                    <div class="prose max-w-none" v-html="props.model.description"></div>
                 </div>
 
                 <!-- Kolom Samping: Info & Aksi -->
@@ -156,19 +156,3 @@ const handleApplyJob = () => {
         </Dialog>
     </AppLayout>
 </template>
-
-<style scoped>
-.prose-content ul {
-    list-style-type: disc !important;
-    margin-left: 1.5rem !important;
-}
-
-.prose-content ol {
-    list-style-type: decimal !important;
-    margin-left: 1.5rem !important;
-}
-
-.prose-content li {
-    margin-bottom: 0.25rem !important;
-}
-</style>
