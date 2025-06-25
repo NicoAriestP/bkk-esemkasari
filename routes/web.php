@@ -78,7 +78,7 @@ Route::middleware(['auth:web,student,partner'])->group(function () {
     // Vacancy (Student)
     Route::get('/students/vacancies', [VacancyStudentController::class, 'index'])->name('students.vacancies.index');
     Route::get('/students/vacancies/{model}', [VacancyStudentController::class, 'show'])->name('students.vacancies.show');
-    Route::post('/students/vacancies', [VacancyStudentController::class, 'applyVacancy'])->name('students.vacancies.apply');
+    Route::post('/students/vacancies/{model}', [VacancyStudentController::class, 'applyVacancy'])->name('students.vacancies.apply');
 
     // User
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
