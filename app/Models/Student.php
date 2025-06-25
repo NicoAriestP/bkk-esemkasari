@@ -132,4 +132,9 @@ class Student extends Authenticatable
     {
         return $this->hasOne(StudentEntrepreneurAnswer::class);
     }
+
+    public function vacancyApplication()
+    {
+        return $this->hasMany(VacancyApplication::class);
+    }
 }
