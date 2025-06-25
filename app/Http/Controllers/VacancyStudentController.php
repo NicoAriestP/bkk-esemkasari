@@ -49,10 +49,18 @@ class VacancyStudentController extends Controller
 
     public function show(Vacancy $model)
     {
-        $model->load('createdBy');
+        $model->load('createdBy', 'vacancyApplication.student');
 
         return Inertia::render('vacancy/student/Detail', [
             'model' => $model,
+            'applicationStatus' => $model->vacancyApplication()->where('student_id', auth()->user()->id)->first()?->status,
         ]);
+    }
+
+    public function applyVacancy(Vacancy $model, VacancyAction $action)
+    {
+        $action->applyVacancy($model);
+
+        return redirect()->route('students.vacancies.show', $model->id);
     }
 }

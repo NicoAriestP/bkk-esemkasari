@@ -52,4 +52,9 @@ class Vacancy extends Model
     {
         return $this->belongsTo(Partner::class, 'updated_by');
     }
+
+    public function vacancyApplication()
+    {
+        return $this->hasMany(VacancyApplication::class);
+    }
 }
