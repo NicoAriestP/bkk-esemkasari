@@ -22,6 +22,14 @@ export default defineConfig({
             },
         }),
     ],
+    // For testing using ngrok
+    server: {
+        host: true,
+        hmr: {
+            host: 'localhost',
+        },
+        cors: true,
+    },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './resources/js'),
