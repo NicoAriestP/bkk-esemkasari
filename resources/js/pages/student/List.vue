@@ -498,7 +498,9 @@ watch(filters, (newValue) => {
             </Card>
 
             <template #footer>
-                <Button label="Download CV" icon="pi pi-download" class="my-2 w-full px-12 text-center" size="small" severity="info" />
+                <a :href="selectedStudent?.cv_file_url" download target="_blank">
+                    <Button label="Download CV" icon="pi pi-download" class="my-2 w-full px-12 text-center" size="small" severity="info" />
+                </a>
                 <Button
                     label="Hapus"
                     icon="pi pi-trash"
