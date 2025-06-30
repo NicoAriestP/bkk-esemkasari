@@ -9,6 +9,7 @@ import { initializeTheme } from './composables/useAppearance';
 import PrimeVue from 'primevue/config';
 import Lara from '@primeuix/themes/lara';
 import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -38,6 +39,7 @@ createInertiaApp({
                 }
             })
             .use(ToastService)
+            .directive('tooltip', Tooltip)
             .mount(el);
     },
     progress: {
