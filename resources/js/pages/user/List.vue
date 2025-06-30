@@ -207,6 +207,7 @@ watch(filters, (newValue) => {
                             icon="pi pi-pencil"
                             variant="link"
                             severity="warn"
+                            v-tooltip.top="'Ubah'"
                             @click="openEditDialog(slotProps.data)"
                         />
                         <Button
@@ -214,6 +215,7 @@ watch(filters, (newValue) => {
                             icon="pi pi-trash"
                             variant="link"
                             severity="danger"
+                            v-tooltip.top="'Hapus Karyawan'"
                             @click="confirmDelete(slotProps.data)"
                         />
                     </div>

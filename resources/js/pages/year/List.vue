@@ -198,6 +198,7 @@ const openStudentClassPage = (model: any) => {
                                 icon="pi pi-pencil"
                                 variant="link"
                                 severity="secondary"
+                                v-tooltip.top="'Ubah'"
                                 @click="openEditModal(slotProps.data)"
                             />
                             <Button
@@ -205,6 +206,7 @@ const openStudentClassPage = (model: any) => {
                                 icon="pi pi-trash"
                                 variant="link"
                                 severity="danger"
+                                v-tooltip.top="'Hapus Angkatan'"
                                 @click="openDeleteDialog(slotProps.data.id)"
                             />
                         </div>
