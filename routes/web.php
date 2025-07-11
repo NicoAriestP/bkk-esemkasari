@@ -74,6 +74,9 @@ Route::middleware(['auth:web,student,partner'])->group(function () {
     Route::get('/partners/vacancies/{model}/edit', [VacancyPartnerController::class, 'edit'])->name('partners.vacancies.edit');
     Route::put('/partners/vacancies/{model}', [VacancyPartnerController::class, 'update'])->name('partners.vacancies.update');
     Route::delete('/partners/vacancies/{model}', [VacancyPartnerController::class, 'destroy'])->name('partners.vacancies.destroy');
+    Route::get('/partners/vacancies/{model}/applications', [VacancyPartnerController::class, 'applications'])->name('partners.vacancies.applications');
+    Route::post('/partners/vacancies/{model}/applications', [VacancyPartnerController::class, 'saveApplications'])->name('partners.vacancies.applications.store');
+    Route::get('/partners/vacancies/{model}/applications/export', [VacancyPartnerController::class, 'exportApplications'])->name('partners.vacancies.applications.export');
 
     // Vacancy (Student)
     Route::get('/students/vacancies', [VacancyStudentController::class, 'index'])->name('students.vacancies.index');
