@@ -27,6 +27,8 @@ class Vacancy extends Model
 
     protected $appends = [
         'file_url',
+        'applicants_count',
+        'qualified_applicants_count',
     ];
 
     /**
@@ -40,6 +42,20 @@ class Vacancy extends Model
             get: fn () => $this->file
                 ? Storage::disk(config('filesystems.default', 'public'))->url($this->file)
                 : null,
+        );
+    }
+
+    public function applicantsCount(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->vacancyApplication()->count(),
+        );
+    }
+
+    public function qualifiedApplicantsCount(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->vacancyApplication()->where('status', 'qualified')->count(),
         );
     }
 
