@@ -18,7 +18,9 @@ class VacancyApplication extends Model
     ];
 
     protected $casts = [
-        'status' => VacancyApplicationStatus::class
+        'status' => VacancyApplicationStatus::class,
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function getStatusLabelAttribute()
