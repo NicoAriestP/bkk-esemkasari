@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Traits\HasFeaturedFile;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class Student extends Authenticatable
 {
@@ -53,6 +54,7 @@ class Student extends Authenticatable
         'is_graduated_label',
         'is_married_label',
         'cv_file_url',
+        'age',
     ];
 
     /**
@@ -81,6 +83,13 @@ class Student extends Authenticatable
     {
         return Attribute::make(
             get: fn() => $this->is_married == true ? 'Menikah' : 'Belum Menikah',
+        );
+    }
+
+    protected function age(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->born_date ? Carbon::parse($this->born_date)->age : null,
         );
     }
 
