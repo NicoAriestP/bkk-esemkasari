@@ -31,7 +31,7 @@ const props = defineProps({
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Lowongan Kerja',
-        href: 'partners/vacancies',
+        href: '/partners/vacancies',
     },
     {
         title: props.isNewRecord ? 'Tambah Lowongan Kerja' : 'Ubah Lowongan Kerja',
