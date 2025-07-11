@@ -17,11 +17,13 @@ class VacancyStudentController extends Controller
         $query = Vacancy::query()
             ->with('createdBy')
             ->when($search, function ($query) use ($search) {
-                $query->where('title', 'like', "%$search%")
-                    ->orWhere('location', 'like', "%$search%")
-                    ->orWhereHas('createdBy', function ($query) use ($search) {
-                        $query->where('name', 'like', "%$search%");
-                    });
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('title', 'like', "%$search%")
+                        ->orWhere('location', 'like', "%$search%")
+                        ->orWhereHas('createdBy', function ($query) use ($search) {
+                            $query->where('name', 'like', "%$search%");
+                        });
+                });
             })
             ->where('due_at', '>=', now())
             ->orderBy('created_at', 'desc');
