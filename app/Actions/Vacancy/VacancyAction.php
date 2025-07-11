@@ -7,6 +7,7 @@ use App\Models\VacancyApplication;
 use Illuminate\Http\Request;
 use App\Http\Requests\Vacancy\CreateVacancyFormRequest;
 use App\Http\Requests\Vacancy\EditVacancyFormRequest;
+use App\Http\Requests\Vacancy\SaveVacancyApplicationsFormRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Enum\VacancyApplicationStatus;
 
@@ -63,4 +64,36 @@ class VacancyAction
 
         return $model;
     }
-}
+
+        public function saveApplications(Vacancy $model, SaveVacancyApplicationsFormRequest $request): Vacancy
+        {
+            $applicantIds = $request->validated('applicant_ids');
+
+            // Ambil semua aplikasi yang sebelumnya memiliki status QUALIFIED untuk lowongan ini
+            $previousQualifiedApplications = VacancyApplication::where('vacancy_id', $model->id)
+                ->where('status', VacancyApplicationStatus::QUALIFIED)
+                ->get();
+
+            // Update status menjadi APPLIED untuk siswa yang tidak lagi ada di applicant_ids
+            foreach ($previousQualifiedApplications as $application) {
+                if (!in_array($application->student_id, $applicantIds)) {
+                    $application->update(['status' => VacancyApplicationStatus::APPLIED]);
+                }
+            }
+
+            // Buat atau update aplikasi untuk applicant_ids yang dikirim
+            foreach ($applicantIds as $studentId) {
+                VacancyApplication::updateOrCreate(
+                    [
+                        'student_id' => $studentId,
+                        'vacancy_id' => $model->id,
+                    ],
+                    [
+                        'status' => VacancyApplicationStatus::QUALIFIED,
+                    ]
+                );
+            }
+
+            return $model;
+        }
+    }
