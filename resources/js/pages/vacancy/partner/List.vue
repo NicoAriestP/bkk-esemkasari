@@ -40,10 +40,8 @@ const openEditPage = (id: number) => {
     router.get(route('partners.vacancies.edit', id));
 }
 
-// PERUBAHAN: Fungsi baru untuk navigasi ke halaman pelamar
 const openApplicantsPage = (id: number) => {
-    // Asumsi nama route Anda adalah 'partners.vacancies.applicants'
-    router.get(route('partners.vacancies.applicants', id));
+    router.get(route('partners.vacancies.applications', id));
 }
 
 
@@ -58,10 +56,11 @@ watch(filters, (newValue) => {
 </script>
 
 <template>
+
     <Head title="Lowongan Kerja" />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <DataTable :value="props.models" paginator removableSort row-hover :rows="10" :rows-per-page-options="[10, 20, 50, 100]"
-            tableStyle="min-width: 50rem">
+        <DataTable :value="props.models" paginator removableSort row-hover :rows="10"
+            :rows-per-page-options="[10, 20, 50, 100]" tableStyle="min-width: 50rem">
 
             <!-- PERUBAHAN: Event @rowClick dihapus dari DataTable untuk menghindari konflik -->
 
@@ -82,29 +81,20 @@ watch(filters, (newValue) => {
                     {{ dayjs(slotProps.data.due_at).format('DD MMMM YYYY') }}
                 </template>
             </Column>
+            <Column field="applicants_count" sortable header="Jumlah Pelamar" />
+            <Column field="qualified_applicants_count" sortable header="Jumlah Terseleksi" />
 
             <!-- PERUBAHAN: Penambahan kolom baru untuk Aksi -->
-            <Column header="Aksi" bodyClass="!text-center" style="width: 10rem">
+            <Column header="Aksi" style="width: 10%;">
                 <template #body="slotProps">
                     <div class="flex justify-center items-center gap-2">
-                         <!-- Tombol untuk melihat pelamar -->
-                        <Button
-                            class="!text-blue-500 hover:!text-blue-600"
-                            icon="pi pi-users"
-                            severity="info"
-                            variant="link"
-                            v-tooltip.top="'Lihat Pelamar'"
-                            @click="openApplicantsPage(slotProps.data.id)"
-                        />
+                        <!-- Tombol untuk melihat pelamar -->
+                        <Button class="!text-blue-500 hover:!text-blue-600" icon="pi pi-users" severity="info"
+                            variant="link" v-tooltip.top="'Seleksi Pelamar'"
+                            @click="openApplicantsPage(slotProps.data.id)" />
                         <!-- Tombol untuk mengedit -->
-                        <Button
-                            class="!text-yellow-500 hover:!text-yellow-600"
-                            icon="pi pi-pencil"
-                            severity="secondary"
-                            variant="link"
-                            v-tooltip.top="'Ubah Lowongan'"
-                            @click="openEditPage(slotProps.data.id)"
-                        />
+                        <Button class="!text-yellow-500 hover:!text-yellow-600" icon="pi pi-pencil" severity="secondary"
+                            variant="link" v-tooltip.top="'Ubah Lowongan'" @click="openEditPage(slotProps.data.id)" />
                     </div>
                 </template>
             </Column>
