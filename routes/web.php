@@ -23,69 +23,99 @@ Route::get('/', function () {
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 
+// Admin Routes
+Route::middleware(['auth:web'])->group(function () {
+    // Announcement Routes
+    Route::prefix('announcements')->name('announcements.')->group(function () {
+        Route::get('/', [AnnouncementController::class, 'index'])->name('index');
+        Route::get('/create', [AnnouncementController::class, 'create'])->name('create');
+        Route::post('/', [AnnouncementController::class, 'store'])->name('store');
+        Route::get('/{model}/edit', [AnnouncementController::class, 'edit'])->name('edit');
+        Route::put('/{model}', [AnnouncementController::class, 'update'])->name('update');
+        Route::delete('/{model}', [AnnouncementController::class, 'destroy'])->name('destroy');
+    });
 
-Route::middleware(['auth:web,student,partner'])->group(function () {
-    // Announcement
-    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
-    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
-    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
-    Route::get('/announcements/{model}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
-    Route::put('/announcements/{model}', [AnnouncementController::class, 'update'])->name('announcements.update');
-    Route::delete('/announcements/{model}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+    // Year Routes
+    Route::prefix('years')->name('years.')->group(function () {
+        Route::get('/', [YearController::class, 'index'])->name('index');
+        Route::post('/', [YearController::class, 'store'])->name('store');
+        Route::put('/{model}', [YearController::class, 'update'])->name('update');
+        Route::delete('/{model}', [YearController::class, 'destroy'])->name('destroy');
 
-    // Announcement (Student)
-    Route::get('/announcements/student', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('announcements.student.index');
-    Route::get('/announcements/{model}', [AnnouncementController::class, 'detailAnnouncementStudent'])->name('announcements.student.detail');
+        // Student Class Routes (nested under years)
+        Route::prefix('{year}/student-classes')->name('student-classes.')->group(function () {
+            Route::get('/', [StudentClassController::class, 'index'])->name('index');
+            Route::post('/', [StudentClassController::class, 'store'])->name('store');
+            Route::put('/{model}', [StudentClassController::class, 'update'])->name('update');
+            Route::delete('/{model}', [StudentClassController::class, 'destroy'])->name('destroy');
 
-    // Year
-    Route::get('/years', [YearController::class, 'index'])->name('years.index');
-    Route::post('/years', [YearController::class, 'store'])->name('years.store');
-    Route::put('/years/{model}', [YearController::class, 'update'])->name('years.update');
-    Route::delete('/years/{model}', [YearController::class, 'destroy'])->name('years.destroy');
+            // Student Routes (nested under student-classes)
+            Route::prefix('{studentClass}/students')->name('students.')->group(function () {
+                Route::get('/', [StudentController::class, 'index'])->name('index');
+                Route::post('/', [StudentController::class, 'store'])->name('store');
+                Route::put('/{model}', [StudentController::class, 'update'])->name('update');
+                Route::delete('/{model}', [StudentController::class, 'destroy'])->name('destroy');
+                Route::post('/import', [StudentController::class, 'import'])->name('import');
+                Route::post('/export', [StudentController::class, 'export'])->name('export');
+            });
+        });
+    });
 
-    // Student Class
-    Route::get('/years/{year}/student-classes', [StudentClassController::class, 'index'])->name('student-classes.index');
-    Route::post('/years/{year}/student-classes', [StudentClassController::class, 'store'])->name('student-classes.store');
-    Route::put('/years/{year}/student-classes/{model}', [StudentClassController::class, 'update'])->name('student-classes.update');
-    Route::delete('/years/{year}/student-classes/{model}', [StudentClassController::class, 'destroy'])->name('student-classes.destroy');
+    // Partner Routes
+    Route::prefix('partners')->name('partners.')->group(function () {
+        Route::get('/', [PartnerController::class, 'index'])->name('index');
+        Route::post('/', [PartnerController::class, 'store'])->name('store');
+        Route::put('/{model}', [PartnerController::class, 'update'])->name('update');
+        Route::delete('/{model}', [PartnerController::class, 'destroy'])->name('destroy');
+    });
 
-    // Student
-    Route::get('/years/{year}/student-classes/{studentClass}/students', [StudentController::class, 'index'])->name('students.index');
-    Route::post('/years/{year}/student-classes/{studentClass}/students', [StudentController::class, 'store'])->name('students.store');
-    Route::put('/years/{year}/student-classes/{studentClass}/students/{model}', [StudentController::class, 'update'])->name('students.update');
-    Route::delete('/years/{year}/student-classes/{studentClass}/students/{model}', [StudentController::class, 'destroy'])->name('students.destroy');
-    Route::post('/years/{year}/student-classes/{studentClass}/students/import', [StudentController::class, 'import'])->name('students.import');
-    Route::post('/years/{year}/student-classes/{studentClass}/students/export', [StudentController::class, 'export'])->name('students.export');
+    // User Routes
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::put('/{model}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{model}', [UserController::class, 'destroy'])->name('destroy');
+    });
+});
 
-    // Tracer Study
-    Route::get('/tracer-study', [TracerStudyController::class, 'tracerStudy'])->name('tracer-study');
-    Route::post('/tracer-study', [TracerStudyController::class, 'saveTracerStudy'])->name('tracer-study.store');
+// Student Routes
+Route::middleware('auth:student')->group(function () {
+    // Announcement Routes (Student)
+    Route::prefix('announcements')->name('announcements.')->group(function () {
+        Route::get('/student', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('student.index');
+        Route::get('/{model}', [AnnouncementController::class, 'detailAnnouncementStudent'])->name('student.detail');
+    });
 
-    // Partner
-    Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
-    Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
-    Route::put('/partners/{model}', [PartnerController::class, 'update'])->name('partners.update');
-    Route::delete('/partners/{model}', [PartnerController::class, 'destroy'])->name('partners.destroy');
+    // Tracer Study Routes
+    Route::prefix('tracer-study')->name('tracer-study')->group(function () {
+        Route::get('/', [TracerStudyController::class, 'tracerStudy']);
+        Route::post('/', [TracerStudyController::class, 'saveTracerStudy'])->name('.store');
+    });
 
-    // Vacancy (Partner)
-    Route::get('/partners/vacancies', [VacancyPartnerController::class, 'index'])->name('partners.vacancies.index');
-    Route::get('/partners/vacancies/create', [VacancyPartnerController::class, 'create'])->name('partners.vacancies.create');
-    Route::post('/partners/vacancies', [VacancyPartnerController::class, 'store'])->name('partners.vacancies.store');
-    Route::get('/partners/vacancies/{model}/edit', [VacancyPartnerController::class, 'edit'])->name('partners.vacancies.edit');
-    Route::put('/partners/vacancies/{model}', [VacancyPartnerController::class, 'update'])->name('partners.vacancies.update');
-    Route::delete('/partners/vacancies/{model}', [VacancyPartnerController::class, 'destroy'])->name('partners.vacancies.destroy');
-    Route::get('/partners/vacancies/{model}/applications', [VacancyPartnerController::class, 'applications'])->name('partners.vacancies.applications');
-    Route::post('/partners/vacancies/{model}/applications', [VacancyPartnerController::class, 'saveApplications'])->name('partners.vacancies.applications.store');
-    Route::get('/partners/vacancies/{model}/applications/export', [VacancyPartnerController::class, 'exportApplications'])->name('partners.vacancies.applications.export');
+    // Vacancy Routes (Student)
+    Route::prefix('students/vacancies')->name('students.vacancies.')->group(function () {
+        Route::get('/', [VacancyStudentController::class, 'index'])->name('index');
+        Route::get('/{model}', [VacancyStudentController::class, 'show'])->name('show');
+        Route::post('/{model}', [VacancyStudentController::class, 'applyVacancy'])->name('apply');
+    });
+});
 
-    // Vacancy (Student)
-    Route::get('/students/vacancies', [VacancyStudentController::class, 'index'])->name('students.vacancies.index');
-    Route::get('/students/vacancies/{model}', [VacancyStudentController::class, 'show'])->name('students.vacancies.show');
-    Route::post('/students/vacancies/{model}', [VacancyStudentController::class, 'applyVacancy'])->name('students.vacancies.apply');
+// Partner Routes
+Route::middleware('auth:partner')->group(function () {
+    // Vacancy Routes (Partner)
+    Route::prefix('partners/vacancies')->name('partners.vacancies.')->group(function () {
+        Route::get('/', [VacancyPartnerController::class, 'index'])->name('index');
+        Route::get('/create', [VacancyPartnerController::class, 'create'])->name('create');
+        Route::post('/', [VacancyPartnerController::class, 'store'])->name('store');
+        Route::get('/{model}/edit', [VacancyPartnerController::class, 'edit'])->name('edit');
+        Route::put('/{model}', [VacancyPartnerController::class, 'update'])->name('update');
+        Route::delete('/{model}', [VacancyPartnerController::class, 'destroy'])->name('destroy');
 
-    // User
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::put('/users/{model}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('/users/{model}', [UserController::class, 'destroy'])->name('users.destroy');
+        // Vacancy Applications Routes (nested under vacancies)
+        Route::prefix('{model}/applications')->name('applications')->group(function () {
+            Route::get('/', [VacancyPartnerController::class, 'applications']);
+            Route::post('/', [VacancyPartnerController::class, 'saveApplications'])->name('.store');
+            Route::get('/export', [VacancyPartnerController::class, 'exportApplications'])->name('.export');
+        });
+    });
 });
