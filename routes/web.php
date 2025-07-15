@@ -11,6 +11,7 @@ use App\Http\Controllers\YearController;
 use App\Http\Controllers\VacancyPartnerController;
 use App\Http\Controllers\VacancyStudentController;
 use App\Http\Controllers\TracerStudyController;
+use App\Http\Controllers\DashboardPartnerController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
@@ -102,6 +103,10 @@ Route::middleware('auth:student')->group(function () {
 
 // Partner Routes
 Route::middleware('auth:partner')->group(function () {
+    Route::prefix('partners/dashboard')->name('partners.dashboard.')->group(function () {
+        Route::get('/', [DashboardPartnerController::class, 'index'])->name('index');
+    });
+
     // Vacancy Routes (Partner)
     Route::prefix('partners/vacancies')->name('partners.vacancies.')->group(function () {
         Route::get('/', [VacancyPartnerController::class, 'index'])->name('index');
