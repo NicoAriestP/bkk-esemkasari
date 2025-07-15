@@ -56,6 +56,12 @@ const staffNavItems: NavItem[] = [
 
 const partnerNavItems: NavItem[] = [
     {
+        title: 'Dashboard',
+        description: 'Halaman Dashboard untuk Mitra DU/DI',
+        href: '/partners/dashboard',
+        icon: LayoutDashboard,
+    },
+    {
         title: 'Lowongan Kerja',
         description: 'Halaman CRUD Lowongan Kerja untuk Mitra DU/DI',
         href: '/partners/vacancies',
