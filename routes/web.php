@@ -12,6 +12,7 @@ use App\Http\Controllers\VacancyPartnerController;
 use App\Http\Controllers\VacancyStudentController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\DashboardPartnerController;
+use App\Http\Controllers\VacancyApplicationController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
@@ -81,6 +82,9 @@ Route::middleware(['auth:web'])->group(function () {
 
 // Student Routes
 Route::middleware('auth:student')->group(function () {
+    Route::prefix('students/dashboard')->name('students.dashboard.')->group(function () {
+        Route::get('/', [StudentController::class, 'dashboard'])->name('dashboard');
+    });
     // Announcement Routes (Student)
     Route::prefix('announcements')->name('announcements.')->group(function () {
         Route::get('/student', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('student.index');
@@ -104,7 +108,7 @@ Route::middleware('auth:student')->group(function () {
 // Partner Routes
 Route::middleware('auth:partner')->group(function () {
     Route::prefix('partners/dashboard')->name('partners.dashboard.')->group(function () {
-        Route::get('/', [DashboardPartnerController::class, 'index'])->name('index');
+        Route::get('/', [PartnerController::class, 'dashboard'])->name('dashboard');
     });
 
     // Vacancy Routes (Partner)

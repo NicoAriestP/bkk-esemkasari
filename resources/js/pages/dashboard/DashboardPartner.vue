@@ -94,7 +94,7 @@ const getStatusSeverity = (status: string) => {
 const getStatusLabel = (status: string) => {
     switch (status) {
         case 'qualified':
-            return 'Diterima';
+            return 'Diseleksi';
         case 'applied':
             return 'Menunggu';
         default:
@@ -283,11 +283,11 @@ const formatDateTime = (date: string) => {
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div class="rounded-lg bg-yellow-50 p-4 text-center">
                             <div class="text-2xl font-bold text-yellow-600">{{ applicationStats.applied || 0 }}</div>
-                            <div class="text-sm text-yellow-800">Menunggu Review</div>
+                            <div class="text-sm text-yellow-800">Menunggu Seleksi</div>
                         </div>
                         <div class="rounded-lg bg-green-50 p-4 text-center">
                             <div class="text-2xl font-bold text-green-600">{{ applicationStats.qualified || 0 }}</div>
-                            <div class="text-sm text-green-800">Diterima</div>
+                            <div class="text-sm text-green-800">Diseleksi</div>
                         </div>
                     </div>
                 </template>
