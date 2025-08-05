@@ -73,6 +73,15 @@ class StudentController extends Controller
         ]);
     }
 
+    public function dashboard(Request $request)
+    {
+        $dashboardData = Student::getDashboardData();
+
+        return Inertia::render('dashboard/DashboardStudent', [
+            'dashboardData' => $dashboardData
+        ]);
+    }
+
     public function import(Year $year, StudentClass $studentClass, ImportStudentRequest $request)
     {
         DB::beginTransaction();

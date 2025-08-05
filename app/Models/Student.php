@@ -107,6 +107,9 @@ class Student extends Authenticatable
         );
     }
 
+    public static function getDashboardData()
+    {}
+
     public function studentClass()
     {
         return $this->belongsTo(StudentClass::class);
