@@ -34,20 +34,20 @@ class StudentClassController extends Controller
     {
         $model = $action->save($request);
 
-        return redirect()->route('student-classes.index', $year->id);
+        return redirect()->route('years.student-classes.index', $year->id);
     }
 
     public function update(Year $year, EditStudentClassFormRequest $request, StudentClass $model, StudentClassAction $action)
     {
         $action->update($model, $request);
 
-        return redirect()->route('student-classes.index', $year->id);
+        return redirect()->route('years.student-classes.index', $year->id);
     }
 
     public function destroy(Year $year, StudentClass $model)
     {
         $model->delete();
 
-        return redirect()->route('student-classes.index', $year->id);
+        return redirect()->route('years.student-classes.index', $year->id);
     }
 }
