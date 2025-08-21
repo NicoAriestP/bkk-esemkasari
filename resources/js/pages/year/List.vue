@@ -159,7 +159,7 @@ const deleteYear = () => {
 };
 
 const openStudentClassPage = (model: any) => {
-    router.get(route('student-classes.index', model.id));
+    router.get(route('years.student-classes.index', model.id));
 }
 </script>
 

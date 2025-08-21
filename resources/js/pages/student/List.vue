@@ -54,11 +54,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Kelas',
-        href: route('student-classes.index', props.year.id),
+        href: route('years.student-classes.index', props.year.id),
     },
     {
         title: props.studentClass.name,
-        href: route('student-classes.index', props.year.id),
+        href: route('years.student-classes.index', props.year.id),
     },
     {
         title: 'Siswa',
@@ -203,7 +203,7 @@ const deleteStudent = () => {
     }
 
     form.delete(
-        route('students.destroy', {
+        route('years.student-classes.students.destroy', {
             year: props.year.id,
             studentClass: props.studentClass.id,
             model: selectedStudent.value.id,
@@ -235,7 +235,7 @@ const deleteStudent = () => {
 
 const createStudent = () => {
     form.post(
-        route('students.store', {
+        route('years.student-classes.students.store', {
             year: props.year.id,
             studentClass: props.studentClass.id,
         }),
@@ -266,7 +266,7 @@ const createStudent = () => {
 
 const updateStudent = () => {
     form.put(
-        route('students.update', {
+        route('years.student-classes.students.update', {
             year: props.year.id,
             studentClass: props.studentClass.id,
             model: form.id,
@@ -358,7 +358,10 @@ watch(
 
 watch(filters, (newValue) => {
     router.get(
-        route('students.index', props.studentClass.id),
+        route('years.student-classes.students.index', {
+            year: props.year.id,
+            studentClass: props.studentClass.id,
+        }),
         { search: newValue },
         {
             preserveState: true,

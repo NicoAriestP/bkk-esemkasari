@@ -39,7 +39,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Kelas',
-        href: route('student-classes.index', props.year.id),
+        href: route('years.student-classes.index', props.year.id),
     },
 ];
 
@@ -55,7 +55,7 @@ const form = useForm({
 
 watch(filters, (newValue) => {
     router.get(
-        route('student-classes.index', props.year.id),
+        route('years.student-classes.index', props.year.id),
         { search: newValue },
         {
             preserveState: true,
@@ -87,7 +87,7 @@ const saveStudentClass = () => {
             year: props.year.id,
         };
 
-        form.post(route('student-classes.store', routeParams), {
+        form.post(route('years.student-classes.store', routeParams), {
             errorBag: 'Kelas',
             preserveScroll: true,
             onSuccess: () => {
@@ -116,7 +116,7 @@ const saveStudentClass = () => {
             model: form.id,
         }
 
-        form.post(route('student-classes.update', routeParams), {
+        form.post(route('years.student-classes.update', routeParams), {
             errorBag: 'Kelas',
             preserveScroll: true,
             onSuccess: () => {
@@ -143,7 +143,7 @@ const saveStudentClass = () => {
 
 // Function to delete data
 const deleteStudentClass = (id: number) => {
-    form.delete(route('student-classes.destroy', {
+    form.delete(route('years.student-classes.destroy', {
         year: props.year.id,
         model: id,
     }), {
@@ -172,7 +172,7 @@ const deleteStudentClass = (id: number) => {
 };
 
 const openStudentsPage = (model: any) => {
-    router.get(route('students.index', { year: model.year_id, studentClass: model.id }));
+    router.get(route('years.student-classes.students.index', { year: model.year_id, studentClass: model.id }));
 };
 </script>
 
