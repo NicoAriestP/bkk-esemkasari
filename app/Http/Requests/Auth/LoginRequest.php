@@ -31,7 +31,7 @@ class LoginRequest extends FormRequest
         if (! Auth::guard($guard)->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => trans('Email tidak cocok dengan password yang diberikan atau akun tidak ditemukan.'),
             ]);
         }
         RateLimiter::clear($this->throttleKey());
