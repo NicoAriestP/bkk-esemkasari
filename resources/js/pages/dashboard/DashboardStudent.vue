@@ -249,7 +249,7 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                                 icon="pi pi-bell"
                                 severity="info"
                                 class="w-full"
-                                @click="router.visit('/announcements/student')"
+                                @click="router.visit('/announcements')"
                             />
 
                             <Divider />
@@ -370,7 +370,7 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                                 label="Lihat Semua"
                                 text
                                 size="small"
-                                @click="router.visit('/announcements/student')"
+                                @click="router.visit('/announcements')"
                             />
                         </div>
                     </template>
