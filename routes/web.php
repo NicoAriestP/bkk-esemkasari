@@ -13,17 +13,23 @@ use App\Http\Controllers\VacancyStudentController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\DashboardPartnerController;
 use App\Http\Controllers\VacancyApplicationController;
+use App\Http\Controllers\HomePageController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
 // })->name('home');
 
-Route::get('/', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth:web,student,partner', 'verified'])->name('dashboard');
-
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+
+// Home Page Routes
+Route::controller(HomePageController::class)->group(function () {
+    Route::get('/', 'index')->name('home');
+});
+
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth:web,student,partner', 'verified'])->name('dashboard');
 
 // Admin Routes
 Route::middleware(['auth:web'])->group(function () {
@@ -63,7 +69,7 @@ Route::middleware(['auth:web'])->group(function () {
         });
     });
 
-    // Partner Routes
+    // Partner Management Routes
     Route::prefix('partners')->name('partners.')->group(function () {
         Route::get('/', [PartnerController::class, 'index'])->name('index');
         Route::post('/', [PartnerController::class, 'store'])->name('store');
@@ -71,7 +77,7 @@ Route::middleware(['auth:web'])->group(function () {
         Route::delete('/{model}', [PartnerController::class, 'destroy'])->name('destroy');
     });
 
-    // User Routes
+    // User Management Routes
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::post('/', [UserController::class, 'store'])->name('store');
@@ -87,7 +93,7 @@ Route::middleware('auth:student')->group(function () {
     });
     // Announcement Routes (Student)
     Route::prefix('announcements')->name('announcements.')->group(function () {
-        Route::get('/student', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('student.index');
+        Route::get('/', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('student.index');
         Route::get('/{model}', [AnnouncementController::class, 'detailAnnouncementStudent'])->name('student.detail');
     });
 
