@@ -1,112 +1,88 @@
-# BKK Esemkasari - AI Development Guide
+
+# BKK Esemkasari – AI Coding Agent Guide
 
 ## Project Overview
-BKK Esemkasari is a specialized job fair management system for SMKN Purwosari Bojonegoro built with Laravel 12 + Inertia.js + Vue 3 + TypeScript + PrimeVue v4.
+BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, built with Laravel 12, Inertia.js, Vue 3, TypeScript, and PrimeVue v4.
 
-**Core Features**: Tracer study questionnaires, announcements, job vacancy screening, multi-guard authentication (admin/student/partner).
+**Core Features:**
+- Tracer study questionnaires (multi-answer types)
+- Announcements
+- Job vacancy screening and application workflow
+- Multi-guard authentication (admin/student/partner)
 
-## Architecture Patterns
+## Architecture & Data Flow
+- **Multi-Guard Auth:**
+  - Admin (`auth:web`): Full CRUD
+  - Student (`auth:student`): Announcements, tracer study, apply vacancies
+  - Partner (`auth:partner`): Manage vacancies, screen applications
+  - Route separation via middleware groups in `routes/web.php`
+- **Data Hierarchy:**
+  - Year → StudentClass → Students
+  - Partners → Vacancies → VacancyApplications
+  - Students → TracerStudy Answers (one-to-one per answer type)
+- **Business Logic:**
+  - All create/update handled in `app/Actions/{Entity}/{Entity}Action.php`
+  - Controllers delegate to Actions (e.g., `StudentAction::save()`)
 
-### Multi-Guard Authentication System
-- **Admin Guard** (`auth:web`): Full CRUD operations for all entities
-- **Student Guard** (`auth:student`): Access to announcements, tracer study, vacancy applications
-- **Partner Guard** (`auth:partner`): Vacancy management and application screening
-- Routes are segregated by guard with middleware groups in `routes/web.php`
+## Developer Workflows
+- **Start Dev:** `composer run dev` (Laravel server + queue + Vite)
+- **Testing:** Pest PHP (`composer run test`), tests in `tests/Feature/` and `tests/Unit/`
+- **Frontend Build:**
+  - `npm run dev` (HMR)
+  - `npm run build` (production)
+  - `npm run build:ssr` (SSR)
+- **CI:** See `.github/workflows/tests.yml` for build/test steps
 
-### Data Flow Architecture
-```
-Year → StudentClass → Students (hierarchical data structure)
-Partners → Vacancies → VacancyApplications (partner workflow)
-Students → TracerStudy Answers (questionnaire system)
-```
+## Conventions & Patterns
+- **Vue:**
+  - Use `<script setup>` in all components
+  - Split features into reusable components (`resources/js/components/`)
+  - Page components in `resources/js/pages/{Entity}/`
+  - Layout via `AppLayout.vue` (or `layout: null` for standalone pages like HomePage)
+  - Auth guard detection via `usePage().props.auth.activeGuard`
+- **TypeScript:**
+  - Types auto-generated in `resources/js/types/` for backend data
+  - Shared types: `Auth`, `BreadcrumbItem`, `NavItem`, `SharedData`
+- **Backend:**
+  - Use model traits (e.g., `HasFeaturedFile` for uploads)
+  - Observers (e.g., `AnnouncementObserver`) for created_by/updated_by
+  - Validation via `app/Http/Requests/{Entity}/`
+  - Soft deletes on most models
+- **File Uploads:**
+  - Trait-based, auto-organized by model type
+  - Public disk: `storage/app/public/`
+- **Import/Export:**
+  - Bulk student import: Excel via `maatwebsite/excel` (`StudentsImport` class)
+  - Application export for partners
 
-### Action-Based Business Logic
-- Business logic resides in `app/Actions/{Entity}/{Entity}Action.php` classes
-- Controllers delegate to Actions for create/update operations
-- Example: `StudentAction::save()` and `StudentAction::update()` handle form validation and model persistence
+## Integrations
+- **PrimeVue:** Lara theme, ToastService, global tooltip
+- **Inertia.js:** Page resolution in `resources/js/pages/`, Ziggy for routes, SSR in `resources/js/ssr.ts`
+- **Database:** MySQL (`bkk_esemkasari`), root/no password, localhost:3306 (Laragon)
+- **TinyMCE:** Rich text editor (API key from backend via `usePage().props.tinymce.api_key`)
 
-## Development Workflows
-
-### Start Development Environment
-```bash
-composer run dev  # Starts Laravel server + queue + Vite concurrently
-```
-
-### Testing
-- Uses **Pest PHP** testing framework
-- Run tests: `composer run test`
-- Test files in `tests/Feature/` and `tests/Unit/`
-
-### Frontend Build
-```bash
-npm run dev        # Development with HMR
-npm run build      # Production build
-npm run build:ssr  # SSR build
-```
-
-## Critical Conventions
-
-### Vue Component Architecture
-- **Always use `<script setup>` syntax** for all Vue components
-- **Component separation**: Break down features into reusable components in `resources/js/components/`
-- **Layout system**: `AppLayout.vue` wraps content with sidebar navigation
-- **TypeScript**: Auto-generate types in `resources/js/types/` for backend data structures
-
-### Backend Patterns
-- **Model Traits**: `HasFeaturedFile` trait for file upload handling with automatic URL generation
-- **Observers**: Use model observers (e.g., `AnnouncementObserver`) for automated created_by/updated_by tracking
-- **Form Requests**: Validation through dedicated request classes in `app/Http/Requests/{Entity}/`
-- **Soft Deletes**: Most models use soft deletes for data retention
-
-### File Organization
-- **Frontend**: `resources/js/pages/{Entity}/` for page components
-- **Backend**: `app/Actions/{Entity}/`, `app/Http/Controllers/{Entity}Controller.php`
-- **Types**: Auto-generated TypeScript interfaces in `resources/js/types/`
-
-## Key Integrations
-
-### PrimeVue UI Framework
-- Theme: Lara preset configured in `app.ts`
-- Toast notifications via PrimeVue ToastService
-- Tooltip directive globally registered
-
-### File Upload System
-- Uses `HasFeaturedFile` trait with automatic folder organization by model type
-- CV files for students, vacancy attachments for partners
-- Files stored in `storage/app/public/` with public disk configuration
-
-### Inertia.js Configuration
-- Page resolution in `resources/js/pages/` directory
-- Ziggy for named route generation in frontend
-- SSR support configured with `resources/js/ssr.ts`
-
-### Development Database
-- **Database**: MySQL (`bkk_esemkasari`)
-- **Credentials**: root user, no password, localhost:3306
-- **Location**: Laragon environment at `~/laragon/www/bkk-esemkasari`
-
-## Specialized Patterns
-
-### Tracer Study System
-Complex questionnaire system with multiple answer types:
-- `StudentActivityAnswer`, `StudentWorkingAnswer`, `StudentUniversityAnswer`, `StudentEntrepreneurAnswer`
-- Each student has one-to-one relationships with different answer types
-- Questions stored in `questionnaires` → `questionnaire_questions` → `question_options`
-
-### Vacancy Application Workflow
-1. Partners create vacancies with file attachments
-2. Students browse and apply to vacancies
-3. Partners screen applications and update status via `VacancyApplicationStatus` enum
-4. Export functionality for application data
-
-### Import/Export Features
-- Student bulk import via Excel files using `maatwebsite/excel` package
-- Application data export for partners
-- File handling through dedicated Import/Export classes
+## Specialized Features
+- **Tracer Study:**
+  - Multiple answer types: `StudentActivityAnswer`, `StudentWorkingAnswer`, `StudentUniversityAnswer`, `StudentEntrepreneurAnswer`
+  - Questions: `questionnaires` → `questionnaire_questions` → `question_options`
+  - Multi-step wizard UI in `TracerStudy.vue`
+- **Vacancy Workflow:**
+  - Partners create vacancies (with attachments)
+  - Students apply via `VacancyStudentController::applyVacancy()`
+  - Partners screen via `VacancyApplicationStatus` enum
+  - Export data functionality
+- **HomePage:**
+  - Standalone page with `layout: null` in `defineOptions`
+  - Sections: hero, stats, about, programs, facilities, news, contact
+  - Smooth scrolling navigation with anchor links
 
 ## Language & Communication
-- **All user-facing content in Bahasa Indonesia**
-- **Code comments and documentation in English**
-- **Error messages and validation in Bahasa Indonesia**
+- All user-facing content: Bahasa Indonesia
+- Code comments/docs: English
+- Error/validation: Bahasa Indonesia
 
-When implementing new features, follow the established Action → Controller → Inertia → Vue component pattern, and ensure TypeScript types are properly defined for all data structures passed between backend and frontend.
+**When implementing features:**
+- Always follow Action → Controller → Inertia → Vue component flow
+- Ensure TypeScript types for all backend→frontend data
+- Use PrimeVue components consistently (Button, Card, DataTable, Dialog, etc.)
+- Follow breadcrumb pattern: `BreadcrumbItem[]` for navigation
