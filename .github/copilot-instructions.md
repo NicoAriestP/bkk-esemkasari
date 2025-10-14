@@ -2,7 +2,7 @@
 # BKK Esemkasari – AI Coding Agent Guide
 
 ## Project Overview
-BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, built with Laravel 12, Inertia.js, Vue 3, TypeScript, and PrimeVue v4.
+BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, built with Laravel 12, Inertia.js, Vue 3, TypeScript, and PrimeVue v4 with Tailwind CSS.
 
 **Core Features:**
 - Tracer study questionnaires (multi-answer types)
@@ -31,7 +31,7 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
   - `npm run dev` (HMR)
   - `npm run build` (production)
   - `npm run build:ssr` (SSR)
-- **CI:** See `.github/workflows/tests.yml` for build/test steps
+- **Code Quality:** ESLint + Prettier (`npm run lint`, `npm run format`)
 
 ## Conventions & Patterns
 - **Vue:**
@@ -49,11 +49,13 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
   - Validation via `app/Http/Requests/{Entity}/`
   - Soft deletes on most models
 - **File Uploads:**
-  - Trait-based, auto-organized by model type
-  - Public disk: `storage/app/public/`
+  - Trait-based via `HasFeaturedFile`, auto-organized by model type
+  - Methods: `updateFile()`, `updateCvFile()`, `deleteFile()`, `deleteCvFile()`
+  - Public disk: `storage/app/public/`, accessible via `{model}FileUrl` attributes
 - **Import/Export:**
-  - Bulk student import: Excel via `maatwebsite/excel` (`StudentsImport` class)
-  - Application export for partners
+  - Bulk student import: Excel via `maatwebsite/excel` (CSV/XLS/XLSX)
+  - Export qualified applicants for partners
+  - Template files for consistent imports
 
 ## Integrations
 - **PrimeVue:** Lara theme, ToastService, global tooltip
