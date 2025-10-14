@@ -11,6 +11,7 @@ use App\Http\Requests\Student\CreateStudentFormRequest;
 use App\Http\Requests\Student\EditStudentFormRequest;
 use App\Http\Requests\ImportStudentRequest;
 use App\Actions\Student\StudentAction;
+use App\Imports\StudentsImport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -28,9 +29,9 @@ class StudentController extends Controller
             ->where('student_class_id', $studentClass->id)
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%$search%")
-                ->orWhere('nisn', 'like', "%$search%")
-                ->orWhere('phone', 'like', "%$search%")
-                ->orWhere('email', 'like', "%$search%");
+                    ->orWhere('nisn', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%");
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -71,6 +72,21 @@ class StudentController extends Controller
             'year' => $year->id,
             'studentClass' => $studentClass->id,
         ]);
+    }
+
+    public function import(ImportStudentRequest $request, StudentClass $studentClass)
+    {
+        $studentClassId = $studentClass->id;
+
+        try {
+            // Import dengan student_class_id default
+            $import = new StudentsImport($studentClassId);
+            $import->import($request->file('file'));
+
+            return back()->with('success', 'Data siswa berhasil diimpor.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
+        }
     }
 
     public function dashboard(Request $request)
