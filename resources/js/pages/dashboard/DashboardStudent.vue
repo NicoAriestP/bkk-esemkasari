@@ -249,7 +249,7 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                                 icon="pi pi-bell"
                                 severity="info"
                                 class="w-full"
-                                @click="router.visit('/announcements')"
+                                @click="router.visit('students/announcements')"
                             />
 
                             <Divider />
@@ -370,7 +370,7 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                                 label="Lihat Semua"
                                 text
                                 size="small"
-                                @click="router.visit('/announcements')"
+                                @click="router.visit('students/announcements')"
                             />
                         </div>
                     </template>
@@ -380,7 +380,7 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                                 v-for="announcement in announcements"
                                 :key="announcement.id"
                                 class="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                                @click="router.visit(`/announcements/${announcement.id}`)"
+                                @click="router.visit(`students/announcements/${announcement.id}`)"
                             >
                                 <h4 class="font-medium text-gray-900 mb-1">{{ announcement.title }}</h4>
                                 <p class="text-sm text-gray-600 mb-2">{{ announcement.excerpt }}</p>
