@@ -372,232 +372,571 @@ watch(filters, (newValue) => {
 });
 </script>
 
+<style scoped>
+:deep(.custom-datatable) {
+    .p-datatable-header {
+        display: none;
+    }
+
+    .p-datatable-tbody > tr {
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .p-datatable-tbody > tr:hover {
+        background-color: rgba(239, 246, 255, 0.5);
+    }
+
+    .p-datatable-tbody > tr:last-child {
+        border-bottom: none;
+    }
+
+    .p-paginator {
+        background-color: rgba(249, 250, 251, 0.5);
+        border-top: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        color: #374151;
+        transition: all 0.2s ease;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page:hover {
+        background-color: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page.p-highlight:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+
+    .p-paginator .p-paginator-first,
+    .p-paginator .p-paginator-prev,
+    .p-paginator .p-paginator-next,
+    .p-paginator .p-paginator-last {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        color: #374151;
+        transition: all 0.2s ease;
+    }
+
+    .p-paginator .p-paginator-first:hover,
+    .p-paginator .p-paginator-prev:hover,
+    .p-paginator .p-paginator-next:hover,
+    .p-paginator .p-paginator-last:hover {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
+    }
+}
+</style>
+
 <template>
     <Head title="Siswa" />
     <Toast />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <DataTable
-            :value="props.models"
-            paginator
-            removableSort
-            row-hover
-            :rows="10"
-            :rows-per-page-options="[10, 20, 50, 100]"
-            tableStyle="min-width: 50rem"
-        >
-            <template #header>
-                <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-                    <InputText class="w-full lg:w-72" v-model="filters" placeholder="Search ..." />
-                    <SplitButton label="Tambah" @click="openCreateDialog" variant="primary" icon="pi pi-plus" :model="splitButtonItems" />
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">
+                        Data Siswa - {{ props.studentClass.name }}
+                    </h1>
+                    <p class="mt-1.5 text-sm text-gray-500">
+                        Kelola data siswa kelas {{ props.studentClass.name }} angkatan {{ props.year.year }}
+                    </p>
                 </div>
-            </template>
-            <template #empty>
-                <span class="text-center">No data found.</span>
-            </template>
+                <div class="flex gap-2 shrink-0">
+                    <SplitButton
+                        label="Tambah Siswa"
+                        @click="openCreateDialog"
+                        icon="pi pi-plus"
+                        :model="splitButtonItems"
+                        class="bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 transition-colors duration-200"
+                    />
+                </div>
+            </div>
+        </div>
 
-            <Column field="name" sortable header="Nama"></Column>
-            <Column field="nisn" sortable header="NISN"></Column>
-            <Column field="phone" sortable header="No. Telepon"></Column>
-            <Column field="gender" sortable header="Jenis Kelamin">
-                <template #body="{ data }">
-                    {{ formatGender(data.gender) }}
-                </template>
-            </Column>
-            <Column style="width: 10%">
-                <template #body="slotProps">
-                    <div class="flex justify-center">
-                        <Button
-                            class="hover:!opacity-50"
-                            style="color: #eab308 !important"
-                            icon="pi pi-pencil"
-                            variant="link"
-                            severity="warn"
-                            v-tooltip.top="'Ubah'"
-                            @click="openEditDialog(slotProps.data)"
-                        />
-                        <Button
-                            class="hover:!opacity-50"
-                            icon="pi pi-angle-right"
-                            variant="link"
-                            severity="secondary"
-                            v-tooltip.top="'Detail Siswa'"
-                            @click="detailStudent(slotProps.data)"
+        <!-- Content Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Search Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="pi pi-search text-gray-400 text-sm"></i>
+                        </div>
+                        <InputText
+                            v-model="filters"
+                            placeholder="Cari siswa berdasarkan nama, NISN, atau telepon..."
+                            class="pl-10 w-full sm:w-96 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-sm"
                         />
                     </div>
-                </template>
-            </Column>
-        </DataTable>
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <i class="pi pi-users"></i>
+                        <span>{{ props.models.length }} siswa terdaftar</span>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Data Table -->
+            <DataTable
+                :value="props.models"
+                paginator
+                removableSort
+                row-hover
+                :rows="10"
+                :rows-per-page-options="[10, 20, 50, 100]"
+                tableStyle="min-width: 100%"
+                class="custom-datatable"
+                paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                currentPageReportTemplate="Menampilkan {first} - {last} dari {totalRecords} siswa"
+            >
+                <template #empty>
+                    <div class="flex flex-col items-center justify-center py-12 text-gray-500">
+                        <i class="pi pi-users text-4xl mb-4 text-gray-300"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Tidak ada data siswa</h3>
+                        <p class="text-sm text-gray-500">Belum ada siswa yang terdaftar di kelas ini</p>
+                    </div>
+                </template>
+
+                <Column
+                    field="name"
+                    sortable
+                    header="Nama Siswa"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-full flex items-center justify-center">
+                                <span class="text-white font-semibold text-sm">
+                                    {{ slotProps.data.name.charAt(0).toUpperCase() }}
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-base font-semibold text-gray-900">
+                                    {{ slotProps.data.name }}
+                                </p>
+                                <p class="text-xs text-gray-500">{{ slotProps.data.email }}</p>
+                            </div>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    field="nisn"
+                    sortable
+                    header="NISN"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                    class="w-40"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="pi pi-id-card text-purple-600 text-sm"></i>
+                            </div>
+                            <span class="font-mono text-sm font-medium text-gray-900">
+                                {{ slotProps.data.nisn }}
+                            </span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    field="phone"
+                    sortable
+                    header="No. Telepon"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                    class="w-44"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="pi pi-phone text-green-600 text-sm"></i>
+                            </div>
+                            <span class="font-medium text-gray-900">
+                                {{ slotProps.data.phone }}
+                            </span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    field="gender"
+                    sortable
+                    header="Jenis Kelamin"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                    class="w-40"
+                >
+                    <template #body="{ data }">
+                        <div class="flex items-center gap-2">
+                            <div :class="[
+                                'flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center',
+                                data.gender === 'laki-laki' ? 'bg-blue-100' : 'bg-pink-100'
+                            ]">
+                                <i :class="[
+                                    'text-sm',
+                                    data.gender === 'laki-laki' ? 'pi pi-mars text-blue-600' : 'pi pi-venus text-pink-600'
+                                ]"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900">
+                                {{ formatGender(data.gender) }}
+                            </span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    header="Aksi"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                    class="w-32"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center justify-center gap-1">
+                            <Button
+                                icon="pi pi-pencil"
+                                severity="warn"
+                                @click="openEditDialog(slotProps.data)"
+                                class="p-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors duration-200"
+                                text
+                                size="small"
+                                v-tooltip.top="'Edit siswa'"
+                            />
+                            <Button
+                                icon="pi pi-eye"
+                                severity="info"
+                                @click="detailStudent(slotProps.data)"
+                                class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                                text
+                                size="small"
+                                v-tooltip.top="'Detail siswa'"
+                            />
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+
+        <!-- Enhanced Student Detail Drawer -->
         <Drawer v-model:visible="displayDrawer" header="Detail Siswa" position="right" class="!w-full lg:!w-lg">
-            <Card class="my-2 !shadow-xl dark:!bg-gray-800 dark:!shadow-none">
-                <template #title> Informasi Pribadi </template>
-                <template #content>
-                    <table class="w-full">
-                        <tbody>
-                            <tr>
-                                <td>Nama</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.name }}</td>
-                            </tr>
-                            <tr>
-                                <td>NISN</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.nisn }}</td>
-                            </tr>
-                            <tr>
-                                <td>Email</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.email }}</td>
-                            </tr>
-                            <tr>
-                                <td>No. Telepon</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.phone }}</td>
-                            </tr>
-                            <tr>
-                                <td>Jenis Kelamin</td>
-                                <td class="py-2 text-right font-bold">{{ formatGender(selectedStudent?.gender) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Tanggal Lahir</td>
-                                <td class="py-2 text-right font-bold">{{ formatTanggal(selectedStudent?.born_date) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </template>
-            </Card>
+            <!-- Student Header Card -->
+            <div class="mb-6 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-6 text-white">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                        <span class="text-2xl font-bold">
+                            {{ selectedStudent?.name.charAt(0).toUpperCase() }}
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold">{{ selectedStudent?.name }}</h3>
+                        <p class="text-blue-100">{{ selectedStudent?.nisn }}</p>
+                        <p class="text-blue-100 text-sm">{{ props.studentClass.name }} - {{ props.year.year }}</p>
+                    </div>
+                </div>
+            </div>
 
-            <Card class="my-2 !shadow-xl dark:!bg-gray-800 dark:!shadow-none">
-                <template #title> Informasi Fisik </template>
-                <template #content>
-                    <table class="w-full">
-                        <tbody>
-                            <tr>
-                                <td>Tinggi Badan</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.height }} cm</td>
-                            </tr>
-                            <tr>
-                                <td>Berat Badan</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.weight }} kg</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </template>
-            </Card>
+            <!-- Information Cards -->
+            <div class="space-y-4">
+                <Card class="!shadow-sm border border-gray-200">
+                    <template #title>
+                        <div class="flex items-center gap-2 text-gray-800">
+                            <i class="pi pi-user text-blue-600"></i>
+                            <span>Informasi Pribadi</span>
+                        </div>
+                    </template>
+                    <template #content>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span class="text-gray-600 text-sm">Nama</span>
+                                <span class="font-semibold text-gray-900">{{ selectedStudent?.name }}</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span class="text-gray-600 text-sm">NISN</span>
+                                <span class="font-mono font-semibold text-gray-900">{{ selectedStudent?.nisn }}</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span class="text-gray-600 text-sm">Email</span>
+                                <span class="font-semibold text-gray-900">{{ selectedStudent?.email }}</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span class="text-gray-600 text-sm">No. Telepon</span>
+                                <span class="font-semibold text-gray-900">{{ selectedStudent?.phone }}</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span class="text-gray-600 text-sm">Jenis Kelamin</span>
+                                <div class="flex items-center gap-2">
+                                    <i :class="[
+                                        'text-sm',
+                                        selectedStudent?.gender === 'laki-laki' ? 'pi pi-mars text-blue-600' : 'pi pi-venus text-pink-600'
+                                    ]"></i>
+                                    <span class="font-semibold text-gray-900">{{ formatGender(selectedStudent?.gender) }}</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-gray-600 text-sm">Tanggal Lahir</span>
+                                <span class="font-semibold text-gray-900">{{ formatTanggal(selectedStudent?.born_date) }}</span>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
 
-            <Card class="my-2 !shadow-xl dark:!bg-gray-800 dark:!shadow-none">
-                <template #title> Alamat </template>
-                <template #content>
-                    <table class="w-full">
-                        <tbody>
-                            <tr>
-                                <td>Provinsi</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.province }}</td>
-                            </tr>
-                            <tr>
-                                <td>Kota</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.city }}</td>
-                            </tr>
-                            <tr>
-                                <td>Alamat Lengkap</td>
-                                <td class="py-2 text-right font-bold">{{ selectedStudent?.address }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </template>
-            </Card>
+                <Card class="!shadow-sm border border-gray-200">
+                    <template #title>
+                        <div class="flex items-center gap-2 text-gray-800">
+                            <i class="pi pi-heart text-red-500"></i>
+                            <span>Informasi Fisik</span>
+                        </div>
+                    </template>
+                    <template #content>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 rounded-lg p-4 text-center">
+                                <i class="pi pi-arrow-up text-blue-600 text-2xl mb-2"></i>
+                                <p class="text-sm text-gray-600">Tinggi Badan</p>
+                                <p class="text-xl font-bold text-gray-900">{{ selectedStudent?.height }}<span class="text-sm font-normal"> cm</span></p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 text-center">
+                                <i class="pi pi-circle text-green-600 text-2xl mb-2"></i>
+                                <p class="text-sm text-gray-600">Berat Badan</p>
+                                <p class="text-xl font-bold text-gray-900">{{ selectedStudent?.weight }}<span class="text-sm font-normal"> kg</span></p>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
 
-            <Card class="my-2 !shadow-xl dark:!bg-gray-800 dark:!shadow-none">
-                <template #title> Status </template>
-                <template #content>
-                    <table class="w-full">
-                        <tbody>
-                            <tr>
-                                <td colspan="2" class="pb-2">Status Lulus</td>
-                                <td class="py-2 text-right">
-                                    <Tag
-                                        :value="selectedStudent?.is_graduated_label"
-                                        :severity="selectedStudent?.is_graduated === true ? 'success' : 'danger'"
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" class="pb-2">Status Menikah</td>
-                                <td class="py-2 text-right">
-                                    <Tag
-                                        :value="selectedStudent?.is_married_label"
-                                        :severity="selectedStudent?.is_married === true ? 'success' : 'danger'"
-                                    />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </template>
-            </Card>
+                <Card class="!shadow-sm border border-gray-200">
+                    <template #title>
+                        <div class="flex items-center gap-2 text-gray-800">
+                            <i class="pi pi-map-marker text-orange-500"></i>
+                            <span>Alamat</span>
+                        </div>
+                    </template>
+                    <template #content>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span class="text-gray-600 text-sm">Provinsi</span>
+                                <span class="font-semibold text-gray-900">{{ selectedStudent?.province }}</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span class="text-gray-600 text-sm">Kota</span>
+                                <span class="font-semibold text-gray-900">{{ selectedStudent?.city }}</span>
+                            </div>
+                            <div class="py-2">
+                                <span class="text-gray-600 text-sm block mb-2">Alamat Lengkap</span>
+                                <p class="font-semibold text-gray-900 bg-gray-50 rounded-lg p-3">{{ selectedStudent?.address }}</p>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+
+                <Card class="!shadow-sm border border-gray-200">
+                    <template #title>
+                        <div class="flex items-center gap-2 text-gray-800">
+                            <i class="pi pi-check-circle text-green-500"></i>
+                            <span>Status</span>
+                        </div>
+                    </template>
+                    <template #content>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Status Lulus</span>
+                                <Tag
+                                    :value="selectedStudent?.is_graduated_label"
+                                    :severity="selectedStudent?.is_graduated === true ? 'success' : 'warn'"
+                                    class="font-medium"
+                                />
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Status Menikah</span>
+                                <Tag
+                                    :value="selectedStudent?.is_married_label"
+                                    :severity="selectedStudent?.is_married === true ? 'info' : 'secondary'"
+                                    class="font-medium"
+                                />
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+            </div>
 
             <template #footer>
-                <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-center">
-                    <a :href="selectedStudent?.cv_file_url" download target="_blank">
-                        <Button
-                            label="Download CV"
-                            icon="pi pi-download"
-                            class="my-2 w-full px-12 text-center lg:w-64"
-                            size="small"
-                            severity="info"
-                        />
-                    </a>
+                <div class="flex flex-col gap-3 pt-4">
                     <Button
-                        label="Hapus"
+                        v-if="selectedStudent?.cv_file_url"
+                        label="Download CV"
+                        icon="pi pi-download"
+                        class="w-full bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 transition-colors duration-200"
+                        @click="window.open(selectedStudent?.cv_file_url, '_blank')"
+                    />
+                    <Button
+                        label="Hapus Siswa"
                         icon="pi pi-trash"
-                        class="my-2 w-full px-12 text-center lg:w-64"
-                        size="small"
                         severity="danger"
+                        class="w-full"
+                        outlined
                         @click="confirmDelete"
                     />
                 </div>
             </template>
         </Drawer>
 
-        <Dialog v-model:visible="displayDeleteDialog" modal header="Konfirmasi Hapus" :style="{ width: '450px' }">
-            <div class="text-center">
-                <i class="pi pi-exclamation-triangle mb-4 text-red-500" style="font-size: 3rem"></i>
-                <p>Apakah Anda yakin ingin menghapus siswa ini?</p>
+        <!-- Enhanced Delete Confirmation Dialog -->
+        <Dialog v-model:visible="displayDeleteDialog" modal class="w-full max-w-md mx-4">
+            <template #header>
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                        <i class="pi pi-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Konfirmasi Hapus</h3>
+                        <p class="text-sm text-gray-500">Tindakan ini tidak dapat dibatalkan</p>
+                    </div>
+                </div>
+            </template>
+
+            <div class="py-4">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="pi pi-exclamation-triangle text-red-500 text-xl mt-0.5"></i>
+                        <div>
+                            <p class="text-sm text-red-800 font-medium mb-1">
+                                Hapus data siswa {{ selectedStudent?.name }}?
+                            </p>
+                            <p class="text-sm text-red-700">
+                                Semua data yang terkait dengan siswa ini akan ikut terhapus.
+                                Pastikan Anda telah membackup data yang diperlukan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             <template #footer>
-                <Button label="Batal" icon="pi pi-times" text @click="displayDeleteDialog = false" />
-                <Button label="Hapus" icon="pi pi-check" severity="danger" @click="deleteStudent" />
+                <div class="flex justify-end gap-3">
+                    <Button
+                        label="Batal"
+                        @click="displayDeleteDialog = false"
+                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        text
+                    />
+                    <Button
+                        label="Hapus Siswa"
+                        icon="pi pi-trash"
+                        @click="deleteStudent"
+                        class="px-4 py-2 bg-red-600 hover:bg-red-700 border-red-600 hover:border-red-700 transition-colors duration-200"
+                        :loading="form.processing"
+                    />
+                </div>
             </template>
         </Dialog>
 
+        <!-- Enhanced Student Form Dialog -->
         <Dialog
             v-model:visible="dialogVisible"
             modal
-            :header="dialogMode === 'add' ? 'Tambah Siswa' : 'Ubah Siswa'"
-            class="w-full max-w-lg sm:max-w-xl md:max-w-2xl"
+            class="w-full max-w-4xl mx-4"
         >
-            <div class="flex flex-col gap-y-4 p-2 lg:p-4">
+            <template #header>
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="pi pi-user text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            {{ dialogMode === 'add' ? 'Tambah Siswa Baru' : 'Edit Data Siswa' }}
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            {{ dialogMode === 'add' ? 'Masukkan data siswa baru untuk kelas ' + props.studentClass.name : 'Ubah data siswa' }}
+                        </p>
+                    </div>
+                </div>
+            </template>
+                        <div class="p-6 space-y-8 max-h-[70vh] overflow-y-auto">
                 <!-- Informasi Pribadi -->
-                <div>
-                    <h5 class="text-foreground mb-2 text-lg font-bold">Informasi Pribadi</h5>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label for="name" class="text-foreground block text-sm font-medium">Nama</label>
-                            <InputText id="name" v-model="form.name" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.name }" />
-                            <small v-if="form.errors.name" class="p-error text-xs">{{ form.errors.name }}</small>
+                <div class="bg-blue-50/50 rounded-lg p-6 border border-blue-100">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="pi pi-user text-blue-600"></i>
                         </div>
-                        <div>
-                            <label for="nisn" class="text-foreground block text-sm font-medium">NISN</label>
-                            <InputText id="nisn" v-model="form.nisn" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.nisn }" />
-                            <small v-if="form.errors.nisn" class="p-error text-xs">{{ form.errors.nisn }}</small>
+                        <h5 class="text-lg font-semibold text-gray-900">Informasi Pribadi</h5>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div class="space-y-2">
+                            <label for="name" class="block text-sm font-medium text-gray-700">
+                                Nama Lengkap <span class="text-red-500">*</span>
+                            </label>
+                            <InputText
+                                id="name"
+                                v-model="form.name"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.name }"
+                                placeholder="Masukkan nama lengkap"
+                            />
+                            <small v-if="form.errors.name" class="text-red-600 text-xs">{{ form.errors.name }}</small>
                         </div>
-                        <div>
-                            <label for="email" class="text-foreground block text-sm font-medium">Email</label>
-                            <InputText id="email" v-model="form.email" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.email }" />
-                            <small v-if="form.errors.email" class="p-error text-xs">{{ form.errors.email }}</small>
+                        <div class="space-y-2">
+                            <label for="nisn" class="block text-sm font-medium text-gray-700">
+                                NISN <span class="text-red-500">*</span>
+                            </label>
+                            <InputText
+                                id="nisn"
+                                v-model="form.nisn"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.nisn }"
+                                placeholder="Nomor Induk Siswa Nasional"
+                            />
+                            <small v-if="form.errors.nisn" class="text-red-600 text-xs">{{ form.errors.nisn }}</small>
                         </div>
-                        <div>
-                            <label for="phone" class="text-foreground block text-sm font-medium">No. Telepon</label>
-                            <InputText id="phone" v-model="form.phone" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.phone }" />
-                            <small v-if="form.errors.phone" class="p-error text-xs">{{ form.errors.phone }}</small>
+                        <div class="space-y-2">
+                            <label for="email" class="block text-sm font-medium text-gray-700">
+                                Email <span class="text-red-500">*</span>
+                            </label>
+                            <InputText
+                                id="email"
+                                v-model="form.email"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.email }"
+                                placeholder="contoh@email.com"
+                            />
+                            <small v-if="form.errors.email" class="text-red-600 text-xs">{{ form.errors.email }}</small>
                         </div>
-                        <div>
-                            <label for="gender" class="text-foreground block text-sm font-medium">Jenis Kelamin</label>
+                        <div class="space-y-2">
+                            <label for="phone" class="block text-sm font-medium text-gray-700">
+                                No. Telepon <span class="text-red-500">*</span>
+                            </label>
+                            <InputText
+                                id="phone"
+                                v-model="form.phone"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.phone }"
+                                placeholder="08123456789"
+                            />
+                            <small v-if="form.errors.phone" class="text-red-600 text-xs">{{ form.errors.phone }}</small>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="gender" class="block text-sm font-medium text-gray-700">
+                                Jenis Kelamin <span class="text-red-500">*</span>
+                            </label>
                             <Select
                                 id="gender"
                                 v-model="form.gender"
@@ -607,89 +946,135 @@ watch(filters, (newValue) => {
                                 ]"
                                 optionLabel="label"
                                 optionValue="value"
-                                class="mt-1 w-full"
-                                :class="{ 'p-invalid': form.errors.gender }"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.gender }"
+                                placeholder="Pilih jenis kelamin"
                             />
-                            <small v-if="form.errors.gender" class="p-error text-xs">{{ form.errors.gender }}</small>
+                            <small v-if="form.errors.gender" class="text-red-600 text-xs">{{ form.errors.gender }}</small>
                         </div>
-                        <div>
-                            <label for="born_date" class="text-foreground block text-sm font-medium">Tanggal Lahir</label>
+                        <div class="space-y-2">
+                            <label for="born_date" class="block text-sm font-medium text-gray-700">
+                                Tanggal Lahir <span class="text-red-500">*</span>
+                            </label>
                             <DatePicker
                                 id="born_date"
                                 v-model="datePickerValue"
-                                class="mt-1 w-full"
-                                :class="{ 'p-invalid': form.errors.born_date }"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.born_date }"
                                 dateFormat="yy-mm-dd"
+                                placeholder="Pilih tanggal lahir"
                             />
-                            <small v-if="form.errors.born_date" class="p-error text-xs">{{ form.errors.born_date }}</small>
+                            <small v-if="form.errors.born_date" class="text-red-600 text-xs">{{ form.errors.born_date }}</small>
                         </div>
-                        <div>
-                            <label for="password" class="text-foreground block text-sm font-medium">Password</label>
+                        <div class="space-y-2 sm:col-span-2">
+                            <label for="password" class="block text-sm font-medium text-gray-700">
+                                Password <span class="text-red-500">*</span>
+                            </label>
                             <Password
                                 id="password"
                                 v-model="form.password"
-                                class="mt-1"
-                                :class="{ 'p-invalid': form.errors.password }"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.password }"
                                 :feedback="true"
-                                min-length="8"
                                 toggleMask
+                                placeholder="Masukkan password"
                             />
-                            <small v-if="form.errors.password" class="p-error text-xs">{{ form.errors.password }}</small>
+                            <small v-if="form.errors.password" class="text-red-600 text-xs">{{ form.errors.password }}</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Informasi Fisik -->
-                <div>
-                    <h5 class="text-foreground mb-2 text-lg font-bold">Informasi Fisik</h5>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label for="height" class="text-foreground block text-sm font-medium">Tinggi Badan (cm)</label>
-                            <InputText id="height" v-model="form.height" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.height }" />
-                            <small v-if="form.errors.height" class="p-error text-xs">{{ form.errors.height }}</small>
+                <div class="bg-green-50/50 rounded-lg p-6 border border-green-100">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="pi pi-heart text-green-600"></i>
                         </div>
-                        <div>
-                            <label for="weight" class="text-foreground block text-sm font-medium">Berat Badan (kg)</label>
-                            <InputText id="weight" v-model="form.weight" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.weight }" />
-                            <small v-if="form.errors.weight" class="p-error text-xs">{{ form.errors.weight }}</small>
+                        <h5 class="text-lg font-semibold text-gray-900">Informasi Fisik</h5>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div class="space-y-2">
+                            <label for="height" class="block text-sm font-medium text-gray-700">Tinggi Badan (cm)</label>
+                            <InputText
+                                id="height"
+                                v-model="form.height"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.height }"
+                                placeholder="Contoh: 170"
+                            />
+                            <small v-if="form.errors.height" class="text-red-600 text-xs">{{ form.errors.height }}</small>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="weight" class="block text-sm font-medium text-gray-700">Berat Badan (kg)</label>
+                            <InputText
+                                id="weight"
+                                v-model="form.weight"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.weight }"
+                                placeholder="Contoh: 65"
+                            />
+                            <small v-if="form.errors.weight" class="text-red-600 text-xs">{{ form.errors.weight }}</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Alamat -->
-                <div>
-                    <h5 class="text-foreground mb-2 text-lg font-bold">Alamat</h5>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label for="province" class="text-foreground block text-sm font-medium">Provinsi</label>
-                            <InputText id="province" v-model="form.province" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.province }" />
-                            <small v-if="form.errors.province" class="p-error text-xs">{{ form.errors.province }}</small>
+                <div class="bg-orange-50/50 rounded-lg p-6 border border-orange-100">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <i class="pi pi-map-marker text-orange-600"></i>
                         </div>
-                        <div>
-                            <label for="city" class="text-foreground block text-sm font-medium">Kota</label>
-                            <InputText id="city" v-model="form.city" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.city }" />
-                            <small v-if="form.errors.city" class="p-error text-xs">{{ form.errors.city }}</small>
+                        <h5 class="text-lg font-semibold text-gray-900">Alamat</h5>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div class="space-y-2">
+                            <label for="province" class="block text-sm font-medium text-gray-700">Provinsi</label>
+                            <InputText
+                                id="province"
+                                v-model="form.province"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.province }"
+                                placeholder="Contoh: Jawa Timur"
+                            />
+                            <small v-if="form.errors.province" class="text-red-600 text-xs">{{ form.errors.province }}</small>
                         </div>
-                        <div class="sm:col-span-2">
-                            <label for="address" class="text-foreground block text-sm font-medium">Alamat Lengkap</label>
+                        <div class="space-y-2">
+                            <label for="city" class="block text-sm font-medium text-gray-700">Kota</label>
+                            <InputText
+                                id="city"
+                                v-model="form.city"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.city }"
+                                placeholder="Contoh: Bojonegoro"
+                            />
+                            <small v-if="form.errors.city" class="text-red-600 text-xs">{{ form.errors.city }}</small>
+                        </div>
+                        <div class="space-y-2 sm:col-span-2">
+                            <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
                             <Textarea
                                 id="address"
                                 v-model="form.address"
-                                class="mt-1 w-full"
+                                class="w-full"
                                 rows="3"
-                                :class="{ 'p-invalid': form.errors.address }"
+                                :class="{ 'border-red-300': form.errors.address }"
+                                placeholder="Masukkan alamat lengkap"
                             />
-                            <small v-if="form.errors.address" class="p-error text-xs">{{ form.errors.address }}</small>
+                            <small v-if="form.errors.address" class="text-red-600 text-xs">{{ form.errors.address }}</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Status -->
-                <div>
-                    <h5 class="text-foreground mb-2 text-lg font-bold">Status</h5>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label for="is_graduated" class="text-foreground block text-sm font-medium">Status Lulus</label>
+                <div class="bg-purple-50/50 rounded-lg p-6 border border-purple-100">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="pi pi-check-circle text-purple-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Status</h5>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div class="space-y-2">
+                            <label for="is_graduated" class="block text-sm font-medium text-gray-700">Status Lulus</label>
                             <Select
                                 id="is_graduated"
                                 v-model="form.is_graduated"
@@ -699,13 +1084,14 @@ watch(filters, (newValue) => {
                                 ]"
                                 optionLabel="label"
                                 optionValue="value"
-                                class="mt-1 w-full"
-                                :class="{ 'p-invalid': form.errors.is_graduated }"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.is_graduated }"
+                                placeholder="Pilih status kelulusan"
                             />
-                            <small v-if="form.errors.is_graduated" class="p-error text-xs">{{ form.errors.is_graduated }}</small>
+                            <small v-if="form.errors.is_graduated" class="text-red-600 text-xs">{{ form.errors.is_graduated }}</small>
                         </div>
-                        <div>
-                            <label for="is_married" class="text-foreground block text-sm font-medium">Status Menikah</label>
+                        <div class="space-y-2">
+                            <label for="is_married" class="block text-sm font-medium text-gray-700">Status Menikah</label>
                             <Select
                                 id="is_married"
                                 v-model="form.is_married"
@@ -715,64 +1101,112 @@ watch(filters, (newValue) => {
                                 ]"
                                 optionLabel="label"
                                 optionValue="value"
-                                class="mt-1 w-full"
-                                :class="{ 'p-invalid': form.errors.is_married }"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.is_married }"
+                                placeholder="Pilih status pernikahan"
                             />
-                            <small v-if="form.errors.is_married" class="p-error text-xs">{{ form.errors.is_married }}</small>
+                            <small v-if="form.errors.is_married" class="text-red-600 text-xs">{{ form.errors.is_married }}</small>
                         </div>
                     </div>
                 </div>
             </div>
 
             <template #footer>
-                <Button label="Batal" icon="pi pi-times" class="p-button-text p-button-secondary" @click="dialogVisible = false" />
-                <Button
-                    :label="dialogMode === 'add' ? 'Simpan' : 'Update'"
-                    icon="pi pi-check"
-                    class="p-button-success"
-                    @click="dialogMode === 'add' ? createStudent() : updateStudent()"
-                />
+                <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+                    <Button
+                        label="Batal"
+                        @click="dialogVisible = false"
+                        class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        text
+                    />
+                    <Button
+                        :label="dialogMode === 'add' ? 'Tambah Siswa' : 'Simpan Perubahan'"
+                        icon="pi pi-check"
+                        @click="dialogMode === 'add' ? createStudent() : updateStudent()"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 transition-colors duration-200"
+                        :loading="form.processing"
+                    />
+                </div>
             </template>
         </Dialog>
 
-        <!-- Dialog Import -->
-        <Dialog v-model:visible="displayImportDialog" modal header="Import Data Siswa" :style="{ width: '450px' }">
-            <div class="flex flex-col gap-y-4 p-2 lg:p-4">
-                <div class="text-center">
-                    <i class="pi pi-file-excel mb-4 text-5xl text-green-500"></i>
-                    <p class="mb-4">Silakan unggah file Excel yang berisi data siswa</p>
-                    <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                        Pastikan format file Excel sesuai dengan template yang disediakan.
-                        <a href="/templates/template_import_siswa.xlsx" class="text-primary-500 hover:underline"> Unduh Template </a>
-                    </p>
+        <!-- Enhanced Import Dialog -->
+        <Dialog v-model:visible="displayImportDialog" modal class="w-full max-w-lg mx-4">
+            <template #header>
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="pi pi-file-excel text-green-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Import Data Siswa</h3>
+                        <p class="text-sm text-gray-500">Unggah file Excel untuk menambah data siswa secara massal</p>
+                    </div>
+                </div>
+            </template>
+
+            <div class="p-6 space-y-6">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="pi pi-info-circle text-blue-600 text-lg mt-0.5"></i>
+                        <div>
+                            <p class="text-sm text-blue-800 font-medium mb-1">Panduan Import</p>
+                            <p class="text-sm text-blue-700 mb-2">
+                                Pastikan format file Excel sesuai dengan template yang disediakan untuk menghindari error saat import.
+                            </p>
+                            <a href="/templates/template_import_siswa.xlsx" class="text-blue-600 hover:text-blue-800 text-sm font-medium underline">
+                                📥 Unduh Template Excel
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="flex w-full flex-col items-center justify-center">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">File Excel</label>
                     <label
                         for="dropzone-file"
-                        class="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
+                        class="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
+                        :class="{ 'border-blue-400 bg-blue-50': importForm.file }"
                     >
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <i class="pi pi-upload mb-2 text-2xl text-gray-500 dark:text-gray-400"></i>
-                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                            <i class="pi pi-upload mb-2 text-2xl text-gray-400"></i>
+                            <p class="mb-2 text-sm text-gray-500">
                                 <span class="font-semibold">Klik untuk mengunggah</span> atau drag & drop
                             </p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">CSV, XLS, XLSX (MAX. 10MB)</p>
+                            <p class="text-xs text-gray-500">CSV, XLS, XLSX (MAX. 10MB)</p>
                         </div>
-                        <input id="dropzone-file" ref="fileInput" type="file" class="hidden" accept=".csv, .xls, .xlsx" @change="handleFileChange" />
+                        <input
+                            id="dropzone-file"
+                            ref="fileInput"
+                            type="file"
+                            class="hidden"
+                            accept=".csv, .xls, .xlsx"
+                            @change="handleFileChange"
+                        />
                     </label>
-                    <p v-if="importForm.file" class="mt-2 text-sm text-gray-600 dark:text-gray-300">File: {{ importForm.file?.name }}</p>
+                    <p v-if="importForm.file" class="text-sm text-green-600 flex items-center gap-2">
+                        <i class="pi pi-check-circle"></i>
+                        <span>File: {{ importForm.file?.name }}</span>
+                    </p>
                 </div>
             </div>
+
             <template #footer>
-                <Button
-                    label="Batal"
-                    icon="pi pi-times"
-                    class="p-button-text p-button-secondary"
-                    :disabled="importLoading"
-                    @click="displayImportDialog = false"
-                />
-                <Button label="Import" icon="pi pi-upload" class="p-button-primary" :loading="importLoading" @click="submitImport" />
+                <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+                    <Button
+                        label="Batal"
+                        @click="displayImportDialog = false"
+                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        :disabled="importLoading"
+                        text
+                    />
+                    <Button
+                        label="Import Data"
+                        icon="pi pi-upload"
+                        @click="submitImport"
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 border-green-600 hover:border-green-700 transition-colors duration-200"
+                        :loading="importLoading"
+                    />
+                </div>
             </template>
         </Dialog>
     </AppLayout>
