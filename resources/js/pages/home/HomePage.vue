@@ -17,7 +17,6 @@
                         <a href="#about" class="font-medium text-blue-900 hover:text-blue-700">Tentang</a>
                         <a href="#programs" class="font-medium text-blue-900 hover:text-blue-700">Program Keahlian</a>
                         <a href="#facilities" class="font-medium text-blue-900 hover:text-blue-700">Fasilitas</a>
-                        <a href="#news" class="font-medium text-blue-900 hover:text-blue-700">Berita</a>
                         <a href="#contact" class="font-medium text-blue-900 hover:text-blue-700">Kontak</a>
                     </div>
                     <div class="flex space-x-2">
@@ -43,7 +42,7 @@
                         </p>
                         <div class="flex flex-col gap-4 sm:flex-row">
                             <Button
-                                @click="$inertia.visit('/announcements')"
+                                @click="$inertia.visit('students/announcements')"
                                 size="large"
                                 class="bg-yellow-500 font-semibold text-blue-900 hover:bg-yellow-600"
                             >
@@ -54,7 +53,7 @@
                                 @click="$inertia.visit('/students/vacancies')"
                                 size="large"
                                 outlined
-                                class="border-white text-white hover:bg-white hover:text-blue-900 dark:hover:bg-gray-800 dark:hover:text-white"
+                                class="border-white !text-white hover:!bg-white hover:!text-blue-900"
                             >
                                 <i class="pi pi-briefcase mr-2"></i>
                                 Cari Lowongan Kerja
@@ -171,10 +170,10 @@
                             </div>
                         </template>
                         <template #content>
-                            <p class="mb-4 text-gray-600 dark:text-gray-400">{{ program.description }}</p>
+                            <p class="mb-4 text-gray-600">{{ program.description }}</p>
                             <div class="mb-4">
-                                <h4 class="mb-2 font-semibold text-blue-900 dark:text-blue-400">Prospek Karir:</h4>
-                                <ul class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                                <h4 class="mb-2 font-semibold text-blue-900">Prospek Karir:</h4>
+                                <ul class="space-y-1 text-sm text-gray-600">
                                     <li v-for="career in program.careers" :key="career" class="flex items-center">
                                         <i class="pi pi-circle-fill mr-2 text-xs text-blue-500"></i>
                                         {{ career }}
@@ -366,8 +365,8 @@
                         <ul class="space-y-2 text-sm">
                             <li><a href="#about" class="transition-colors hover:text-white">Tentang Sekolah</a></li>
                             <li><a href="#programs" class="transition-colors hover:text-white">Program Keahlian</a></li>
-                            <li><a href="/announcements" class="transition-colors hover:text-white">Pengumuman</a></li>
-                            <li><a href="/vacancies" class="transition-colors hover:text-white">Lowongan Kerja</a></li>
+                            <li><a href="/students/announcements" class="transition-colors hover:text-white">Pengumuman</a></li>
+                            <li><a href="/students/vacancies" class="transition-colors hover:text-white">Lowongan Kerja</a></li>
                             <li><a href="/tracer-study" class="transition-colors hover:text-white">Tracer Study</a></li>
                         </ul>
                     </div>
@@ -519,9 +518,9 @@ const facilities = ref([
     },
     {
         id: 6,
-        name: 'Perpustakaan Digital',
+        name: 'Perpustakaan',
         icon: 'pi pi-book',
-        description: 'Perpustakaan modern dengan koleksi digital dan akses internet untuk research',
+        description: 'Perpustakaan dengan koleksi buku, jurnal, dan sumber belajar yang lengkap',
     },
     {
         id: 7,
@@ -619,6 +618,22 @@ onUnmounted(() => {
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* Adjust based on navbar height */
+}
+
+/* Section offset for fixed navbar */
+section[id] {
+    scroll-margin-top: 80px;
+}
+
+/* Alternative method using pseudo-element anchor offset */
+section[id]::before {
+    content: '';
+    display: block;
+    height: 80px;
+    margin-top: -80px;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 /* Navigation scroll effect */
