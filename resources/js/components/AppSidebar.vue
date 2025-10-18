@@ -21,27 +21,38 @@ const commonNavItems: NavItem[] = [];
 // Menu khusus untuk staff
 const staffNavItems: NavItem[] = [
     {
+        title: 'Dashboard',
+        description: 'Halaman Dashboard untuk Staff',
+        href: '/dashboard',
+        icon: LayoutDashboard,
+    },
+    {
         title: 'Pengumuman',
+        description: 'Halaman Pengumuman untuk Staff',
         href: '/announcements',
         icon: Megaphone,
     },
     {
         title: 'Kuisioner',
+        description: 'Halaman Kuisioner untuk Staff',
         href: '/questionnaires',
         icon: FileText,
     },
     {
         title: 'Siswa',
+        description: 'Halaman Siswa untuk Staff',
         href: '/years',
         icon: Users,
     },
     {
         title: 'Mitra DU/DI',
+        description: 'Halaman Mitra DU/DI untuk Staff',
         href: '/partners',
         icon: Briefcase,
     },
     {
         title: 'Karyawan',
+        description: 'Halaman Karyawan untuk Staff',
         href: '/users',
         icon: ShieldCheck,
     },
@@ -72,7 +83,7 @@ const studentNavItems: NavItem[] = [
     {
         title: 'Pengumuman',
         description: 'Halaman Pengumuman untuk Siswa',
-        href: '/announcements',
+        href: 'students/announcements',
         icon: Megaphone,
     },
     {
