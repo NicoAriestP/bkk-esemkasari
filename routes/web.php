@@ -92,7 +92,7 @@ Route::middleware('auth:student')->group(function () {
         Route::get('/', [StudentController::class, 'dashboard'])->name('dashboard');
     });
     // Announcement Routes (Student)
-    Route::prefix('announcements')->name('announcements.')->group(function () {
+    Route::prefix('students/announcements')->name('announcements.')->group(function () {
         Route::get('/', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('student.index');
         Route::get('/{model}', [AnnouncementController::class, 'detailAnnouncementStudent'])->name('student.detail');
     });
