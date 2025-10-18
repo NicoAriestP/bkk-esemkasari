@@ -32,13 +32,14 @@ services:
     image: mysql:8.0
     container_name: bkk-esemkasari-mysql
     restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password --skip-ssl
     environment:
-      MYSQL_DATABASE: bkk_esemkasari
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: root
-      MYSQL_USER: laravel
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
     ports:
-      - "3306:3306"
+      - "3902:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
