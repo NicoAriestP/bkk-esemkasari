@@ -195,6 +195,7 @@ watch(filters, (newValue) => {
                         <div class="flex items-center justify-center">
                             <Button
                                 icon="pi pi-pencil"
+                                severity="warn"
                                 @click.stop="openEditPage(slotProps.data.id)"
                                 class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
                                 text
