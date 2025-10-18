@@ -37,7 +37,7 @@ createInertiaApp({
                 theme: {
                     preset: Lara,
                     options: {
-                        darkModeSelector: false
+                        darkModeSelector: false,
                     },
                 },
             })
