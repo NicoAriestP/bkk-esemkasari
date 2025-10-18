@@ -12,26 +12,28 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
 
 ## Architecture & Data Flow
 - **Multi-Guard Auth:**
-  - Admin (`auth:web`): Full CRUD
-  - Student (`auth:student`): Announcements, tracer study, apply vacancies
+  - Admin (`auth:web`): Full CRUD operations
+  - Student (`auth:student`): View announcements, complete tracer study, apply to vacancies
   - Partner (`auth:partner`): Manage vacancies, screen applications
-  - Route separation via middleware groups in `routes/web.php`
+  - Route separation: `routes/web.php` uses middleware groups, `routes/auth.php` handles all guards
+- **Action-Controller Pattern:**
+  - Business logic in `app/Actions/{Entity}/{Entity}Action.php` (e.g., `StudentAction::save()`)
+  - Controllers delegate to Actions, never handle business logic directly
+  - Actions return models, Controllers handle HTTP responses and redirects
 - **Data Hierarchy:**
-  - Year → StudentClass → Students
-  - Partners → Vacancies → VacancyApplications
-  - Students → TracerStudy Answers (one-to-one per answer type)
-- **Business Logic:**
-  - All create/update handled in `app/Actions/{Entity}/{Entity}Action.php`
-  - Controllers delegate to Actions (e.g., `StudentAction::save()`)
+  - Year → StudentClass → Students (nested educational structure)
+  - Partners → Vacancies → VacancyApplications (job workflow)
+  - Students → TracerStudy Answers (one-to-one per answer type: activity/working/university/entrepreneur)
 
 ## Developer Workflows
-- **Start Dev:** `composer run dev` (Laravel server + queue + Vite)
-- **Testing:** Pest PHP (`composer run test`), tests in `tests/Feature/` and `tests/Unit/`
-- **Frontend Build:**
-  - `npm run dev` (HMR)
-  - `npm run build` (production)
-  - `npm run build:ssr` (SSR)
-- **Code Quality:** ESLint + Prettier (`npm run lint`, `npm run format`)
+- **Local Dev:** `composer run dev` (concurrently runs Laravel server + queue + Vite HMR)
+- **Docker Dev:** `docker-compose up -d` (app/nginx/mysql containers, frontend runs on host)
+- **Database:** MySQL 8.0, use `bkk_esemkasari` database, migrations handle schema
+- **Testing:** Pest PHP (`composer run test`), organized in `tests/Feature/` and `tests/Unit/`
+- **Frontend:** 
+  - `npm run dev` (Vite HMR at localhost:5173)
+  - `npm run build` (production), `npm run build:ssr` (SSR support)
+  - ESLint + Prettier (`npm run lint`, `npm run format`)
 
 ## Conventions & Patterns
 - **Vue:**
@@ -40,6 +42,7 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
   - Page components in `resources/js/pages/{Entity}/`
   - Layout via `AppLayout.vue` (or `layout: null` for standalone pages like HomePage)
   - Auth guard detection via `usePage().props.auth.activeGuard`
+  - Always prioritize using Tailwind CSS utility classes for styling before custom CSS.
 - **TypeScript:**
   - Types auto-generated in `resources/js/types/` for backend data
   - Shared types: `Auth`, `BreadcrumbItem`, `NavItem`, `SharedData`
@@ -57,11 +60,18 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
   - Export qualified applicants for partners
   - Template files for consistent imports
 
+## Docker & Environment
+- **Docker Setup:** `docker-compose up -d` (app: PHP 8.2-FPM, nginx, mysql: 8.0)
+- **Environment:** Copy `.env.docker` to `.env` for Docker development
+- **Database Access:** localhost:3306 (Docker) or via DBeaver with MySQL 8.0 driver
+- **File Structure:** `/var/www/app` in containers, volume-mounted for live development
+- **Frontend:** Run `npm install` and `npm run dev` on host (not in container)
+
 ## Integrations
-- **PrimeVue:** Lara theme, ToastService, global tooltip
-- **Inertia.js:** Page resolution in `resources/js/pages/`, Ziggy for routes, SSR in `resources/js/ssr.ts`
-- **Database:** MySQL (`bkk_esemkasari`), root/no password, localhost:3306 (Laragon)
-- **TinyMCE:** Rich text editor (API key from backend via `usePage().props.tinymce.api_key`)
+- **PrimeVue:** Lara theme, ToastService, global tooltip, utility-first styling approach
+- **Inertia.js:** Page resolution in `resources/js/pages/`, Ziggy for routes, SSR support
+- **Database:** MySQL 8.0 (`bkk_esemkasari`), queue/cache via database tables
+- **TinyMCE:** Rich text editor, API key from backend via `usePage().props.tinymce.api_key`
 
 ## Specialized Features
 - **Tracer Study:**
