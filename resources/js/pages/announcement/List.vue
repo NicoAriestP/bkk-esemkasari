@@ -52,30 +52,257 @@ watch(filters, (newValue) => {
 <template>
     <Head title="Pengumuman" />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <DataTable :value="props.models" paginator removableSort row-hover :rows="10" :rows-per-page-options="[10, 20, 50, 100]"
-            tableStyle="min-width: 50rem"
-            @rowClick="(event: any) => openEditPage(event.data.id)">
-            <template #header>
-                <div class="flex justify-between items-center">
-                    <InputText class="w-72" v-model="filters" placeholder="Search ..." />
-                    <Button label="Tambah" @click="openCreatePage" variant="primary" icon="pi pi-plus" />
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">
+                        Pengumuman
+                    </h1>
+                    <p class="mt-1.5 text-sm text-gray-500">
+                        Kelola semua pengumuman yang telah dibuat
+                    </p>
                 </div>
-            </template>
-            <template #empty>
-                <span class="text-center">No data found.</span>
-            </template>
+                <Button
+                    label="Tambah Pengumuman"
+                    @click="openCreatePage"
+                    icon="pi pi-plus"
+                    class="shrink-0 bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 transition-colors duration-200"
+                />
+            </div>
+        </div>
 
-            <Column field="created_at" sortable header="Tanggal Dibuat">
-                <template #body="slotProps">
-                    {{ dayjs(slotProps.data.created_at).format('DD MMMM YYYY') }}
+        <!-- Content Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Search Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="relative">
+                        <!-- <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="pi pi-search text-gray-400 text-sm"></i>
+                        </div> -->
+                        <InputText
+                            v-model="filters"
+                            placeholder="Cari pengumuman..."
+                            class="pl-10 w-full sm:w-80 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-sm"
+                        />
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <i class="pi pi-info-circle"></i>
+                        <span>{{ props.models.length }} pengumuman</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <DataTable
+                :value="props.models"
+                paginator
+                removableSort
+                row-hover
+                :rows="10"
+                :rows-per-page-options="[10, 20, 50, 100]"
+                @rowClick="(event: any) => openEditPage(event.data.id)"
+                class="custom-datatable"
+                tableStyle="min-width: 100%"
+                paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                currentPageReportTemplate="Menampilkan {first} - {last} dari {totalRecords} data"
+            >
+                <template #empty>
+                    <div class="flex flex-col items-center justify-center py-12 text-gray-500">
+                        <i class="pi pi-inbox text-4xl mb-4 text-gray-300"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Tidak ada data</h3>
+                        <p class="text-sm text-gray-500">Belum ada pengumuman yang dibuat</p>
+                    </div>
                 </template>
-            </Column>
-            <Column field="title" sortable header="Judul"></Column>
-            <Column field="created_by" sortable header="Pembuat">
-                <template #body="slotProps">
-                    {{ slotProps.data.created_by?.name }}
-                </template>
-            </Column>
-        </DataTable>
+
+                <Column
+                    field="created_at"
+                    sortable
+                    header="Tanggal"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6 text-sm"
+                    class="w-36"
+                >
+                    <template #body="slotProps">
+                        <div class="flex flex-col">
+                            <span class="font-medium text-gray-900">
+                                {{ dayjs(slotProps.data.created_at).format('DD MMM YYYY') }}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                {{ dayjs(slotProps.data.created_at).format('HH:mm') }}
+                            </span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    field="title"
+                    sortable
+                    header="Judul Pengumuman"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors cursor-pointer">
+                                    {{ slotProps.data.title }}
+                                </h3>
+                                <p v-if="slotProps.data.description" class="mt-1 text-xs text-gray-500 line-clamp-1">
+                                    {{ slotProps.data.description }}
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    field="created_by"
+                    sortable
+                    header="Pembuat"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6 text-sm"
+                    class="w-48"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-medium text-white">
+                                    {{ slotProps.data.created_by?.name?.charAt(0).toUpperCase() }}
+                                </span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-medium text-gray-900 truncate">
+                                    {{ slotProps.data.created_by?.name }}
+                                </p>
+                                <!-- <p class="text-xs text-gray-500">
+                                    Administrator
+                                </p> -->
+                            </div>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    header="Aksi"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                    class="w-24"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center justify-center">
+                            <Button
+                                icon="pi pi-pencil"
+                                severity="warn"
+                                @click.stop="openEditPage(slotProps.data.id)"
+                                class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                                text
+                                size="small"
+                                v-tooltip.top="'Edit pengumuman'"
+                            />
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
     </AppLayout>
 </template>
+
+<style scoped>
+/* Line clamp utilities */
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Custom DataTable styling */
+:deep(.custom-datatable) {
+    .p-datatable-header {
+        display: none;
+    }
+
+    .p-datatable-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .p-datatable-thead > tr > th {
+        border-bottom: 1px solid rgb(229 231 235);
+        background-color: rgb(249 250 251);
+        font-weight: 600;
+        color: rgb(55 65 81);
+        text-align: left;
+    }
+
+    .p-datatable-tbody > tr {
+        border-bottom: 1px solid rgb(243 244 246);
+        transition: background-color 150ms;
+        cursor: pointer;
+    }
+
+    .p-datatable-tbody > tr:hover {
+        background-color: rgba(249 250 251 / 0.5);
+    }
+
+    .p-datatable-tbody > tr:last-child {
+        border-bottom: none;
+    }
+
+    .p-datatable-tbody > tr > td {
+        border: none;
+        color: rgb(55 65 81);
+    }
+
+    .p-paginator {
+        border-top: 1px solid rgb(229 231 235);
+        background-color: rgba(249 250 251 / 0.3);
+        padding: 1rem 1.5rem;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page {
+        min-width: 2rem;
+        height: 2rem;
+        font-size: 0.875rem;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+        background-color: rgb(37 99 235);
+        border-color: rgb(37 99 235);
+    }
+
+    .p-paginator .p-dropdown {
+        font-size: 0.875rem;
+    }
+}
+
+/* Loading and hover states */
+.p-datatable-loading-overlay {
+    background-color: rgba(255 255 255 / 0.8);
+    backdrop-filter: blur(4px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    :deep(.custom-datatable) .p-datatable-tbody > tr > td {
+        padding: 0.75rem 1rem;
+    }
+
+    :deep(.custom-datatable) .p-datatable-thead > tr > th {
+        padding: 0.75rem 1rem;
+        font-size: 0.75rem;
+    }
+}
+</style>

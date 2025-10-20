@@ -30,7 +30,7 @@ const activeGuard = computed(() => page.props.auth.activeGuard);
             </template>
         </div>
 
-        <div class="hidden items-center lg:flex">
+        <!-- <div class="hidden items-center lg:flex">
             <div v-if="activeGuard === 'web' && currentUser" class="text-sm text-muted-foreground">
                 Selamat datang, <span class="font-semibold text-foreground">{{ currentUser.name }}</span>!
             </div>
@@ -40,6 +40,6 @@ const activeGuard = computed(() => page.props.auth.activeGuard);
             <div v-else-if="activeGuard === 'partner' && currentPartner" class="text-sm text-muted-foreground">
                 Selamat datang, <span class="font-semibold text-foreground">{{ currentPartner.name }}</span>!
             </div>
-        </div>
+        </div> -->
     </header>
 </template>

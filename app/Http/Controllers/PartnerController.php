@@ -66,4 +66,13 @@ class PartnerController extends Controller
 
         return redirect()->route('partners.index');
     }
+
+    public function dashboard(Request $request)
+    {
+        $dashboardData = Partner::getDashboardData();
+
+        return Inertia::render('dashboard/DashboardPartner', [
+            'dashboardData' => $dashboardData
+        ]);
+    }
 }

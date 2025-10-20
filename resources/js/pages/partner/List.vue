@@ -170,134 +170,525 @@ watch(filters, (newValue) => {
 });
 </script>
 
+<style scoped>
+:deep(.custom-datatable) {
+    .p-datatable-header {
+        display: none;
+    }
+
+    .p-datatable-tbody > tr {
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .p-datatable-tbody > tr:hover {
+        background-color: rgba(240, 253, 250, 0.5);
+    }
+
+    .p-datatable-tbody > tr:last-child {
+        border-bottom: none;
+    }
+
+    .p-paginator {
+        background-color: rgba(249, 250, 251, 0.5);
+        border-top: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .p-paginator .p-paginator-current {
+        order: 1;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .p-paginator .p-paginator-pages {
+        order: 2;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .p-paginator .p-dropdown {
+        order: 3;
+        margin-left: auto;
+    }
+
+    @media (min-width: 640px) {
+        .p-paginator .p-paginator-current {
+            order: 1;
+            width: auto;
+            margin-bottom: 0;
+            text-align: left;
+        }
+
+        .p-paginator .p-paginator-pages {
+            order: 2;
+            flex: none;
+        }
+
+        .p-paginator .p-dropdown {
+            order: 3;
+            margin-left: 1rem;
+        }
+    }
+
+    /* Mobile pagination adjustments */
+    @media (max-width: 639px) {
+        .p-paginator .p-paginator-first,
+        .p-paginator .p-paginator-last {
+            display: none;
+        }
+
+        .p-paginator .p-paginator-pages .p-paginator-page {
+            width: 2rem;
+            height: 2rem;
+            font-size: 0.75rem;
+        }
+
+        .p-paginator .p-paginator-prev,
+        .p-paginator .p-paginator-next {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .p-paginator .p-dropdown {
+            width: auto;
+            min-width: 4rem;
+        }
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        color: #374151;
+        transition: all 0.2s ease;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page:hover {
+        background-color: #f0fdfa;
+        border-color: #a7f3d0;
+        color: #0d9488;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+        background-color: #0d9488;
+        border-color: #0d9488;
+        color: white;
+    }
+
+    .p-paginator .p-paginator-pages .p-paginator-page.p-highlight:hover {
+        background-color: #0f766e;
+        border-color: #0f766e;
+    }
+
+    .p-paginator .p-paginator-first,
+    .p-paginator .p-paginator-prev,
+    .p-paginator .p-paginator-next,
+    .p-paginator .p-paginator-last {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        color: #374151;
+        transition: all 0.2s ease;
+    }
+
+    .p-paginator .p-paginator-first:hover,
+    .p-paginator .p-paginator-prev:hover,
+    .p-paginator .p-paginator-next:hover,
+    .p-paginator .p-paginator-last:hover {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
+    }
+}
+
+/* Password Component Responsive Fix */
+:deep(.p-password) {
+    width: 100% !important;
+    display: flex !important;
+}
+
+:deep(.p-password .p-inputtext) {
+    width: 100% !important;
+    flex: 1 !important;
+}
+
+:deep(.p-password .p-password-panel) {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 640px) {
+    :deep(.p-password .p-password-panel) {
+        left: 0 !important;
+        right: 0 !important;
+        width: auto !important;
+        margin: 0 1rem !important;
+    }
+}
+</style>
+
 <template>
     <Toast />
     <Head title="Mitra DU/DI" />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <DataTable
-            :value="props.models"
-            paginator
-            removableSort
-            row-hover
-            :rows="10"
-            :rows-per-page-options="[10, 20, 50, 100]"
-            tableStyle="min-width: 50rem"
-        >
-            <template #header>
-                <div class="flex items-center justify-between">
-                    <InputText class="w-72" v-model="filters" placeholder="Search ..." />
-                    <Button label="Tambah" @click="openCreateDialog" variant="primary" icon="pi pi-plus" />
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">
+                        Manajemen Mitra DU/DI
+                    </h1>
+                    <p class="mt-1.5 text-sm text-gray-500">
+                        Kelola data perusahaan dan industri mitra BKK
+                    </p>
                 </div>
-            </template>
-            <template #empty>
-                <span class="text-center">No data found.</span>
-            </template>
+                <Button
+                    label="Tambah Mitra"
+                    @click="openCreateDialog"
+                    icon="pi pi-plus"
+                    class="shrink-0 bg-teal-600 hover:bg-teal-700 border-teal-600 hover:border-teal-700 transition-colors duration-200"
+                />
+            </div>
+        </div>
 
-            <Column field="name" sortable header="Nama"></Column>
-            <Column field="email" sortable header="Email"></Column>
-            <Column field="phone" sortable header="No. Telp"></Column>
-            <Column field="address" sortable header="Alamat"></Column>
-            <Column style="width: 10%">
-                <template #body="slotProps">
-                    <div class="flex justify-center">
-                        <Button
-                            style="color: #eab308 !important"
-                            icon="pi pi-pencil"
-                            variant="link"
-                            severity="warn"
-                            v-tooltip.top="'Ubah'"
-                            @click="openEditDialog(slotProps.data)"
-                        />
-                        <Button
-                            style="color: #dc2626 !important"
-                            icon="pi pi-trash"
-                            variant="link"
-                            severity="danger"
-                            v-tooltip.top="'Hapus'"
-                            @click="confirmDelete(slotProps.data)"
+        <!-- Content Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Search Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="relative">
+                        <!-- <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="pi pi-search text-gray-400 text-sm"></i>
+                        </div> -->
+                        <InputText
+                            v-model="filters"
+                            placeholder="Cari mitra berdasarkan nama, email, atau alamat..."
+                            class="pl-10 w-full sm:w-96 bg-white border-gray-300 focus:border-teal-500 focus:ring-teal-500 rounded-lg text-sm"
                         />
                     </div>
-                </template>
-            </Column>
-        </DataTable>
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <i class="pi pi-building"></i>
+                        <span>{{ props.models.length }} mitra terdaftar</span>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Data Table -->
+            <DataTable
+                :value="props.models"
+                paginator
+                removableSort
+                row-hover
+                :rows="10"
+                :rows-per-page-options="[10, 20, 50, 100]"
+                tableStyle="min-width: 100%"
+                class="custom-datatable"
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                currentPageReportTemplate="{first}-{last} dari {totalRecords}"
+            >
+                <template #empty>
+                    <div class="flex flex-col items-center justify-center py-12 text-gray-500">
+                        <i class="pi pi-building text-4xl mb-4 text-gray-300"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Tidak ada data mitra</h3>
+                        <p class="text-sm text-gray-500">Belum ada mitra DU/DI yang terdaftar dalam sistem</p>
+                    </div>
+                </template>
+
+                <Column
+                    field="name"
+                    sortable
+                    header="Nama Perusahaan"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center">
+                                <span class="text-white font-semibold text-sm">
+                                    {{ slotProps.data.name.charAt(0).toUpperCase() }}
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-base font-semibold text-gray-900">
+                                    {{ slotProps.data.name }}
+                                </p>
+                                <p class="text-xs text-gray-500">{{ slotProps.data.email }}</p>
+                            </div>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    field="email"
+                    sortable
+                    header="Email"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                    class="w-64"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="pi pi-envelope text-blue-600 text-sm"></i>
+                            </div>
+                            <span class="font-medium text-gray-900 truncate">
+                                {{ slotProps.data.email }}
+                            </span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    field="phone"
+                    sortable
+                    header="No. Telepon"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                    class="w-44"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="pi pi-phone text-green-600 text-sm"></i>
+                            </div>
+                            <span class="font-medium text-gray-900">
+                                {{ slotProps.data.phone }}
+                            </span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    field="address"
+                    header="Alamat"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <i class="pi pi-map-marker text-orange-600 text-sm"></i>
+                            </div>
+                            <span class="font-medium text-gray-900 line-clamp-2">
+                                {{ slotProps.data.address }}
+                            </span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column
+                    header="Aksi"
+                    headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
+                    bodyClass="py-4 px-6"
+                    class="w-32"
+                >
+                    <template #body="slotProps">
+                        <div class="flex items-center justify-center gap-1">
+                            <Button
+                                icon="pi pi-pencil"
+                                severity="warn"
+                                @click="openEditDialog(slotProps.data)"
+                                class="p-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors duration-200"
+                                text
+                                size="small"
+                                v-tooltip.top="'Edit mitra'"
+                            />
+                            <Button
+                                icon="pi pi-trash"
+                                severity="danger"
+                                @click="confirmDelete(slotProps.data)"
+                                class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                                text
+                                size="small"
+                                v-tooltip.top="'Hapus mitra'"
+                            />
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+
+        <!-- Enhanced Partner Form Dialog -->
         <Dialog
             v-model:visible="dialogVisible"
             modal
-            :header="dialogMode === 'add' ? 'Tambah Mitra DU/DI' : 'Ubah Mitra DU/DI'"
-            class="w-full max-w-lg sm:max-w-xl md:max-w-2xl"
+            class="w-full max-w-2xl mx-4"
         >
-            <div class="flex flex-col gap-y-4 p-2 lg:p-4">
-                <div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2 lg:col-span-1">
-                            <label for="name" class="text-foreground block text-sm font-medium">Nama</label>
-                            <InputText id="name" v-model="form.name" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.name }" />
-                            <small v-if="form.errors.name" class="p-error text-xs">{{ form.errors.name }}</small>
+            <template #header>
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                        <i class="pi pi-building text-teal-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            {{ dialogMode === 'add' ? 'Tambah Mitra DU/DI Baru' : 'Edit Data Mitra DU/DI' }}
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            {{ dialogMode === 'add' ? 'Masukkan data perusahaan mitra baru' : 'Ubah data perusahaan mitra' }}
+                        </p>
+                    </div>
+                </div>
+            </template>
+
+            <div class="p-6 space-y-6">
+                <!-- Company Information Section -->
+                <div class="bg-teal-50/50 rounded-lg p-6 border border-teal-100">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+                            <i class="pi pi-building text-teal-600"></i>
                         </div>
-                        <div class="col-span-2 lg:col-span-1">
-                            <label for="phone" class="text-foreground block text-sm font-medium">No. Telepon</label>
-                            <InputText id="phone" v-model="form.phone" class="mt-1 w-full" :class="{ 'p-invalid': form.errors.phone }" />
-                            <small v-if="form.errors.phone" class="p-error text-xs">{{ form.errors.phone }}</small>
-                        </div>
-                        <div class="col-span-2">
-                            <label for="address" class="text-foreground block text-sm font-medium">Alamat</label>
-                            <Textarea
-                                id="address"
-                                v-model="form.address"
-                                class="mt-1 w-full"
-                                rows="3"
-                                :class="{ 'p-invalid': form.errors.address }"
+                        <h5 class="text-lg font-semibold text-gray-900">Informasi Perusahaan</h5>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div class="space-y-2 sm:col-span-2">
+                            <label for="name" class="block text-sm font-medium text-gray-700">
+                                Nama Perusahaan <span class="text-red-500">*</span>
+                            </label>
+                            <InputText
+                                id="name"
+                                v-model="form.name"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.name }"
+                                placeholder="Masukkan nama perusahaan"
                             />
-                            <small v-if="form.errors.address" class="p-error text-xs">{{ form.errors.address }}</small>
+                            <small v-if="form.errors.name" class="text-red-600 text-xs">{{ form.errors.name }}</small>
                         </div>
-                        <div class="col-span-2 lg:col-span-1">
-                            <label for="email" class="text-foreground block text-sm font-medium">Email</label>
+                        <div class="space-y-2">
+                            <label for="email" class="block text-sm font-medium text-gray-700">
+                                Email Perusahaan <span class="text-red-500">*</span>
+                            </label>
                             <InputText
                                 inputmode="email"
                                 id="email"
                                 v-model="form.email"
-                                class="mt-1 w-full"
-                                :class="{ 'p-invalid': form.errors.email }"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.email }"
+                                placeholder="contoh@perusahaan.com"
                             />
-                            <small v-if="form.errors.email" class="p-error text-xs">{{ form.errors.email }}</small>
+                            <small v-if="form.errors.email" class="text-red-600 text-xs">{{ form.errors.email }}</small>
                         </div>
-                        <div class="col-span-2 lg:col-span-1">
-                            <label for="password" class="text-foreground block text-sm font-medium">Password</label>
+                        <div class="space-y-2">
+                            <label for="phone" class="block text-sm font-medium text-gray-700">
+                                No. Telepon <span class="text-red-500">*</span>
+                            </label>
+                            <InputText
+                                id="phone"
+                                v-model="form.phone"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.phone }"
+                                placeholder="08123456789"
+                            />
+                            <small v-if="form.errors.phone" class="text-red-600 text-xs">{{ form.errors.phone }}</small>
+                        </div>
+                        <div class="space-y-2 sm:col-span-2">
+                            <label for="address" class="block text-sm font-medium text-gray-700">
+                                Alamat Perusahaan <span class="text-red-500">*</span>
+                            </label>
+                            <Textarea
+                                id="address"
+                                v-model="form.address"
+                                class="w-full"
+                                rows="3"
+                                :class="{ 'border-red-300': form.errors.address }"
+                                placeholder="Masukkan alamat lengkap perusahaan"
+                            />
+                            <small v-if="form.errors.address" class="text-red-600 text-xs">{{ form.errors.address }}</small>
+                        </div>
+                        <div class="space-y-2 sm:col-span-2">
+                            <label for="password" class="block text-sm font-medium text-gray-700">
+                                Password <span class="text-red-500">*</span>
+                            </label>
                             <Password
                                 id="password"
                                 v-model="form.password"
-                                class="mt-1"
-                                :class="{ 'p-invalid': form.errors.password }"
+                                class="w-full"
+                                :class="{ 'border-red-300': form.errors.password }"
                                 :feedback="true"
-                                min-length="8"
                                 toggleMask
+                                placeholder="Masukkan password"
+                                inputClass="w-full"
                             />
-                            <small v-if="form.errors.password" class="p-error text-xs">{{ form.errors.password }}</small>
+                            <small v-if="form.errors.password" class="text-red-600 text-xs">{{ form.errors.password }}</small>
                         </div>
                     </div>
                 </div>
             </div>
 
             <template #footer>
-                <Button label="Batal" icon="pi pi-times" class="p-button-text p-button-secondary" @click="dialogVisible = false" />
-                <Button
-                    :label="dialogMode === 'add' ? 'Simpan' : 'Update'"
-                    icon="pi pi-check"
-                    class="p-button-success"
-                    @click="dialogMode === 'add' ? createPartner() : updatePartner()"
-                />
+                <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+                    <Button
+                        label="Batal"
+                        @click="dialogVisible = false"
+                        class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        text
+                    />
+                    <Button
+                        :label="dialogMode === 'add' ? 'Tambah Mitra' : 'Simpan Perubahan'"
+                        icon="pi pi-check"
+                        @click="dialogMode === 'add' ? createPartner() : updatePartner()"
+                        class="px-6 py-2 !bg-teal-600 hover:!bg-teal-700 border-teal-600 hover:border-teal-700 transition-colors duration-200"
+                        :loading="form.processing"
+                    />
+                </div>
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="displayDeleteDialog" modal header="Konfirmasi Hapus" :style="{ width: '450px' }">
-            <div class="text-center">
-                <i class="pi pi-exclamation-triangle mb-4 text-red-500" style="font-size: 3rem"></i>
-                <p>Apakah Anda yakin ingin menghapus mitra DU/DI ini?</p>
+        <!-- Enhanced Delete Confirmation Dialog -->
+        <Dialog v-model:visible="displayDeleteDialog" modal class="w-full max-w-md mx-4">
+            <template #header>
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                        <i class="pi pi-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Konfirmasi Hapus</h3>
+                        <p class="text-sm text-gray-500">Tindakan ini tidak dapat dibatalkan</p>
+                    </div>
+                </div>
+            </template>
+
+            <div class="py-4">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="pi pi-exclamation-triangle text-red-500 text-xl mt-0.5"></i>
+                        <div>
+                            <p class="text-sm text-red-800 font-medium mb-1">
+                                Hapus data mitra {{ selectedPartner?.name }}?
+                            </p>
+                            <p class="text-sm text-red-700">
+                                Mitra ini akan dihapus dari sistem dan tidak dapat mengakses akun mereka lagi.
+                                Pastikan Anda telah mempertimbangkan keputusan ini dengan baik.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             <template #footer>
-                <Button label="Batal" icon="pi pi-times" text @click="displayDeleteDialog = false" />
-                <Button label="Hapus" icon="pi pi-check" severity="danger" @click="deletePartner" />
+                <div class="flex justify-end gap-3">
+                    <Button
+                        label="Batal"
+                        @click="displayDeleteDialog = false"
+                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        text
+                    />
+                    <Button
+                        label="Hapus Mitra"
+                        icon="pi pi-trash"
+                        severity="danger"
+                        @click="deletePartner"
+                        class="px-4 py-2 bg-red-600 hover:bg-red-700 border-red-600 hover:border-red-700 transition-colors duration-200"
+                        :loading="form.processing"
+                    />
+                </div>
             </template>
         </Dialog>
     </AppLayout>

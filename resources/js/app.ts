@@ -1,15 +1,15 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/vue3';
+import Lara from '@primeuix/themes/lara';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
-import PrimeVue from 'primevue/config';
-import Lara from '@primeuix/themes/lara';
-import ToastService from 'primevue/toastservice';
-import Tooltip from 'primevue/tooltip';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -35,8 +35,11 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(PrimeVue, {
                 theme: {
-                    preset: Lara
-                }
+                    preset: Lara,
+                    options: {
+                        darkModeSelector: false,
+                    },
+                },
             })
             .use(ToastService)
             .directive('tooltip', Tooltip)

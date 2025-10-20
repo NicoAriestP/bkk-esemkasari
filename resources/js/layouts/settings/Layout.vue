@@ -14,10 +14,10 @@ const sidebarNavItems: NavItem[] = [
         title: 'Password',
         href: '/settings/password',
     },
-    {
-        title: 'Tampilan',
-        href: '/settings/appearance',
-    },
+    // {
+    //     title: 'Tampilan',
+    //     href: '/settings/appearance',
+    // },
 ];
 
 const page = usePage();
