@@ -411,9 +411,9 @@ const openStudentClassPage = (model: any) => {
                         Tahun Angkatan <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <!-- <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <i class="pi pi-calendar text-gray-400 text-sm"></i>
-                        </div>
+                        </div> -->
                         <InputText
                             v-model="form.year"
                             placeholder="Contoh: 2024"

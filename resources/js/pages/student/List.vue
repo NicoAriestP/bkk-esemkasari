@@ -479,9 +479,10 @@ watch(filters, (newValue) => {
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <!-- Dicomment terlebih dahulu karena icon pi-search menabrak placeholder input -->
+                        <!-- <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <i class="pi pi-search text-gray-400 text-sm"></i>
-                        </div>
+                        </div> -->
                         <InputText
                             v-model="filters"
                             placeholder="Cari siswa berdasarkan nama, NISN, atau telepon..."
