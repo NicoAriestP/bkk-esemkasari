@@ -239,6 +239,31 @@ watch(filters, (newValue) => {
         border-color: #9ca3af;
     }
 }
+
+/* Password Component Responsive Fix */
+:deep(.p-password) {
+    width: 100% !important;
+    display: flex !important;
+}
+
+:deep(.p-password .p-inputtext) {
+    width: 100% !important;
+    flex: 1 !important;
+}
+
+:deep(.p-password .p-password-panel) {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 640px) {
+    :deep(.p-password .p-password-panel) {
+        left: 0 !important;
+        right: 0 !important;
+        width: auto !important;
+        margin: 0 1rem !important;
+    }
+}
 </style>
 
 <template>
@@ -272,9 +297,9 @@ watch(filters, (newValue) => {
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <!-- <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <i class="pi pi-search text-gray-400 text-sm"></i>
-                        </div>
+                        </div> -->
                         <InputText
                             v-model="filters"
                             placeholder="Cari karyawan berdasarkan nama, email, atau telepon..."
@@ -510,7 +535,7 @@ watch(filters, (newValue) => {
                         />
                         <small v-if="form.errors.email" class="text-red-600 text-xs">{{ form.errors.email }}</small>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-2 sm:col-span-2">
                         <label for="password" class="block text-sm font-medium text-gray-700">
                             Password <span class="text-red-500">*</span>
                         </label>
@@ -522,6 +547,7 @@ watch(filters, (newValue) => {
                             :feedback="true"
                             toggleMask
                             placeholder="Masukkan password"
+                            inputClass="w-full"
                         />
                         <small v-if="form.errors.password" class="text-red-600 text-xs">{{ form.errors.password }}</small>
                     </div>
@@ -541,7 +567,7 @@ watch(filters, (newValue) => {
                     :label="dialogMode === 'add' ? 'Tambah Karyawan' : 'Simpan Perubahan'"
                     icon="pi pi-check"
                     @click="dialogMode === 'add' ? createUser() : updateUser()"
-                    class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 transition-colors duration-200"
+                    class="px-6 py-2 !bg-emerald-600 hover:!bg-emerald-700 border-emerald-600 hover:border-emerald-700 transition-colors duration-200"
                     :loading="form.processing"
                 />
             </div>
@@ -590,6 +616,7 @@ watch(filters, (newValue) => {
                 <Button
                     label="Hapus Karyawan"
                     icon="pi pi-trash"
+                    severity="danger"
                     @click="deleteUser"
                     class="px-4 py-2 bg-red-600 hover:bg-red-700 border-red-600 hover:border-red-700 transition-colors duration-200"
                     :loading="form.processing"
