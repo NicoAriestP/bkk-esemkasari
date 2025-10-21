@@ -12,8 +12,10 @@ import Dialog from 'primevue/dialog';
 import Toast from 'primevue/toast';
 import Tag from 'primevue/tag'; // PERUBAHAN: Import komponen Tag
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.locale('id');
+dayjs.extend(relativeTime);
 const toast = useToast();
 
 // Props untuk menerima data lowongan dari controller
@@ -115,94 +117,318 @@ const applyVacancy = () => {
 
     <Toast/>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="p-4 sm:p-6 lg:p-8">
-            <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                <!-- Kolom Utama: Deskripsi Pekerjaan -->
-                <div class="rounded-lg bg-white p-6 shadow md:p-8 lg:col-span-2 dark:bg-gray-800">
-                    <!-- Header Lowongan -->
-                    <div class="mb-6 flex items-start gap-4 border-b pb-6 dark:border-gray-700">
-                        <Avatar :label="props.model.created_by?.name.charAt(0) || 'M'" size="xlarge" shape="circle" />
-                        <div>
-                             <!-- PERUBAHAN: Penambahan Wrapper untuk Judul dan Tag Status -->
-                            <div class="flex items-center gap-3 flex-wrap">
-                                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ props.model.title }}</h1>
-                                <Tag v-if="applicationStatus"
-                                     :value="getApplicationStatusInfo(applicationStatus)?.text"
-                                     :severity="getApplicationStatusInfo(applicationStatus)?.severity"
-                                     :icon="getApplicationStatusInfo(applicationStatus)?.icon"
-                                     rounded
-                                 />
-                            </div>
-                            <p class="mt-1 text-lg text-gray-600 dark:text-gray-300">{{ props.model.created_by?.name }}</p>
+        <!-- Hero Header Section -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 mb-8 border border-blue-100">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-start gap-6">
+                    <!-- Company Avatar -->
+                    <div class="relative flex-shrink-0">
+                        <Avatar
+                            :label="props.model.created_by?.name.charAt(0) || 'M'"
+                            size="xlarge"
+                            shape="circle"
+                            class="!w-20 !h-20 !bg-gradient-to-br !from-blue-500 !to-indigo-600 !text-white shadow-xl ring-4 ring-white"
+                        />
+                        <!-- Verified Badge -->
+                        <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                            <i class="pi pi-check text-white text-sm"></i>
                         </div>
                     </div>
 
-                    <!-- Deskripsi dari WYSIWYG Editor -->
-                    <h2 class="mb-4 text-xl font-semibold">Deskripsi Pekerjaan</h2>
-                    <div class="prose max-w-none" v-html="props.model.description"></div>
-                </div>
+                    <!-- Job Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-3 flex-wrap mb-2">
+                                    <h1 class="text-3xl font-bold text-gray-900 leading-tight">{{ props.model.title }}</h1>
+                                    <Tag v-if="applicationStatus"
+                                         :value="getApplicationStatusInfo(applicationStatus)?.text"
+                                         :severity="getApplicationStatusInfo(applicationStatus)?.severity"
+                                         :icon="getApplicationStatusInfo(applicationStatus)?.icon"
+                                         rounded
+                                         class="!text-sm !font-semibold"
+                                    />
+                                </div>
+                                <p class="text-xl font-semibold text-gray-700 mb-4">{{ props.model.created_by?.name }}</p>
 
-                <!-- Kolom Samping: Info & Aksi -->
-                <div class="lg:col-span-1">
-                    <div class="sticky top-24 space-y-6 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                        <h2 class="border-b pb-3 text-xl font-semibold dark:border-gray-700">Detail Lowongan</h2>
-
-                        <div class="space-y-4 text-sm">
-                            <div class="flex items-center gap-3">
-                                <i class="pi pi-map-marker text-xl text-gray-500 dark:text-gray-300"></i>
-                                <div>
-                                    <p class="font-medium text-gray-500 dark:text-gray-300">Lokasi</p>
-                                    <p class="font-semibold">{{ props.model.location }}</p>
+                                <!-- Quick Info -->
+                                <div class="flex flex-wrap gap-4 text-sm">
+                                    <div class="flex items-center gap-2 bg-white/60 backdrop-blur-sm px-3 py-2 rounded-lg">
+                                        <i class="pi pi-map-marker text-blue-600"></i>
+                                        <span class="font-medium text-gray-700">{{ props.model.location }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-white/60 backdrop-blur-sm px-3 py-2 rounded-lg">
+                                        <i class="pi pi-calendar text-blue-600"></i>
+                                        <span class="font-medium text-gray-700">Ditayangkan {{ dayjs(props.model.created_at).fromNow() }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-white/60 backdrop-blur-sm px-3 py-2 rounded-lg" :class="getDeadlineInfo(props.model.due_at).class.replace('text-red-600', 'text-red-700').replace('text-amber-600', 'text-amber-700').replace('text-gray-600', 'text-gray-700')">
+                                        <i class="pi pi-clock text-blue-600"></i>
+                                        <span class="font-medium">Berakhir {{ getDeadlineInfo(props.model.due_at).text }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <i class="pi pi-calendar-times text-xl text-gray-500 dark:text-gray-300"></i>
-                                <div>
-                                    <p class="font-medium text-gray-500 dark:text-gray-300">Tenggat Waktu</p>
-                                    <span :class="['font-semibold', getDeadlineInfo(props.model.due_at).class]">{{
-                                        getDeadlineInfo(props.model.due_at).text
-                                    }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tombol Lampiran -->
-                        <div v-if="props.model.file_url">
-                            <a :href="props.model.file_url" download target="_blank" class="w-full">
-                                <Button label="Unduh Lampiran" :icon="getFileIcon(props.model.file)" outlined class="w-full" />
-                            </a>
-                        </div>
-
-                        <!-- Tombol Lamar Pekerjaan -->
-                        <div>
-                             <!-- PERUBAHAN: Tombol dinonaktifkan jika sudah ada status lamaran -->
-                            <Button
-                                label="Lamar Pekerjaan"
-                                icon="pi pi-send"
-                                class="w-full"
-                                @click="openConfirmDialog"
-                                :disabled="!!applicationStatus"
-                            />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Dialog Konfirmasi Lamar Pekerjaan -->
-        <Dialog class="w-sm lg:w-md" v-model:visible="isConfirmDialogVisible" modal header="Konfirmasi Lamaran Pekerjaan">
-            <div class="text-center">
-                <i class="pi pi-exclamation-triangle text-amber-500 mb-4 !text-4xl"></i>
-                <p class="font-semibold">Apakah Anda yakin ingin melamar pekerjaan ini?</p>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    Dengan melanjutkan, informasi pribadi dan CV Anda akan dibagikan kepada pihak
-                    <span class="font-bold">{{ props.model.created_by?.name }}</span
-                    >.
-                </p>
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <!-- Main Content: Job Description -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <!-- Content Header -->
+                    <div class="border-b border-gray-100 px-8 py-6">
+                        <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                            <div class="w-2 h-8 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></div>
+                            Deskripsi Pekerjaan
+                        </h2>
+                        <p class="text-gray-600 mt-2">Detail lengkap mengenai posisi dan persyaratan yang dibutuhkan</p>
+                    </div>
+
+                    <!-- Job Description Content -->
+                    <div class="px-8 py-8">
+                        <div class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900" v-html="props.model.description"></div>
+                    </div>
+                </div>
+
+                <!-- Additional Info Cards -->
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Company Info Card -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="pi pi-building text-blue-600"></i>
+                            Tentang Perusahaan
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <Avatar
+                                    :label="props.model.created_by?.name.charAt(0) || 'M'"
+                                    size="large"
+                                    shape="circle"
+                                    class="!bg-gradient-to-br !from-blue-500 !to-indigo-600 !text-white"
+                                />
+                                <div>
+                                    <p class="font-semibold text-gray-900">{{ props.model.created_by?.name }}</p>
+                                    <p class="text-sm text-gray-600">Mitra Industri Terpercaya</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Application Stats Card -->
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="pi pi-chart-pie text-purple-600"></i>
+                            Statistik Lamaran
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Total Pelamar</span>
+                                <span class="font-bold text-gray-900">{{ props.model.applicants_count || 0 }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Lolos Seleksi</span>
+                                <span class="font-bold text-green-600">{{ props.model.qualified_applicants_count || 0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Sidebar: Actions & Details -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-8 space-y-6">
+                    <!-- Action Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                            <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                                <i class="pi pi-send"></i>
+                                Lamar Sekarang
+                            </h3>
+                            <p class="text-blue-100 text-sm mt-1">Jangan lewatkan kesempatan emas ini!</p>
+                        </div>
+
+                        <div class="px-6 py-6 space-y-4">
+                            <!-- Application Button -->
+                            <Button
+                                label="Lamar Pekerjaan"
+                                icon="pi pi-send"
+                                class="w-full !bg-gradient-to-r !from-green-600 !to-emerald-600 hover:!from-green-700 hover:!to-emerald-700 !border-0 !font-semibold !py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                                @click="openConfirmDialog"
+                                :disabled="!!applicationStatus"
+                            />
+
+                            <!-- Download Attachment -->
+                            <div v-if="props.model.file_url">
+                                <a :href="props.model.file_url" download target="_blank" class="w-full block">
+                                    <Button
+                                        label="Unduh Lampiran"
+                                        :icon="getFileIcon(props.model.file)"
+                                        outlined
+                                        class="w-full !border-blue-600 !text-blue-600 hover:!bg-blue-50"
+                                    />
+                                </a>
+                            </div>
+
+                            <!-- Status Info -->
+                            <div v-if="applicationStatus" class="mt-4 p-4 bg-gray-50 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <i :class="getApplicationStatusInfo(applicationStatus)?.icon" class="text-lg"></i>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Status Lamaran</p>
+                                        <p class="text-sm text-gray-600">{{ getApplicationStatusInfo(applicationStatus)?.text }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Details Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="border-b border-gray-100 px-6 py-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                <i class="pi pi-info-circle text-blue-600"></i>
+                                Informasi Lowongan
+                            </h3>
+                        </div>
+
+                        <div class="px-6 py-6 space-y-6">
+                            <!-- Location -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="pi pi-map-marker text-blue-600 text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-gray-500 text-sm">Lokasi Kerja</p>
+                                    <p class="font-semibold text-gray-900 mt-1">{{ props.model.location }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Deadline -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="pi pi-calendar-times text-red-600 text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-gray-500 text-sm">Batas Lamaran</p>
+                                    <p :class="['font-semibold mt-1', getDeadlineInfo(props.model.due_at).class.replace('dark:text-red-500', '').replace('dark:text-amber-500', '').replace('dark:text-gray-400', '')]">
+                                        {{ getDeadlineInfo(props.model.due_at).text }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Posted Date -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="pi pi-calendar-plus text-green-600 text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-gray-500 text-sm">Tanggal Posting</p>
+                                    <p class="font-semibold text-gray-900 mt-1">{{ dayjs(props.model.created_at).format('DD MMM YYYY') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tips Card -->
+                    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <i class="pi pi-lightbulb text-yellow-600"></i>
+                            Tips Lamaran
+                        </h4>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <i class="pi pi-check-circle text-green-500 mt-0.5 flex-shrink-0"></i>
+                                <span>Pastikan CV Anda sudah terbaru</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="pi pi-check-circle text-green-500 mt-0.5 flex-shrink-0"></i>
+                                <span>Baca deskripsi pekerjaan dengan teliti</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="pi pi-check-circle text-green-500 mt-0.5 flex-shrink-0"></i>
+                                <span>Lamar sebelum tenggat waktu</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Application Confirmation Dialog -->
+        <Dialog
+            class="w-full max-w-md mx-4"
+            v-model:visible="isConfirmDialogVisible"
+            modal
+            :closable="false"
+            :draggable="false"
+        >
+            <template #header>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                        <i class="pi pi-send text-blue-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Konfirmasi Lamaran</h3>
+                        <p class="text-sm text-gray-600">Pastikan data Anda sudah benar</p>
+                    </div>
+                </div>
+            </template>
+
+            <div class="space-y-6">
+                <!-- Job Summary -->
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-3">
+                        <Avatar
+                            :label="props.model.created_by?.name.charAt(0) || 'M'"
+                            size="large"
+                            shape="circle"
+                            class="!bg-gradient-to-br !from-blue-500 !to-indigo-600 !text-white"
+                        />
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ props.model.title }}</p>
+                            <p class="text-sm text-gray-600">{{ props.model.created_by?.name }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Message -->
+                <div class="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                    <i class="pi pi-info-circle text-amber-600 text-lg mt-0.5 flex-shrink-0"></i>
+                    <div class="text-sm">
+                        <p class="font-medium text-amber-800 mb-1">Informasi Penting</p>
+                        <p class="text-amber-700">
+                            Dengan melanjutkan, informasi pribadi dan CV Anda akan dibagikan kepada
+                            <span class="font-semibold">{{ props.model.created_by?.name }}</span> untuk proses seleksi.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Confirmation Question -->
+                <div class="text-center">
+                    <p class="text-lg font-medium text-gray-900 mb-2">Yakin ingin melamar posisi ini?</p>
+                    <p class="text-sm text-gray-600">Pastikan Anda telah membaca seluruh deskripsi pekerjaan</p>
+                </div>
+            </div>
+
             <template #footer>
-                <Button label="Batal" text severity="secondary" @click="isConfirmDialogVisible = false" />
-                <Button label="Ya, Lamar" severity="success" @click="applyVacancy" autofocus />
+                <div class="flex gap-3 w-full justify-end">
+                    <Button
+                        label="Batal"
+                        text
+                        severity="secondary"
+                        @click="isConfirmDialogVisible = false"
+                        class="!px-6"
+                    />
+                    <Button
+                        label="Ya, Lamar Sekarang"
+                        icon="pi pi-send"
+                        class="!bg-gradient-to-r !from-green-600 !to-emerald-600 hover:!from-green-700 hover:!to-emerald-700 !border-0 !px-6"
+                        @click="applyVacancy"
+                        autofocus
+                    />
+                </div>
             </template>
         </Dialog>
     </AppLayout>
