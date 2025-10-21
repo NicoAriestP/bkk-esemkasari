@@ -2,11 +2,11 @@
 # BKK Esemkasari – AI Coding Agent Guide
 
 ## Project Overview
-BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, built with Laravel 12, Inertia.js, Vue 3, TypeScript, and PrimeVue v4 with Tailwind CSS.
+BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, built with Laravel 12, Inertia.js, Vue 3, TypeScript, and PrimeVue v4 with Tailwind CSS v4.
 
 **Core Features:**
 - Tracer study questionnaires (multi-answer types)
-- Announcements
+- Announcements with VirtualScroller lazy loading
 - Job vacancy screening and application workflow
 - Multi-guard authentication (admin/student/partner)
 
@@ -25,76 +25,81 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
   - Partners → Vacancies → VacancyApplications (job workflow)
   - Students → TracerStudy Answers (one-to-one per answer type: activity/working/university/entrepreneur)
 
-## Developer Workflows
+## Essential Developer Workflows
 - **Local Dev:** `composer run dev` (concurrently runs Laravel server + queue + Vite HMR)
 - **Docker Dev:** `docker-compose up -d` (app/nginx/mysql containers, frontend runs on host)
 - **Database:** MySQL 8.0, use `bkk_esemkasari` database, migrations handle schema
+- **Frontend Build:** `npm run dev` (Vite HMR), `npm run build` (production), `npm run build:ssr` (SSR)
 - **Testing:** Pest PHP (`composer run test`), organized in `tests/Feature/` and `tests/Unit/`
-- **Frontend:** 
-  - `npm run dev` (Vite HMR at localhost:5173)
-  - `npm run build` (production), `npm run build:ssr` (SSR support)
-  - ESLint + Prettier (`npm run lint`, `npm run format`)
+- **Code Quality:** ESLint + Prettier (`npm run lint`, `npm run format`)
 
-## Conventions & Patterns
-- **Vue:**
-  - Use `<script setup>` in all components
-  - Split features into reusable components (`resources/js/components/`)
-  - Page components in `resources/js/pages/{Entity}/`
-  - Layout via `AppLayout.vue` (or `layout: null` for standalone pages like HomePage)
-  - Auth guard detection via `usePage().props.auth.activeGuard`
-  - Always prioritize using Tailwind CSS utility classes for styling before custom CSS.
-- **TypeScript:**
-  - Types auto-generated in `resources/js/types/` for backend data
-  - Shared types: `Auth`, `BreadcrumbItem`, `NavItem`, `SharedData`
-- **Backend:**
-  - Use model traits (e.g., `HasFeaturedFile` for uploads)
-  - Observers (e.g., `AnnouncementObserver`) for created_by/updated_by
-  - Validation via `app/Http/Requests/{Entity}/`
-  - Soft deletes on most models
-- **File Uploads:**
-  - Trait-based via `HasFeaturedFile`, auto-organized by model type
+## Critical Patterns & Conventions
+- **Vue Components:**
+  - Always use `<script setup>` syntax in all Vue files
+  - Page components: `resources/js/pages/{Entity}/` with proper `AppLayout` or `layout: null`
+  - Auth guard detection: `usePage().props.auth.activeGuard`
+  - Breadcrumbs: Required `BreadcrumbItem[]` for all pages
+- **Styling Philosophy:**
+  - **Tailwind CSS v4**: Uses `@import 'tailwindcss';` with inline theme configuration
+  - **Utility-first approach**: Always prioritize Tailwind CSS classes over custom CSS
+  - **Mobile-responsive**: All layouts must work on mobile (`sm:`, `md:`, `lg:` breakpoints)
+  - **Professional UI patterns**: Card layouts, icon-enhanced columns, hover states
+- **File Upload System:**
+  - Use `HasFeaturedFile` trait on models (`Announcement`, `Vacancy`, `Student`)
   - Methods: `updateFile()`, `updateCvFile()`, `deleteFile()`, `deleteCvFile()`
-  - Public disk: `storage/app/public/`, accessible via `{model}FileUrl` attributes
-- **Import/Export:**
-  - Bulk student import: Excel via `maatwebsite/excel` (CSV/XLS/XLSX)
-  - Export qualified applicants for partners
-  - Template files for consistent imports
+  - Auto-organized by model type in `storage/app/public/`
+  - Access via `{model}FileUrl` attributes
 
-## Docker & Environment
-- **Docker Setup:** `docker-compose up -d` (app: PHP 8.2-FPM, nginx, mysql: 8.0)
-- **Environment:** Copy `.env.docker` to `.env` for Docker development
-- **Database Access:** localhost:3306 (Docker) or via DBeaver with MySQL 8.0 driver
-- **File Structure:** `/var/www/app` in containers, volume-mounted for live development
-- **Frontend:** Run `npm install` and `npm run dev` on host (not in container)
+## Specialized Implementation Patterns
+- **DataTable Lists:**
+  - Template: `paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"`
+  - Responsive pagination with CSS order properties for mobile
+  - Professional empty states with icons and descriptive text
+- **VirtualScroller (Announcements/Vacancies):**
+  - Lazy loading via Intersection Observer with `loaderTrigger` ref
+  - Backend supports `?lazy_load=true&first={offset}` parameters
+  - Skeleton components for loading states
+  - Search with `preserveState: true, preserveScroll: false, replace: true`
+- **TinyMCE Integration:**
+  - API key: `usePage().props.tinymce.api_key`
+  - Consistent toolbar configuration across forms
+  - Content stored as HTML in database
+  - Styled with `.prose` classes for v-html content
 
-## Integrations
-- **PrimeVue:** Lara theme, ToastService, global tooltip, utility-first styling approach
-- **Inertia.js:** Page resolution in `resources/js/pages/`, Ziggy for routes, SSR support
-- **Database:** MySQL 8.0 (`bkk_esemkasari`), queue/cache via database tables
-- **TinyMCE:** Rich text editor, API key from backend via `usePage().props.tinymce.api_key`
+## Vue 3 + TypeScript Specifics
+- **Component Structure:** Import only used PrimeVue components individually
+- **Date Formatting:** dayjs with `'dayjs/locale/id'` and `relativeTime` plugin
+- **Route Navigation:** Use `router.get(route('name', params), options)` for Inertia
+- **State Management:** Vue 3 Composition API with `ref()`, `computed()`, `watch()`
+- **TypeScript Types:** All data types defined in `resources/js/types/`
 
-## Specialized Features
-- **Tracer Study:**
-  - Multiple answer types: `StudentActivityAnswer`, `StudentWorkingAnswer`, `StudentUniversityAnswer`, `StudentEntrepreneurAnswer`
-  - Questions: `questionnaires` → `questionnaire_questions` → `question_options`
-  - Multi-step wizard UI in `TracerStudy.vue`
-- **Vacancy Workflow:**
-  - Partners create vacancies (with attachments)
-  - Students apply via `VacancyStudentController::applyVacancy()`
-  - Partners screen via `VacancyApplicationStatus` enum
-  - Export data functionality
-- **HomePage:**
-  - Standalone page with `layout: null` in `defineOptions`
-  - Sections: hero, stats, about, programs, facilities, news, contact
-  - Smooth scrolling navigation with anchor links
+## Multi-Guard Authentication Flow
+- **Route Guards:** `middleware('auth:web,student,partner')` for shared routes
+- **Controller Pattern:** Check `auth()->guard('student')->check()` for guard-specific logic
+- **Frontend Detection:** `usePage().props.auth.activeGuard` determines UI behavior
+- **Login Flow:** Single login form with `login_as` parameter determines guard
+
+## Docker Development Setup
+- **Quick Start:** `cp .env.docker .env && docker-compose up -d`
+- **Database:** MySQL 8.0 at localhost:3306 (root/root)
+- **Frontend:** Run `npm install && npm run dev` on host (not containerized)
+- **File structure:** `/var/www/app` in containers, volume-mounted for development
+
+## Import/Export Workflows
+- **Student Import:** Excel via `maatwebsite/excel` supporting CSV/XLS/XLSX formats
+- **Vacancy Exports:** Partners can export qualified applicants as Excel
+- **Template System:** Consistent import templates with validation
 
 ## Language & Communication
-- All user-facing content: Bahasa Indonesia
-- Code comments/docs: English
-- Error/validation: Bahasa Indonesia
+- **User Content:** All Bahasa Indonesia
+- **Code/Comments:** English for maintainability
+- **Validation Messages:** Bahasa Indonesia for user experience
 
-**When implementing features:**
-- Always follow Action → Controller → Inertia → Vue component flow
-- Ensure TypeScript types for all backend→frontend data
-- Use PrimeVue components consistently (Button, Card, DataTable, Dialog, etc.)
-- Follow breadcrumb pattern: `BreadcrumbItem[]` for navigation
+## When Implementing Features
+1. **Follow the Action → Controller → Inertia → Vue flow**
+2. **Create TypeScript types** in `resources/js/types/` for all backend data
+3. **Use PrimeVue components consistently**: Button, Card, DataTable, Dialog, Toast
+4. **Implement responsive design** with mobile-first approach
+5. **Add proper loading states** and error handling with Toast notifications
+6. **Follow breadcrumb pattern** for navigation consistency
+7. **Use utility-first styling** with Tailwind CSS before writing custom CSS
