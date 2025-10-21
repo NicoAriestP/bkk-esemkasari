@@ -83,7 +83,7 @@ const studentNavItems: NavItem[] = [
     {
         title: 'Pengumuman',
         description: 'Halaman Pengumuman untuk Siswa',
-        href: 'students/announcements',
+        href: '/students/announcements',
         icon: Megaphone,
     },
     {
