@@ -12,10 +12,13 @@ import Dialog from 'primevue/dialog';
 import Toast from 'primevue/toast';
 import Tag from 'primevue/tag'; // PERUBAHAN: Import komponen Tag
 import dayjs from 'dayjs';
+import 'dayjs/locale/id';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-dayjs.locale('id');
+// Set up dayjs properly
 dayjs.extend(relativeTime);
+dayjs.locale('id');
+
 const toast = useToast();
 
 // Props untuk menerima data lowongan dari controller
@@ -130,9 +133,9 @@ const applyVacancy = () => {
                             class="!w-20 !h-20 !bg-gradient-to-br !from-blue-500 !to-indigo-600 !text-white shadow-xl ring-4 ring-white"
                         />
                         <!-- Verified Badge -->
-                        <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                        <!-- <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
                             <i class="pi pi-check text-white text-sm"></i>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- Job Info -->
