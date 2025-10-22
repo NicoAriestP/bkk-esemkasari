@@ -270,7 +270,7 @@ onUnmounted(() => {
                                         <div class="flex items-center justify-between text-sm">
                                             <div class="flex items-center gap-2 text-gray-500">
                                                 <i class="pi pi-calendar text-xs"></i>
-                                                <span>{{ dayjs(item.created_at).fromNow() }}</span>
+                                                <span>Ditayangkan {{ dayjs(item.created_at).fromNow() }}</span>
                                             </div>
                                             <div class="flex items-center gap-2" :class="getDeadlineInfo(item.due_at).class.replace('dark:text-red-500', '').replace('dark:text-amber-500', '').replace('dark:text-gray-400', '')">
                                                 <i class="pi pi-clock text-xs"></i>
