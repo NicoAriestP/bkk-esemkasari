@@ -12,7 +12,7 @@ import StudentFeedback from '@/pages/tracerStudy/StudentFeedback.vue';
 // Import komponen PrimeVue dan Toast
 import Button from 'primevue/button';
 import Select from 'primevue/select';
-import Fieldset from 'primevue/fieldset';
+
 import InputText from 'primevue/inputtext';
 import RadioButton from 'primevue/radiobutton';
 import Steps from 'primevue/steps';
@@ -25,6 +25,8 @@ const toast = useToast();
 // --- Props dari Controller ---
 const props = defineProps({
     student: { type: Object, required: true },
+    studentClass: { type: Object, required: true },
+    studentYear: { type: Object, required: true },
     studentActivityAnswer: { type: Object, default: () => ({}) },
     detailActivityAnswer: { type: Object, default: () => ({}) },
     studentUniversityAnswer: { type: Object, default: () => ({}) },
@@ -187,145 +189,283 @@ const workTypeOptions = ref([
     <Head title="Tracer Study" />
     <Toast/>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="p-4 sm:p-6 lg:p-8">
-            <div class="card mb-8">
-                <Steps :model="stepItems" :active-step="activeStep" :readonly="true" />
-            </div>
+        <!-- Hero Header Section -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 sm:p-8 mb-8 border border-blue-100">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    <i class="pi pi-chart-line"></i>
+                    <span>Tracer Study SMKN Purwosari</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+                    Survey Alumni & Lulusan
+                </h1>
+                <p class="text-base sm:text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+                    Bantu kami melacak perkembangan karir dan memberikan umpan balik untuk meningkatkan kualitas pendidikan
+                </p>
 
-            <!-- Konten Step 1 -->
-            <div v-if="activeStep === 0">
-                <Fieldset legend="Update Data Pribadi" :toggleable="true" class="!mb-8">
-                    <div class="space-y-6 p-6">
-                        <!-- Baris 1: Status dan Lokasi -->
-                        <div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-3">
-                            <div class="flex flex-col gap-2">
-                                <label for="marriage-status">Status Pernikahan</label>
-                                <Select id="marriage-status" v-model="form.is_married" :options="marriageStatusOptions" optionLabel="label" optionValue="value" placeholder="Pilih status" class="w-full" />
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <label for="province">Tempat tinggal sekarang - Provinsi</label>
-                                <InputText id="province" v-model="form.province" type="text" placeholder="Masukkan provinsi" />
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <label for="city">Tempat tinggal sekarang - Kabupaten/Kota</label>
-                                <InputText id="city" v-model="form.city" type="text" placeholder="Masukkan kab/kota" />
-                            </div>
-                        </div>
-
-                        <!-- Baris 2: Email dan No. HP -->
-                        <div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
-                            <div class="flex flex-col gap-2">
-                                <label for="email">Email</label>
-                                <InputText id="email" v-model="form.email" type="email" placeholder="contoh: contoh.email@gmail.com" />
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <label for="phone">No. Telepon</label>
-                                <InputText id="phone" v-model="form.phone" type="text" placeholder="08xxxxxxxxxx" />
-                            </div>
-                        </div>
-
-                        <!-- Baris 3: Berat dan Tinggi Badan -->
-                        <div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
-                            <div class="flex flex-col gap-2">
-                                <label for="weight">Berat Badan (kg)</label>
-                                <InputText id="weight" v-model="form.weight" type="number" placeholder="Contoh: 65" />
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <label for="height">Tinggi Badan (cm)</label>
-                                <InputText id="height" v-model="form.height" type="number" placeholder="Contoh: 170" />
-                            </div>
-                        </div>
-
-                        <!-- Baris 4: Alamat -->
-                        <div class="flex flex-col gap-2">
-                            <label for="address">Alamat Tempat Tinggal Sekarang</label>
-                            <Textarea id="address" v-model="form.address" rows="3" placeholder="Masukkan alamat lengkap..." autoResize />
-                        </div>
-
-                        <!-- Baris 5: Upload CV -->
-                        <div class="flex flex-col gap-2">
-                            <label for="cv" class="text-foreground block font-medium">Upload CV</label>
-                            <div class="relative w-full lg:w-1/2">
-                                <input ref="fileInput" type="file" id="cv" name="cv" @change="handleFileChange" class="hidden" accept=".pdf" />
-                                <button type="button" @click="fileInput?.click()" class="bg-green-500 text-foreground hover:bg-green-600 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition">
-                                    📁 {{ form.cv_file ? 'Ubah' : 'Pilih' }} File CV
-                                </button>
-                                <span class="mx-2 my-2 text-sm text-foreground">
-                                    {{ form.cv_file ? getFileName(form.cv_file) : 'Belum ada file yang dipilih' }}
-                                </span>
-                            </div>
-                            <small class="text-foreground">Hanya file PDF, ukuran maksimal 2MB.</small>
-                        </div>
+                <!-- Progress Info -->
+                <div class="bg-white/60 backdrop-blur-sm rounded-xl px-4 py-3 inline-flex items-center gap-3">
+                    <div class="flex items-center gap-2 text-sm text-gray-700">
+                        <i class="pi pi-user text-blue-600"></i>
+                        <span class="font-medium">{{ props.student?.name }}</span>
                     </div>
-                </Fieldset>
-
-                <Fieldset legend="Aktivitas Lulusan" :toggleable="true" class="!mb-8">
-                    <div class="space-y-8 p-6">
-                        <div class="flex flex-col gap-3">
-                            <p>Apakah Anda sedang melanjutkan studi di perguruan tinggi?</p>
-                            <div class="flex items-center gap-6">
-                                <div class="flex items-center">
-                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyYes" name="isStudying" value="Ya" />
-                                    <label for="studyYes" class="ml-2">Ya</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyNo" name="isStudying" value="Tidak" />
-                                    <label for="studyNo" class="ml-2">Tidak</label>
-                                </div>
-                            </div>
-                        </div>
-                        <template v-if="studentActivityData.isStudying === 'Tidak'">
-                            <div class="flex flex-col gap-3">
-                                <p>Dalam seminggu terakhir, apakah Anda sedang bekerja atau berwirausaha?</p>
-                                <div class="flex items-center gap-6">
-                                    <div class="flex items-center">
-                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workYes" name="isWorking" value="Ya" />
-                                        <label for="workYes" class="ml-2">Ya</label>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workNo" name="isWorking" value="Tidak" />
-                                        <label for="workNo" class="ml-2">Tidak</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                        <template v-if="studentActivityData.isStudying === 'Tidak' && studentActivityData.isWorking === 'Ya'">
-                            <div class="flex flex-col gap-3">
-                                <p>
-                                    Apa bentuk kegiatan/pekerjaan yang Anda lakukan?
-                                    <br />
-                                    <small class="text-foreground">(catatan: Youtuber, jual-beli online, dan usaha kreatif lainnya termasuk kategori wirausaha)</small>
-                                </p>
-                                <div class="mt-2 flex flex-col gap-3">
-                                    <div v-for="option in workTypeOptions" :key="option" class="flex items-center">
-                                        <RadioButton v-model="studentActivityData.workType" :inputId="option" name="workType" :value="option" />
-                                        <label :for="option" class="ml-2">{{ option }}</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
+                    <div class="w-px h-4 bg-gray-300"></div>
+                    <div class="flex items-center gap-2 text-sm text-gray-700">
+                        <i class="pi pi-graduation-cap text-blue-600"></i>
+                        <span>{{ props.studentClass?.name }} - {{ props.studentYear?.year }}</span>
                     </div>
-                </Fieldset>
-            </div>
-
-            <!-- Konten Step 2 -->
-            <div v-if="activeStep === 1">
-                <ActivityDetails v-model="activityDetailsData" />
-            </div>
-
-            <!-- Konten Step 3 -->
-            <div v-if="activeStep === 2">
-                <StudentFeedback v-model="feedbackData" />
-            </div>
-
-            <!-- Tombol Aksi -->
-            <div class="flex lg:flex-row flex-col lg:justify-between space-y-2 lg:space-y-0 mt-8">
-                <Button v-if="activeStep > 0" label="Kembali" icon="pi pi-arrow-left" @click="prevStep" severity="secondary" />
-                <div v-else></div>
-                <Button v-if="activeStep < stepItems.length - 1" class="w-full lg:w-auto" label="Lanjut" icon="pi pi-arrow-right" iconPos="right" @click="nextStep" />
-                <Button v-else class="w-full lg:w-auto" label="Selesai" icon="pi pi-check" severity="success" :loading="form.processing" @click="saveTracerStudy" />
+                </div>
             </div>
         </div>
+
+        <!-- Steps Progress Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-900">Progress Pengisian</h2>
+                <p class="text-sm text-gray-600 mt-1">Langkah {{ activeStep + 1 }} dari {{ stepItems.length }}</p>
+            </div>
+            <div class="p-6">
+                <Steps :model="stepItems" :active-step="activeStep" :readonly="true" class="!mb-0" />
+            </div>
+        </div>
+
+            <!-- Step 1: Personal Data -->
+            <div v-if="activeStep === 0" class="space-y-8">
+                <!-- Personal Information Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <i class="pi pi-user"></i>
+                            Update Data Pribadi
+                        </h3>
+                        <p class="text-blue-100 text-sm mt-1">Pastikan data pribadi Anda sudah lengkap dan terbaru</p>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        <!-- Row 1: Marriage Status and Location -->
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="space-y-2">
+                                <label for="marriage-status" class="block text-sm font-medium text-gray-700">Status Pernikahan</label>
+                                <Select
+                                    id="marriage-status"
+                                    v-model="form.is_married"
+                                    :options="marriageStatusOptions"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Pilih status"
+                                    class="w-full"
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <label for="province" class="block text-sm font-medium text-gray-700">Provinsi</label>
+                                <InputText id="province" v-model="form.province" placeholder="Masukkan provinsi" class="w-full" />
+                            </div>
+                            <div class="space-y-2">
+                                <label for="city" class="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
+                                <InputText id="city" v-model="form.city" placeholder="Masukkan kota" class="w-full" />
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Contact Information -->
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div class="space-y-2">
+                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <InputText id="email" v-model="form.email" type="email" placeholder="contoh@email.com" class="w-full" />
+                            </div>
+                            <div class="space-y-2">
+                                <label for="phone" class="block text-sm font-medium text-gray-700">No. HP</label>
+                                <InputText id="phone" v-model="form.phone" placeholder="08123456789" class="w-full" />
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Physical Data -->
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div class="space-y-2">
+                                <label for="weight" class="block text-sm font-medium text-gray-700">Berat Badan (kg)</label>
+                                <InputText id="weight" v-model="form.weight" type="number" placeholder="60" class="w-full" />
+                            </div>
+                            <div class="space-y-2">
+                                <label for="height" class="block text-sm font-medium text-gray-700">Tinggi Badan (cm)</label>
+                                <InputText id="height" v-model="form.height" type="number" placeholder="170" class="w-full" />
+                            </div>
+                        </div>
+
+                        <!-- Row 4: Address -->
+                        <div class="space-y-2">
+                            <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
+                            <Textarea id="address" v-model="form.address" rows="3" placeholder="Masukkan alamat lengkap..." class="w-full" autoResize />
+                        </div>
+
+                        <!-- Row 5: CV Upload -->
+                        <div class="space-y-3">
+                            <label class="block text-sm font-medium text-gray-700">Upload CV Terbaru</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors duration-200">
+                                <input ref="fileInput" type="file" accept=".pdf,.doc,.docx" @change="handleFileChange" class="hidden" />
+                                <div class="space-y-3">
+                                    <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
+                                        <i class="pi pi-upload text-blue-600 text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <Button label="Pilih File CV" icon="pi pi-folder-open" outlined @click="fileInput?.click()" />
+                                        <p class="text-sm text-gray-500 mt-2">Format: PDF, DOC, DOCX (Max. 5MB)</p>
+                                    </div>
+                                    <div v-if="form.cv_file" class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                                        <div class="flex items-center gap-2 text-green-700">
+                                            <i class="pi pi-check-circle"></i>
+                                            <span class="text-sm font-medium">{{ getFileName(form.cv_file) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Graduate Activity Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <i class="pi pi-briefcase"></i>
+                            Aktivitas Lulusan
+                        </h3>
+                        <p class="text-green-100 text-sm mt-1">Ceritakan aktivitas Anda setelah lulus dari SMK</p>
+                    </div>
+
+                    <div class="p-6 space-y-8">
+                        <!-- Study Status Question -->
+                        <div class="space-y-4">
+                            <h4 class="font-semibold text-lg text-gray-900">Apakah Anda sedang melanjutkan studi?</h4>
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors duration-200" :class="{ 'border-blue-500 bg-blue-50': studentActivityData.isStudying === 'Ya' }">
+                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyYes" name="isStudying" value="Ya" />
+                                    <label for="studyYes" class="ml-3 text-gray-700 font-medium cursor-pointer">Ya, sedang kuliah</label>
+                                </div>
+                                <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors duration-200" :class="{ 'border-blue-500 bg-blue-50': studentActivityData.isStudying === 'Tidak' }">
+                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyNo" name="isStudying" value="Tidak" />
+                                    <label for="studyNo" class="ml-3 text-gray-700 font-medium cursor-pointer">Tidak melanjutkan studi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Working Status Question (shown when not studying) -->
+                        <template v-if="studentActivityData.isStudying === 'Tidak'">
+                            <div class="space-y-4 p-4 bg-gray-50 rounded-xl">
+                                <h4 class="font-semibold text-lg text-gray-900">Apakah Anda sedang bekerja?</h4>
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-green-300 transition-colors duration-200 bg-white" :class="{ 'border-green-500 bg-green-50': studentActivityData.isWorking === 'Ya' }">
+                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workYes" name="isWorking" value="Ya" />
+                                        <label for="workYes" class="ml-3 text-gray-700 font-medium cursor-pointer">Ya, sedang bekerja</label>
+                                    </div>
+                                    <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-green-300 transition-colors duration-200 bg-white" :class="{ 'border-green-500 bg-green-50': studentActivityData.isWorking === 'Tidak' }">
+                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workNo" name="isWorking" value="Tidak" />
+                                        <label for="workNo" class="ml-3 text-gray-700 font-medium cursor-pointer">Tidak bekerja</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Work Type Question (shown when working) -->
+                        <template v-if="studentActivityData.isStudying === 'Tidak' && studentActivityData.isWorking === 'Ya'">
+                            <div class="space-y-4 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                                <h4 class="font-semibold text-lg text-gray-900">Jenis pekerjaan Anda saat ini?</h4>
+                                <p class="text-sm text-gray-600 mb-4">
+                                    <em>Youtuber, jual-beli online, dan usaha kreatif lainnya termasuk kategori wirausaha</em>
+                                </p>
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div v-for="option in workTypeOptions" :key="option" class="flex items-center p-3 border border-yellow-200 rounded-lg hover:border-yellow-400 transition-colors duration-200 bg-white" :class="{ 'border-yellow-500 bg-yellow-50': studentActivityData.workType === option }">
+                                        <RadioButton v-model="studentActivityData.workType" :inputId="option" name="workType" :value="option" />
+                                        <label :for="option" class="ml-3 text-gray-700 font-medium cursor-pointer">{{ option }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Activity Details -->
+            <div v-if="activeStep === 1" class="space-y-8">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-600 to-violet-600 px-6 py-4">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <i class="pi pi-chart-line"></i>
+                            Detail Aktivitas
+                        </h3>
+                        <p class="text-purple-100 text-sm mt-1">Berikan detail tentang aktivitas yang sedang Anda jalani</p>
+                    </div>
+
+                    <div class="p-6">
+                        <ActivityDetails v-model="activityDetailsData" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Student Feedback -->
+            <div v-if="activeStep === 2" class="space-y-8">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gradient-to-r from-orange-600 to-red-600 px-6 py-4">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <i class="pi pi-comments"></i>
+                            Feedback & Saran
+                        </h3>
+                        <p class="text-orange-100 text-sm mt-1">Berikan masukan untuk perbaikan pendidikan di SMK</p>
+                    </div>
+
+                    <div class="p-6">
+                        <StudentFeedback v-model="feedbackData" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-8">
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-4">
+                    <Button
+                        v-if="activeStep > 0"
+                        label="Kembali"
+                        icon="pi pi-arrow-left"
+                        @click="prevStep"
+                        severity="secondary"
+                        outlined
+                        class="flex-1 sm:flex-none min-w-32"
+                    />
+                    <div v-else class="hidden sm:block"></div>
+
+                    <div class="flex gap-3">
+                        <Button
+                            v-if="activeStep < stepItems.length - 1"
+                            label="Lanjut"
+                            icon="pi pi-arrow-right"
+                            iconPos="right"
+                            @click="nextStep"
+                            class="flex-1 sm:flex-none min-w-32"
+                        />
+                        <Button
+                            v-else
+                            label="Selesai"
+                            icon="pi pi-check"
+                            severity="success"
+                            :loading="form.processing"
+                            @click="saveTracerStudy"
+                            class="flex-1 sm:flex-none min-w-32"
+                        />
+                    </div>
+                </div>
+
+                <!-- Progress Indicator -->
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex items-center justify-between text-sm text-gray-600">
+                        <span>Langkah {{ activeStep + 1 }} dari {{ stepItems.length }}</span>
+                        <span>{{ Math.round(((activeStep + 1) / stepItems.length) * 100) }}% selesai</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div
+                            class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
+                            :style="{ width: `${((activeStep + 1) / stepItems.length) * 100}%` }"
+                        ></div>
+                    </div>
+                </div>
+            </div>
     </AppLayout>
 </template>
 
@@ -337,21 +477,23 @@ const workTypeOptions = ref([
 :deep(.p-steps .p-steps-item.p-highlight .p-menuitem-link) {
     border-color: #3b82f6 !important;
 }
-:deep(.p-fieldset .p-fieldset-legend) {
-    background-color: #3b82f6;
-    color: #ffffff;
-    border: none;
-    padding: 0.75rem 1.25rem;
+/* Enhanced card styling for form sections */
+:deep(.p-card) {
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
-:deep(.p-fieldset .p-fieldset-legend):hover {
-    background-color: #1d4ed8;
-    color: #ffffff;
-    border: none;
-    padding: 0.75rem 1.25rem;
+/* Custom progress bar animation */
+.progress-bar-animated {
+    animation: progress-fill 0.5s ease-in-out;
 }
 
-:deep(.p-fieldset-toggler) {
-    color: #ffffff !important;
+@keyframes progress-fill {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
 }
 </style>

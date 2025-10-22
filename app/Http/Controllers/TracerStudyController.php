@@ -23,6 +23,8 @@ class TracerStudyController extends Controller
 
         return [
             'student' => $student,
+            'studentClass' => $student->studentClass,
+            'studentYear' => $student->studentClass->year,
             'studentActivityAnswer' => $student->studentActivityAnswer,
             'studentUniversityAnswer' => $student->studentUniversityAnswer,
             'studentWorkingAnswer' => $student->studentWorkingAnswer,
