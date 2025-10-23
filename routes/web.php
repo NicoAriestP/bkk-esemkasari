@@ -88,8 +88,8 @@ Route::middleware(['auth:web'])->group(function () {
 
 // Student Routes
 Route::middleware('auth:student')->group(function () {
-    Route::prefix('students/dashboard')->name('students.dashboard.')->group(function () {
-        Route::get('/', [StudentController::class, 'dashboard'])->name('dashboard');
+    Route::prefix('students/dashboard')->name('students.dashboard')->group(function () {
+        Route::get('/', [StudentController::class, 'dashboard']);
     });
     // Announcement Routes (Student)
     Route::prefix('students/announcements')->name('announcements.')->group(function () {
@@ -113,8 +113,8 @@ Route::middleware('auth:student')->group(function () {
 
 // Partner Routes
 Route::middleware('auth:partner')->group(function () {
-    Route::prefix('partners/dashboard')->name('partners.dashboard.')->group(function () {
-        Route::get('/', [PartnerController::class, 'dashboard'])->name('dashboard');
+    Route::prefix('partners/dashboard')->name('partners.dashboard')->group(function () {
+        Route::get('/', [PartnerController::class, 'dashboard']);
     });
 
     // Vacancy Routes (Partner)
