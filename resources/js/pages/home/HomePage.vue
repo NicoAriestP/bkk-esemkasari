@@ -1,5 +1,5 @@
 <template>
-    <Head title="Home" />
+    <Head title="Beranda" />
     <div class="home-page">
         <!-- Navigation -->
         <nav class="fixed top-0 right-0 left-0 z-50 bg-white shadow-md">
