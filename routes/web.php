@@ -13,6 +13,7 @@ use App\Http\Controllers\VacancyStudentController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\DashboardPartnerController;
 use App\Http\Controllers\VacancyApplicationController;
+use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\HomePageController;
 
 // Route::get('/', function () {
@@ -69,6 +70,16 @@ Route::middleware(['auth:web'])->group(function () {
         });
     });
 
+    // Questionnaire Management Routes
+    Route::prefix('questionnaires')->name('questionnaires.')->group(function () {
+        Route::get('/', [QuestionnaireController::class, 'indexQuestionnaire'])->name('index');
+        Route::get('/create', [QuestionnaireController::class, 'createQuestionnaire'])->name('create');
+        Route::post('/', [QuestionnaireController::class, 'storeQuestionnaire'])->name('store');
+        Route::get('/{model}/edit', [QuestionnaireController::class, 'editQuestionnaire'])->name('edit');
+        Route::put('/{model}', [QuestionnaireController::class, 'updateQuestionnaire'])->name('update');
+        Route::delete('/{model}', [QuestionnaireController::class, 'destroyQuestionnaire'])->name('destroy');
+    });
+
     // Partner Management Routes
     Route::prefix('partners')->name('partners.')->group(function () {
         Route::get('/', [PartnerController::class, 'index'])->name('index');
@@ -91,6 +102,7 @@ Route::middleware('auth:student')->group(function () {
     Route::prefix('students/dashboard')->name('students.dashboard')->group(function () {
         Route::get('/', [StudentController::class, 'dashboard']);
     });
+
     // Announcement Routes (Student)
     Route::prefix('students/announcements')->name('announcements.')->group(function () {
         Route::get('/', [AnnouncementController::class, 'indexAnnouncementStudent'])->name('student.index');
