@@ -28,10 +28,12 @@ class StudentController extends Controller
         $students = Student::query()
             ->where('student_class_id', $studentClass->id)
             ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%$search%")
-                    ->orWhere('nisn', 'like', "%$search%")
-                    ->orWhere('phone', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%");
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'like', "%$search%")
+                        ->orWhere('nisn', 'like', "%$search%")
+                        ->orWhere('phone', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%");
+                });
             })
             ->orderBy('created_at', 'desc')
             ->get();
