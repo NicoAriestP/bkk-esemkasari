@@ -17,4 +17,28 @@ class QuestionAnswer extends Model
         'text_answer',
         'is_selected'
     ];
+
+    protected $casts = [
+        'is_selected' => 'boolean',
+    ];
+
+    public function question()
+    {
+        return $this->belongsTo(QuestionnaireQuestion::class, 'question_id');
+    }
+
+    public function questionOption()
+    {
+        return $this->belongsTo(QuestionOption::class, 'question_option_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(Student::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(Student::class, 'updated_by');
+    }
 }
