@@ -114,7 +114,8 @@ const save = () => {
 };
 
 const exportQualifiedApplicants = () => {
-    window.top.location = route('partners.vacancies.applications.export', props.vacancy.id);
+    const targetWindow = window.top ?? window;
+    targetWindow.location.href = route('partners.vacancies.applications.export', props.vacancy.id);
 
     toast.add({
         severity: 'info',
