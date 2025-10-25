@@ -974,7 +974,6 @@ watch(filters, (newValue) => {
                             <Password
                                 id="password"
                                 v-model="form.password"
-                                class="w-full"
                                 :class="{ 'border-red-300': form.errors.password }"
                                 :feedback="true"
                                 toggleMask
