@@ -20,13 +20,18 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
   - Business logic in `app/Actions/{Entity}/{Entity}Action.php` (e.g., `StudentAction::save()`)
   - Controllers delegate to Actions, never handle business logic directly
   - Actions return models, Controllers handle HTTP responses and redirects
+- **Observer Pattern:**
+  - All models use observers in `app/Observers/` extending `BaseObserver`
+  - `BaseObserver` auto-authenticates user ID 1 in console for seeders/migrations
+  - Observers handle created_by/updated_by via `Blameable` trait
 - **Data Hierarchy:**
   - Year → StudentClass → Students (nested educational structure)
   - Partners → Vacancies → VacancyApplications (job workflow)
   - Students → TracerStudy Answers (one-to-one per answer type: activity/working/university/entrepreneur)
 
 ## Essential Developer Workflows
-- **Local Dev:** `composer run dev` (concurrently runs Laravel server + queue + Vite HMR)
+- **Local Dev:** `composer run dev` (concurrently runs Laravel server + queue + Vite HMR with color coding)
+- **SSR Dev:** `composer run dev:ssr` (includes Inertia SSR server + Laravel Pail for logs)
 - **Docker Dev:** `docker-compose up -d` (app/nginx/mysql containers, frontend runs on host)
 - **Database:** MySQL 8.0, use `bkk_esemkasari` database, migrations handle schema
 - **Frontend Build:** `npm run dev` (Vite HMR), `npm run build` (production), `npm run build:ssr` (SSR)
@@ -58,8 +63,10 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
 - **VirtualScroller (Announcements/Vacancies):**
   - Lazy loading via Intersection Observer with `loaderTrigger` ref
   - Backend supports `?lazy_load=true&first={offset}` parameters
-  - Skeleton components for loading states
+  - Skeleton components for loading states during async operations
   - Search with `preserveState: true, preserveScroll: false, replace: true`
+  - **Announcements**: Uses PrimeVue VirtualScroller with `onLazyLoad` event
+  - **Vacancies**: Uses custom Intersection Observer pattern with threshold 0.1
 - **TinyMCE Integration:**
   - API key: `usePage().props.tinymce.api_key`
   - Consistent toolbar configuration across forms
@@ -72,6 +79,7 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
 - **Route Navigation:** Use `router.get(route('name', params), options)` for Inertia
 - **State Management:** Vue 3 Composition API with `ref()`, `computed()`, `watch()`
 - **TypeScript Types:** All data types defined in `resources/js/types/`
+- **Vite Configuration:** Uses Tailwind CSS v4 plugin, path aliases for `@/` → `resources/js/`
 
 ## Multi-Guard Authentication Flow
 - **Route Guards:** `middleware('auth:web,student,partner')` for shared routes
@@ -80,20 +88,40 @@ BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, bu
 - **Login Flow:** Single login form with `login_as` parameter determines guard
 
 ## Docker Development Setup
-- **Quick Start:** `cp .env.docker .env && docker-compose up -d`
-- **Database:** MySQL 8.0 at localhost:3306 (root/root)
+- **Quick Start:** `cp .env.docker .env && docker-compose up -d --build`
+- **Database:** MySQL 8.0 at localhost:3306 (username: root, password: root)
+- **Access Points:** App at localhost:8000, Vite at localhost:5173
 - **Frontend:** Run `npm install && npm run dev` on host (not containerized)
 - **File structure:** `/var/www/app` in containers, volume-mounted for development
+- **Container commands:** `docker-compose exec app php artisan {command}`
 
 ## Import/Export Workflows
 - **Student Import:** Excel via `maatwebsite/excel` supporting CSV/XLS/XLSX formats
 - **Vacancy Exports:** Partners can export qualified applicants as Excel
 - **Template System:** Consistent import templates with validation
 
+## Laravel Ecosystem Integration
+- **Laravel 12 Features:** Uses new routing configuration in `bootstrap/app.php`
+- **Middleware Stack:** Custom `HandleInertiaRequests` and `HandleAppearance` middleware
+- **Queue Driver:** Database-based with `jobs` and `job_batches` tables
+- **Storage:** Public disk with `HasFeaturedFile` trait pattern
+- **TinyMCE Integration:** API key configured in `config/tinymce.php`
+
 ## Language & Communication
 - **User Content:** All Bahasa Indonesia
 - **Code/Comments:** English for maintainability
 - **Validation Messages:** Bahasa Indonesia for user experience
+
+## Critical Development Patterns
+- **Queue Configuration:** Uses database driver, queue listener runs in dev mode via `composer run dev`
+- **File Upload Integration:** 
+  - Models extend `HasFeaturedFile` trait with `updateFile()` and `deleteFile()` methods
+  - Auto-organized in `storage/app/public/` by model type or custom `$type` property
+  - Access files via `{model}FileUrl` attributes (automatically appended)
+- **PrimeVue Theme Setup:**
+  - Uses Lara preset with `darkModeSelector: false` in `app.ts`
+  - Components imported individually, never bulk imports
+  - Toast service and Tooltip directive globally registered
 
 ## When Implementing Features
 1. **Follow the Action → Controller → Inertia → Vue flow**
