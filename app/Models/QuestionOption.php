@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Model\Blameable;
 
 class QuestionOption extends Model
 {
-    use HasFactory;
+    use HasFactory, Blameable;
 
     protected $fillable = [
         'created_by',
@@ -15,4 +16,9 @@ class QuestionOption extends Model
         'question_id',
         'option_label'
     ];
+
+    public function questionnaireQuestion()
+    {
+        return $this->belongsTo(QuestionnaireQuestion::class);
+    }
 }
