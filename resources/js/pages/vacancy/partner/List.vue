@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue'
-import { BreadcrumbItem, VacancyType } from '@/types'
+import { BreadcrumbItem } from '@/types'
 import { Head, router } from '@inertiajs/vue3'
 import dayjs from 'dayjs'
 import 'dayjs/locale/id'
@@ -15,9 +15,12 @@ import { ref, watch } from 'vue'
 dayjs.locale('id')
 dayjs.extend(relativeTime)
 
-const props = defineProps<{
-    models: VacancyType[]
-}>()
+const props = defineProps({
+    models: {
+        type: Array as () => any[],
+        required: true,
+    },
+});
 
 const filters = ref<string>('')
 
