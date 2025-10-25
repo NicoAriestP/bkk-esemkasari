@@ -83,9 +83,9 @@ class LoginRequest extends FormRequest
 
         switch ($loginAs) {
             case 'student':
-                return route('dashboard'); // Menggunakan nama route
+                return route('students.dashboard'); // Menggunakan nama route
             case 'partner':
-                return route('dashboard'); // Menggunakan nama route
+                return route('partners.dashboard'); // Menggunakan nama route
             case 'user':
             default:
                 return route('dashboard'); // Menggunakan nama route
