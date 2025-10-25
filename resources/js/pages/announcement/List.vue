@@ -1,51 +1,48 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
+import { ref, watch } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { BreadcrumbItem } from '@/types'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import InputText from 'primevue/inputtext'
+import Button from 'primevue/button'
+import dayjs from 'dayjs'
+import 'dayjs/locale/id'
 
-import { BreadcrumbItem } from '@/types';
-
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import InputText from "primevue/inputtext";
-import Button from 'primevue/button';
-
-import dayjs from 'dayjs';
-import 'dayjs/locale/id';
-
-dayjs.locale('id');
+dayjs.locale('id')
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Pengumuman',
         href: '/announcements',
     },
-];
+]
 
 const props = defineProps({
     models: {
         type: Array,
         required: true,
     },
-});
+})
 
-const filters = ref();
+const filters = ref()
 
 const openCreatePage = () => {
-    router.get(route('announcements.create'));
+    router.get(route('announcements.create'))
 }
 
 const openEditPage = (id: number) => {
-    router.get(route('announcements.edit', id));
+    router.get(route('announcements.edit', id))
 }
 
 watch(filters, (newValue) => {
-    router.get(route("announcements.index"), { search: newValue }, {
+    router.get(route('announcements.index'), { search: newValue }, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-    });
-});
+    })
+})
 
 </script>
 
@@ -78,13 +75,10 @@ watch(filters, (newValue) => {
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div class="relative">
-                        <!-- <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <i class="pi pi-search text-gray-400 text-sm"></i>
-                        </div> -->
                         <InputText
                             v-model="filters"
                             placeholder="Cari pengumuman..."
-                            class="pl-10 w-full sm:w-80 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-sm"
+                            class="w-full sm:w-80 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-sm"
                         />
                     </div>
                     <div class="flex items-center gap-2 text-sm text-gray-600">
@@ -93,7 +87,6 @@ watch(filters, (newValue) => {
                     </div>
                 </div>
             </div>
-
             <!-- Data Table -->
             <DataTable
                 :value="props.models"
@@ -103,7 +96,6 @@ watch(filters, (newValue) => {
                 :rows="10"
                 :rows-per-page-options="[10, 20, 50, 100]"
                 @rowClick="(event: any) => openEditPage(event.data.id)"
-                class="custom-datatable"
                 tableStyle="min-width: 100%"
                 paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 currentPageReportTemplate="Menampilkan {first} - {last} dari {totalRecords} data"
@@ -177,9 +169,6 @@ watch(filters, (newValue) => {
                                 <p class="text-sm font-medium text-gray-900 truncate">
                                     {{ slotProps.data.created_by?.name }}
                                 </p>
-                                <!-- <p class="text-xs text-gray-500">
-                                    Administrator
-                                </p> -->
                             </div>
                         </div>
                     </template>
@@ -210,99 +199,21 @@ watch(filters, (newValue) => {
     </AppLayout>
 </template>
 
-<style scoped>
-/* Line clamp utilities */
+<style>
+/* Line clamp utilities - keep these as they're needed for text truncation */
 .line-clamp-1 {
+    overflow: hidden;
     display: -webkit-box;
+    -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 .line-clamp-2 {
+    overflow: hidden;
     display: -webkit-box;
+    -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-/* Custom DataTable styling */
-:deep(.custom-datatable) {
-    .p-datatable-header {
-        display: none;
-    }
-
-    .p-datatable-table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .p-datatable-thead > tr > th {
-        border-bottom: 1px solid rgb(229 231 235);
-        background-color: rgb(249 250 251);
-        font-weight: 600;
-        color: rgb(55 65 81);
-        text-align: left;
-    }
-
-    .p-datatable-tbody > tr {
-        border-bottom: 1px solid rgb(243 244 246);
-        transition: background-color 150ms;
-        cursor: pointer;
-    }
-
-    .p-datatable-tbody > tr:hover {
-        background-color: rgba(249 250 251 / 0.5);
-    }
-
-    .p-datatable-tbody > tr:last-child {
-        border-bottom: none;
-    }
-
-    .p-datatable-tbody > tr > td {
-        border: none;
-        color: rgb(55 65 81);
-    }
-
-    .p-paginator {
-        border-top: 1px solid rgb(229 231 235);
-        background-color: rgba(249 250 251 / 0.3);
-        padding: 1rem 1.5rem;
-    }
-
-    .p-paginator .p-paginator-pages .p-paginator-page {
-        min-width: 2rem;
-        height: 2rem;
-        font-size: 0.875rem;
-    }
-
-    .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
-        background-color: rgb(37 99 235);
-        border-color: rgb(37 99 235);
-    }
-
-    .p-paginator .p-dropdown {
-        font-size: 0.875rem;
-    }
-}
-
-/* Loading and hover states */
-.p-datatable-loading-overlay {
-    background-color: rgba(255 255 255 / 0.8);
-    backdrop-filter: blur(4px);
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-    :deep(.custom-datatable) .p-datatable-tbody > tr > td {
-        padding: 0.75rem 1rem;
-    }
-
-    :deep(.custom-datatable) .p-datatable-thead > tr > th {
-        padding: 0.75rem 1rem;
-        font-size: 0.75rem;
-    }
 }
 </style>

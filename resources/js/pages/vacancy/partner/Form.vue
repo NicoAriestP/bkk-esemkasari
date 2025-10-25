@@ -153,100 +153,396 @@ const save = () => {
     <Head :title="model?.id ? 'Ubah Lowongan Kerja' : 'Tambah Lowongan Kerja'" />
     <Toast />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="mx-auto p-2 lg:p-6">
-            <div class="mb-6 flex items-center justify-between">
-                <h1 class="text-foreground text-2xl font-bold">
-                    {{ model?.id ? 'Ubah Lowongan Kerja' : 'Tambah Lowongan Kerja' }}
-                </h1>
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">
+                        {{ model?.id ? 'Ubah Lowongan Kerja' : 'Tambah Lowongan Kerja' }}
+                    </h1>
+                    <p class="mt-1.5 text-sm text-gray-500">
+                        {{ model?.id ? 'Perbarui informasi lowongan kerja yang sudah ada' : 'Buat lowongan kerja baru untuk dipublikasikan' }}
+                    </p>
+                </div>
                 <div v-if="!isNewRecord" class="flex gap-2">
-                    <Button label="Hapus" severity="danger" icon="pi pi-trash" @click="deleteVacancy"/>
+                    <Button
+                        label="Hapus Lowongan"
+                        severity="danger"
+                        icon="pi pi-trash"
+                        @click="deleteVacancy"
+                        class="shrink-0"
+                        outlined
+                    />
                 </div>
             </div>
-            <form @submit.prevent="save">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-y-4 gap-x-2">
-                    <div class="col-span-1 flex flex-col gap-2">
-                        <label for="title" class="text-foreground block text-sm font-medium">Posisi</label>
-                        <InputText id="title" v-model="form.title" required class="lg:w-full" placeholder="Posisi" />
-                        <InputError :message="form.errors.title" />
-                    </div>
-                    <div class="col-span-1 flex flex-col gap-2">
-                        <label for="location" class="text-foreground block text-sm font-medium">Lokasi</label>
-                        <InputText id="location" v-model="form.location" required class="lg:w-full" placeholder="Lokasi" />
-                        <InputError :message="form.errors.location" />
-                    </div>
-                    <div class="col-span-1 flex flex-col gap-2">
-                        <label for="due_at" class="text-foreground block text-sm font-medium">Tenggat Waktu</label>
-                        <DatePicker id="due_at" v-model="datePickerValue" required class="lg:w-full" placeholder="Tenggat Waktu" />
-                        <InputError :message="form.errors.due_at" />
-                    </div>
-                    <div class="col-span-3 flex flex-col gap-2">
-                        <label for="description" class="text-foreground block text-sm font-medium">Deskripsi</label>
-                        <Editor
-                            v-model="form.description"
-                            :api-key="TINYMCE_API_KEY"
-                            :init="{
-                                plugins: 'save lists link image media table code codesample help autosave emoticons fullscreen preview',
-                                toolbar: [
-                                    { name: 'history', items: ['undo', 'redo'] },
-                                    { name: 'styles', items: ['styles'] },
-                                    { name: 'formatting', items: ['bold', 'italic', 'underline'] },
-                                    { name: 'media', items: ['link', 'emoticons', 'image'] },
-                                    { name: 'lists', items: ['numlist', 'bullist'] },
-                                    { name: 'alignment', items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify'] },
-                                    { name: 'indentation', items: ['outdent', 'indent'] },
-                                    { name: 'code', items: ['codesample', 'code'] },
-                                    { name: 'misc', items: ['preview', 'fullscreen'] },
-                                ],
-                                menubar: false,
-                                placeholder: 'Tulis deskripsi lowongan kerja ...',
-                                min_height: 350,
-                                height: 350,
-                                branding: false,
-                                resize: true,
-                                link_default_target: '_blank',
-                            }"
-                        />
-                        <InputError :message="form.errors.description" />
-                    </div>
-                    <div class="col-span-3 flex flex-col gap-2">
-                        <label for="file" class="text-foreground block text-sm font-medium">Lampiran</label>
+        </div>
 
-                        <div class="relative w-full lg:w-1/2">
-                            <input ref="fileInput" type="file" id="file" name="file" @change="handleFileChange" class="hidden" />
+        <!-- Main Form Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Form Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="pi pi-briefcase text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            Informasi Lowongan Kerja
+                        </h2>
+                        <p class="text-sm text-gray-600">
+                            Lengkapi form di bawah untuk {{ model?.id ? 'mengubah' : 'membuat' }} lowongan kerja
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-                            <button
-                                type="button"
-                                @click="$refs.fileInput.click()"
-                                class="bg-blue-500 hover:bg-blue-600 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition"
-                            >
-                                📁 {{ form?.file ? 'Ubah' : 'Pilih' }} File
-                            </button>
-
-                            <span class="mx-2 my-2 text-sm text-gray-600">
-                                <!-- Tampilkan nama file jika ada -->
-                                {{ getFileName(form?.file || model?.file) || 'Belum ada file yang dipilih' }}
-                            </span>
+            <!-- Form Content -->
+            <form @submit.prevent="save" class="p-6">
+                <div class="space-y-8">
+                    <!-- Basic Information Fields - One Row on Desktop, Stacked on Mobile -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="text-base font-semibold text-gray-900">Informasi Dasar</h3>
+                            <p class="mt-1 text-sm text-gray-600">Masukkan detail utama lowongan pekerjaan</p>
                         </div>
-                        <small class="text-gray-500"> Max 4MB (PDF, JPG, JPEG, PNG) </small>
+
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                            <!-- Title Field -->
+                            <div class="space-y-3">
+                                <label for="title" class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <i class="pi pi-briefcase text-indigo-600"></i>
+                                    Posisi Pekerjaan
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <InputText
+                                        id="title"
+                                        v-model="form.title"
+                                        required
+                                        class="w-full text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                                        placeholder="Software Developer"
+                                        size="large"
+                                    />
+                                </div>
+                                <InputError :message="form.errors.title" />
+                                <p class="text-xs text-gray-500">Nama posisi yang jelas</p>
+                            </div>
+
+                            <!-- Location Field -->
+                            <div class="space-y-3">
+                                <label for="location" class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <i class="pi pi-map-marker text-emerald-600"></i>
+                                    Lokasi Kerja
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <InputText
+                                        id="location"
+                                        v-model="form.location"
+                                        required
+                                        class="w-full text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                                        placeholder="Jakarta, Remote"
+                                        size="large"
+                                    />
+                                </div>
+                                <InputError :message="form.errors.location" />
+                                <p class="text-xs text-gray-500">Lokasi kerja yang spesifik</p>
+                            </div>
+
+                            <!-- Due Date Field -->
+                            <div class="space-y-3">
+                                <label for="due_at" class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <i class="pi pi-calendar text-amber-600"></i>
+                                    Batas Akhir
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <DatePicker
+                                        id="due_at"
+                                        v-model="datePickerValue"
+                                        required
+                                        class="w-full text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                                        placeholder="Pilih tanggal"
+                                        size="large"
+                                        show-icon
+                                    />
+                                </div>
+                                <InputError :message="form.errors.due_at" />
+                                <p class="text-xs text-gray-500">Batas penerimaan lamaran</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description Field -->
+                    <div class="space-y-3">
+                        <label for="description" class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                            <i class="pi pi-file-edit text-purple-600"></i>
+                            Deskripsi Lowongan
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="rounded-lg border border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 overflow-hidden">
+                            <Editor
+                                v-model="form.description"
+                                :api-key="TINYMCE_API_KEY"
+                                :init="{
+                                    plugins: 'save lists link image media table code codesample help autosave emoticons fullscreen preview',
+                                    toolbar: [
+                                        { name: 'history', items: ['undo', 'redo'] },
+                                        { name: 'styles', items: ['styles'] },
+                                        { name: 'formatting', items: ['bold', 'italic', 'underline'] },
+                                        { name: 'media', items: ['link', 'emoticons', 'image'] },
+                                        { name: 'lists', items: ['numlist', 'bullist'] },
+                                        { name: 'alignment', items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify'] },
+                                        { name: 'indentation', items: ['outdent', 'indent'] },
+                                        { name: 'code', items: ['codesample', 'code'] },
+                                        { name: 'misc', items: ['preview', 'fullscreen'] },
+                                    ],
+                                    menubar: false,
+                                    placeholder: 'Tulis deskripsi lengkap lowongan kerja, job desc, requirements, dan benefit yang ditawarkan...',
+                                    min_height: 400,
+                                    height: 400,
+                                    branding: false,
+                                    resize: true,
+                                    link_default_target: '_blank',
+                                    skin: 'oxide',
+                                    content_css: 'default',
+                                }"
+                            />
+                        </div>
+                        <InputError :message="form.errors.description" />
+                        <p class="text-xs text-gray-500">Gunakan editor untuk memformat teks, menambahkan daftar requirements, dan benefit</p>
+                    </div>
+
+                    <!-- File Upload Field -->
+                    <div class="space-y-3">
+                        <label for="file" class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                            <i class="pi pi-paperclip text-rose-600"></i>
+                            Lampiran (Opsional)
+                        </label>
+
+                        <div class="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors duration-200 p-6">
+                            <div class="text-center">
+                                <input ref="fileInput" type="file" id="file" name="file" @change="handleFileChange" class="hidden" />
+
+                                <!-- File Upload Area -->
+                                <div class="space-y-4">
+                                    <div class="flex justify-center">
+                                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <i class="pi pi-cloud-upload text-blue-600 text-2xl"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <Button
+                                            type="button"
+                                            @click="$refs.fileInput.click()"
+                                            :label="form?.file ? 'Ubah File' : 'Pilih File'"
+                                            icon="pi pi-upload"
+                                            class="bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700"
+                                        />
+
+                                        <p class="text-sm text-gray-600">
+                                            atau seret dan lepas file di sini
+                                        </p>
+                                    </div>
+
+                                    <!-- File Info -->
+                                    <div v-if="form?.file || model?.file" class="bg-white rounded-lg border border-gray-200 p-4 mt-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                                <i class="pi pi-file text-green-600"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 truncate">
+                                                    {{ getFileName(form?.file || model?.file) }}
+                                                </p>
+                                                <p class="text-xs text-gray-500">File berhasil dipilih</p>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <i class="pi pi-check-circle text-green-500"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div v-else class="text-center">
+                                        <p class="text-sm text-gray-500">Belum ada file yang dipilih</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                            <i class="pi pi-info-circle"></i>
+                            <span>Maksimal 4MB • Format yang didukung: PDF, JPG, JPEG, PNG</span>
+                        </div>
+
                         <InputError :message="form.errors.file" />
                     </div>
                 </div>
-                <div class="mt-8 flex justify-end gap-4">
-                    <Button
-                        type="button"
-                        label="Reset"
-                        severity="secondary"
-                        icon="pi pi-refresh"
-                        @click="form.reset()"
-                    />
-                    <Button type="submit" label="Simpan" severity="primary" icon="pi pi-check" />
+
+                <!-- Form Actions -->
+                <div class="mt-12 pt-6 border-t border-gray-200">
+                    <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        <Button
+                            type="button"
+                            label="Reset Form"
+                            severity="secondary"
+                            icon="pi pi-refresh"
+                            @click="form.reset()"
+                            outlined
+                            class="w-full sm:w-auto"
+                        />
+                        <Button
+                            type="submit"
+                            :label="model?.id ? 'Perbarui Lowongan' : 'Buat Lowongan'"
+                            icon="pi pi-check"
+                            class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700"
+                            :loading="form.processing"
+                            loadingIcon="pi pi-spinner pi-spin"
+                        />
+                    </div>
                 </div>
             </form>
         </div>
     </AppLayout>
 </template>
 <style scoped>
-.p-fileupload-basic {
-    justify-content: start !important;
+/* TinyMCE Editor Custom Styling */
+:deep(.tox-tinymce) {
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+:deep(.tox-edit-area) {
+    border: none !important;
+}
+
+:deep(.tox-toolbar-overlord) {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+/* File Upload Drag and Drop Effects */
+.file-upload-area {
+    transition: all 0.2s ease-in-out;
+}
+
+.file-upload-area:hover {
+    background-color: rgb(239 246 255);
+    border-color: rgb(59 130 246);
+}
+
+/* Form Field Focus Effects */
+:deep(.p-inputtext:focus) {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    border-color: rgb(59 130 246) !important;
+}
+
+:deep(.p-datepicker:not(.p-disabled).p-focus) {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    border-color: rgb(59 130 246) !important;
+}
+
+/* Button Loading Animation */
+:deep(.p-button .pi-spin) {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Card Shadow on Hover */
+.main-form-card {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.main-form-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradient Background for Form Header */
+.form-header-gradient {
+    background: linear-gradient(135deg, rgb(239 246 255) 0%, rgb(224 242 254) 100%);
+}
+
+/* File Preview Card Animation */
+.file-preview-card {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input Icon Positioning */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon .p-inputtext {
+    padding-right: 2.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    /* Stack grid items on mobile */
+    .grid.md\\:grid-cols-3 {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    :deep(.tox-toolbar__group) {
+        flex-wrap: wrap;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+    }
+
+    .form-actions .p-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Mobile input adjustments */
+    :deep(.p-inputtext) {
+        padding-right: 0.75rem !important;
+    }
+
+    /* Mobile DatePicker adjustments */
+    :deep(.p-datepicker) {
+        width: 100% !important;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Tablet adjustments - keep 3 columns but adjust spacing */
+    .grid.md\\:grid-cols-3 {
+        gap: 1rem;
+    }
+}
+
+/* Enhanced focus states for accessibility */
+:deep(.p-button:focus) {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
+}
+
+:deep(.p-button:focus:not(:active)) {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
 }
 </style>

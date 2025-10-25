@@ -280,7 +280,7 @@ onUnmounted(() => {
 
                                         <!-- Action Button -->
                                         <Button
-                                            label="Lihat Detail & Lamar"
+                                            label="Lihat Detail"
                                             icon="pi pi-arrow-right"
                                             icon-pos="right"
                                             class="w-full !bg-gradient-to-r !from-blue-600 !to-indigo-600 hover:!from-blue-700 hover:!to-indigo-700 !border-0 !font-semibold !py-3 shadow-lg hover:shadow-xl transition-all duration-300"

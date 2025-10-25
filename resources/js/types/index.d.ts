@@ -48,4 +48,28 @@ export interface UserForm {
     password?: string;
 }
 
+// export interface Partner {
+//     id: number;
+//     name: string;
+//     email: string;
+//     created_at: string;
+//     updated_at: string;
+// }
+
+// export interface VacancyType {
+//     id: number;
+//     title: string;
+//     description: string;
+//     due_at: string;
+//     location: string;
+//     file?: string;
+//     file_url?: string;
+//     applicants_count: number;
+//     qualified_applicants_count: number;
+//     created_at: string;
+//     updated_at: string;
+//     created_by?: Partner;
+//     updated_by?: Partner;
+// }
+
 export type BreadcrumbItemType = BreadcrumbItem;
