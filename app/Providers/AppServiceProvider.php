@@ -29,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Year::observe(\App\Observers\YearObserver::class);
         \App\Models\Partner::observe(\App\Observers\PartnerObserver::class);
         \App\Models\Vacancy::observe(\App\Observers\VacancyObserver::class);
+        \App\Models\Questionnaire::observe(\App\Observers\QuestionnaireObserver::class);
+        \App\Models\QuestionnaireQuestion::observe(\App\Observers\QuestionnaireQuestionObserver::class);
+        \App\Models\QuestionOption::observe(\App\Observers\QuestionOptionObserver::class);
+        \App\Models\QuestionAnswer::observe(\App\Observers\QuestionAnswerObserver::class);
 
         Inertia::share([
             'auth' => fn () => [
