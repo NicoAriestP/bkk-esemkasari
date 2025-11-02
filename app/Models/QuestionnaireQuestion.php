@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Model\Blameable;
+use App\Enum\QuestionType;
 
 class QuestionnaireQuestion extends Model
 {
@@ -14,11 +15,24 @@ class QuestionnaireQuestion extends Model
         'created_by',
         'updated_by',
         'questionnaire_id',
-        'question',
+        'question_title',
         'type',
         'notes',
-        'is_multiple_answers'
+        // 'is_multiple_answers'
     ];
+
+    protected $appends = [
+        'type_label',
+    ];
+
+    protected $casts = [
+        'type' => QuestionType::class,
+    ];
+
+    public function getTypeLabelAttribute()
+    {
+        return $this->type->label();
+    }
 
     public function questionnaire()
     {
