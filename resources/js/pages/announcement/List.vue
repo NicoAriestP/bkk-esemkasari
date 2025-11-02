@@ -54,7 +54,7 @@ watch(filters, (newValue) => {
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">
-                        Pengumuman
+                        Manajemen Pengumuman
                     </h1>
                     <p class="mt-1.5 text-sm text-gray-500">
                         Kelola semua pengumuman yang telah dibuat
