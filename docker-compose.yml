@@ -7,6 +7,7 @@ services:
     container_name: bkk-esemkasari-app
     restart: unless-stopped
     working_dir: /var/www/app
+    # user: "1000:1000"
     volumes:
       - ./:/var/www/app
       - ./storage:/var/www/app/storage
