@@ -32,10 +32,10 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
 
-            $table->string('question');
+            $table->string('question_title');
             $table->string('type', 20);
-            $table->text('notes');
-            $table->tinyInteger('is_multiple_answers')->default(0); 
+            $table->text('notes')->nullable();
+            // $table->tinyInteger('is_multiple_answers')->default(0); // Dicomment dulu karena tidak efektif secara code convention untuk handle logic pilihan pertanyaan
             $table->timestamps();
         });
     }
