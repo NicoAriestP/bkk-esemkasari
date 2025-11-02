@@ -15,7 +15,6 @@ class Questionnaire extends Model
         'updated_by',
         'title',
         'description',
-        'type',
         'due_at'
     ];
 

@@ -28,8 +28,7 @@ return new class extends Migration
 
             $table->string('title');
             $table->text('description');
-            $table->string('type');
-            $table->date('due_at');
+            $table->date('due_at')->nullable();
             $table->timestamps();
         });
     }
