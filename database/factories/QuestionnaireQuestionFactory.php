@@ -18,10 +18,10 @@ class QuestionnaireQuestionFactory extends Factory
     {
         return [
             'questionnaire_id' => fake()->numberBetween(1, 10),
-            'question' => fake()->sentence(3),
-            'type' => fake()->randomElement(['options', 'fillable', 'date']),
+            'question_title' => fake()->sentence(3),
+            'type' => fake()->randomElement(['dropdown', 'checkbox', 'fillable', 'date']),
             'notes' => fake()->paragraph(3),
-            'is_multiple_answers' => fake()->boolean(),
+            // 'is_multiple_answers' => fake()->boolean(),
         ];
     }
 }
