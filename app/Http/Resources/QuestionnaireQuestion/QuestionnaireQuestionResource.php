@@ -12,8 +12,10 @@ class QuestionnaireQuestionResource extends JsonResource
         return [
             'id' => $this->id,
             'questionnaire_id' => $this->questionnaire_id,
-            'question' => $this->question,
+            'question_title' => $this->question_title,
             'type' => $this->type,
+            'type_label' => $this->type_label,
+            'notes' => $this->notes,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
