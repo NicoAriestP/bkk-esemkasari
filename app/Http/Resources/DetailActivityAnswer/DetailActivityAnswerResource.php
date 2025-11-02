@@ -11,8 +11,7 @@ class DetailActivityAnswerResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'student_activity_answer_id' => $this->student_activity_answer_id,
-            'question' => $this->question,
+            'student_id' => $this->student_id,
             'answer' => $this->answer,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
