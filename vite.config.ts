@@ -4,6 +4,7 @@ import path from 'path';
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
+import fs from 'fs';
 
 export default defineConfig({
     plugins: [
@@ -22,11 +23,16 @@ export default defineConfig({
             },
         }),
     ],
-    // For testing using ngrok
     server: {
-        host: true,
+        host: '0.0.0.0',
+        port: 5173,
+        https: {
+            key: fs.readFileSync('./docker/ssl/bkk-esemkasari.key'),
+            cert: fs.readFileSync('./docker/ssl/bkk-esemkasari.crt'),
+        },
         hmr: {
-            host: 'localhost',
+            host: 'bkk-esemkasari.dev',
+            protocol: 'wss',
         },
         cors: true,
     },
