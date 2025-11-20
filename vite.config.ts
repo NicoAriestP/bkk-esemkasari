@@ -6,6 +6,11 @@ import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import fs from 'fs';
 
+// Check if SSL certificate exists
+const sslKeyPath = './docker/ssl/bkk-esemkasari.key';
+const sslCertPath = './docker/ssl/bkk-esemkasari.crt';
+const hasSSL = fs.existsSync(sslKeyPath) && fs.existsSync(sslCertPath);
+
 export default defineConfig({
     plugins: [
         laravel({
@@ -26,14 +31,23 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         port: 5173,
-        https: {
-            key: fs.readFileSync('./docker/ssl/bkk-esemkasari.key'),
-            cert: fs.readFileSync('./docker/ssl/bkk-esemkasari.crt'),
-        },
-        hmr: {
-            host: 'bkk-esemkasari.dev',
-            protocol: 'wss',
-        },
+        // Use HTTPS if certificate exists, otherwise fallback to HTTP
+        ...(hasSSL && {
+            https: {
+                key: fs.readFileSync(sslKeyPath),
+                cert: fs.readFileSync(sslCertPath),
+            },
+            hmr: {
+                host: 'bkk-esemkasari.dev',
+                protocol: 'wss',
+            },
+        }),
+        // Fallback to localhost if no SSL
+        ...(!hasSSL && {
+            hmr: {
+                host: 'localhost',
+            },
+        }),
         cors: true,
     },
     resolve: {
