@@ -22,3 +22,8 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# SSL Certificates (should be generated locally, never committed)
+/docker/ssl/*.crt
+/docker/ssl/*.key
+/docker/ssl/*.pem
