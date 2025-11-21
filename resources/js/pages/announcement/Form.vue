@@ -288,7 +288,7 @@ const save = () => {
                                                 <p class="text-sm font-medium text-gray-900 truncate">
                                                     {{ getFileName(form?.file || model?.file) }}
                                                 </p>
-                                                <p class="text-xs text-gray-500">File berhasil dipilih</p>
+                                                <p class="text-xs text-gray-500">File berhasil diupload</p>
                                             </div>
                                             <div class="flex-shrink-0">
                                                 <i class="pi pi-check-circle text-green-500"></i>
