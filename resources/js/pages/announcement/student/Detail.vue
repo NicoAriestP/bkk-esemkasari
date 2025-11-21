@@ -132,14 +132,16 @@ const handleShare = async () => {
                     <div class="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
                         <i class="pi pi-paperclip text-amber-600"></i>
                     </div>
-                    <div class="flex-1">
+                    <div class="flex-1 min-w-0">
                         <h4 class="text-sm font-semibold text-amber-900 mb-1">Lampiran Tersedia</h4>
-                        <p class="text-xs text-amber-700">Terdapat file lampiran untuk pengumuman ini</p>
+                        <p class="text-xs text-amber-700 truncate" :title="props.model.file_url.split('/').pop()">
+                            📄 {{ props.model.file_url.split('/').pop() }}
+                        </p>
                     </div>
                     <a
                         :href="props.model.file_url"
                         target="_blank"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors duration-200"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors duration-200 flex-shrink-0"
                     >
                         <i class="pi pi-download text-xs"></i>
                         <span>Unduh</span>
