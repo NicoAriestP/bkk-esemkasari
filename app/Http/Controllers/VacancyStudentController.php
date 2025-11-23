@@ -13,6 +13,7 @@ class VacancyStudentController extends Controller
     {
         $search = $request->input('search', '');
         $itemsPerPage = 8; // Tentukan jumlah item per halaman/permintaan
+        $studentId = auth()->guard('student')->id();
 
         $query = Vacancy::query()
             ->with('createdBy')
@@ -25,7 +26,12 @@ class VacancyStudentController extends Controller
                         });
                 });
             })
-            ->where('due_at', '>=', now())
+            ->where(function ($query) use ($studentId) {
+                $query->where('due_at', '>=', now())
+                    ->orWhereHas('vacancyApplication', function ($q) use ($studentId) {
+                        $q->where('student_id', $studentId);
+                    });
+            })
             ->orderBy('created_at', 'desc');
 
         // Cek jika ini adalah permintaan untuk lazy load dari frontend
@@ -55,7 +61,7 @@ class VacancyStudentController extends Controller
 
         return Inertia::render('vacancy/student/Detail', [
             'model' => $model,
-            'applicationStatus' => $model->vacancyApplication()->where('student_id', auth()->user()->id)->first()?->status,
+            'applicationStatus' => $model->vacancyApplication()->where('student_id', auth()->guard('student')->id())->first()?->status,
         ]);
     }
 
