@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Questionnaire;
 use Inertia\Inertia;
 use App\Http\Requests\Questionnaire\CreateQuestionnaireFormRequest;
-use App\Http\Requests\Announcement\EditAnnouncementFormRequest;
+use App\Http\Requests\Questionnaire\EditQuestionnaireFormRequest;
 use App\Actions\Questionnaire\QuestionnaireAction;
 use Symfony\Component\Console\Question\Question;
 
