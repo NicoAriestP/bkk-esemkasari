@@ -177,8 +177,70 @@ const applyVacancy = () => {
         </div>
 
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <!-- Main Content: Job Description -->
-            <div class="lg:col-span-2">
+            <!-- Main Content: Job Description & Info -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Job Details Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="border-b border-gray-100 px-8 py-6">
+                        <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                            <div class="w-2 h-8 bg-gradient-to-b from-indigo-500 to-purple-600 rounded-full"></div>
+                            Informasi Lowongan
+                        </h2>
+                        <p class="text-gray-600 mt-2">Detail informasi posisi dan perusahaan</p>
+                    </div>
+
+                    <div class="px-8 py-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Company Name -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="pi pi-building text-indigo-600 text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-gray-500 text-sm">Nama Perusahaan</p>
+                                    <p class="font-semibold text-gray-900 mt-1">{{ props.model.created_by?.name }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="pi pi-map-marker text-blue-600 text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-gray-500 text-sm">Lokasi Kerja</p>
+                                    <p class="font-semibold text-gray-900 mt-1">{{ props.model.location }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Deadline -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="pi pi-calendar-times text-red-600 text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-gray-500 text-sm">Batas Lamaran</p>
+                                    <p :class="['font-semibold mt-1', getDeadlineInfo(props.model.due_at).class.replace('dark:text-red-500', '').replace('dark:text-amber-500', '').replace('dark:text-gray-400', '')]">
+                                        {{ getDeadlineInfo(props.model.due_at).text }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Posted Date -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="pi pi-calendar-plus text-green-600 text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-gray-500 text-sm">Tanggal Posting</p>
+                                    <p class="font-semibold text-gray-900 mt-1">{{ dayjs(props.model.created_at).format('DD MMM YYYY') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Description Card -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <!-- Content Header -->
                     <div class="border-b border-gray-100 px-8 py-6">
@@ -194,52 +256,9 @@ const applyVacancy = () => {
                         <div class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900" v-html="props.model.description"></div>
                     </div>
                 </div>
-
-                <!-- Additional Info Cards -->
-                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Company Info Card -->
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <i class="pi pi-building text-blue-600"></i>
-                            Tentang Perusahaan
-                        </h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center gap-3">
-                                <Avatar
-                                    :label="props.model.created_by?.name.charAt(0) || 'M'"
-                                    size="large"
-                                    shape="circle"
-                                    class="!bg-gradient-to-br !from-blue-500 !to-indigo-600 !text-white"
-                                />
-                                <div>
-                                    <p class="font-semibold text-gray-900">{{ props.model.created_by?.name }}</p>
-                                    <p class="text-sm text-gray-600">Mitra Industri Terpercaya</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Application Stats Card -->
-                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <i class="pi pi-chart-pie text-purple-600"></i>
-                            Statistik Lamaran
-                        </h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Total Pelamar</span>
-                                <span class="font-bold text-gray-900">{{ props.model.applicants_count || 0 }}</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Lolos Seleksi</span>
-                                <span class="font-bold text-green-600">{{ props.model.qualified_applicants_count || 0 }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Sidebar: Actions & Details -->
+            <!-- Sidebar: Actions & Stats -->
             <div class="lg:col-span-1">
                 <div class="sticky top-8 space-y-6">
                     <!-- Action Card -->
@@ -287,48 +306,39 @@ const applyVacancy = () => {
                         </div>
                     </div>
 
-                    <!-- Job Details Card -->
+                    <!-- Application Stats Card -->
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="border-b border-gray-100 px-6 py-4">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                <i class="pi pi-info-circle text-blue-600"></i>
-                                Informasi Lowongan
+                                <i class="pi pi-chart-bar text-purple-600"></i>
+                                Statistik Lamaran
                             </h3>
                         </div>
 
-                        <div class="px-6 py-6 space-y-6">
-                            <!-- Location -->
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="pi pi-map-marker text-blue-600 text-lg"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-medium text-gray-500 text-sm">Lokasi Kerja</p>
-                                    <p class="font-semibold text-gray-900 mt-1">{{ props.model.location }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Deadline -->
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="pi pi-calendar-times text-red-600 text-lg"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-medium text-gray-500 text-sm">Batas Lamaran</p>
-                                    <p :class="['font-semibold mt-1', getDeadlineInfo(props.model.due_at).class.replace('dark:text-red-500', '').replace('dark:text-amber-500', '').replace('dark:text-gray-400', '')]">
-                                        {{ getDeadlineInfo(props.model.due_at).text }}
-                                    </p>
+                        <div class="px-6 py-6 space-y-4">
+                            <!-- Total Applicants -->
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                                        <i class="pi pi-users text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600">Total Pelamar</p>
+                                        <p class="text-2xl font-bold text-gray-900">{{ props.model.applicants_count || 0 }}</p>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Posted Date -->
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="pi pi-calendar-plus text-green-600 text-lg"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-medium text-gray-500 text-sm">Tanggal Posting</p>
-                                    <p class="font-semibold text-gray-900 mt-1">{{ dayjs(props.model.created_at).format('DD MMM YYYY') }}</p>
+                            <!-- Qualified Applicants -->
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                                        <i class="pi pi-check-circle text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600">Lolos Seleksi</p>
+                                        <p class="text-2xl font-bold text-green-600">{{ props.model.qualified_applicants_count || 0 }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
