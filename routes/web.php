@@ -72,12 +72,12 @@ Route::middleware(['auth:web'])->group(function () {
 
     // Questionnaire Management Routes
     Route::prefix('questionnaires')->name('questionnaires.')->group(function () {
-        Route::get('/', [QuestionnaireController::class, 'indexQuestionnaire'])->name('index');
-        Route::get('/create', [QuestionnaireController::class, 'createQuestionnaire'])->name('create');
-        Route::post('/', [QuestionnaireController::class, 'storeQuestionnaire'])->name('store');
-        Route::get('/{model}/edit', [QuestionnaireController::class, 'editQuestionnaire'])->name('edit');
-        Route::put('/{model}', [QuestionnaireController::class, 'updateQuestionnaire'])->name('update');
-        Route::delete('/{model}', [QuestionnaireController::class, 'destroyQuestionnaire'])->name('destroy');
+        Route::get('/', [QuestionnaireController::class, 'index'])->name('index');
+        Route::get('/create', [QuestionnaireController::class, 'create'])->name('create');
+        Route::post('/', [QuestionnaireController::class, 'store'])->name('store');
+        Route::get('/{model}/edit', [QuestionnaireController::class, 'edit'])->name('edit');
+        Route::put('/{model}', [QuestionnaireController::class, 'update'])->name('update');
+        Route::delete('/{model}', [QuestionnaireController::class, 'destroy'])->name('destroy');
     });
 
     // Partner Management Routes
