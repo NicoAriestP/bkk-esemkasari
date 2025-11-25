@@ -61,8 +61,10 @@ class QuestionnaireController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Question $model)
+    public function edit(Questionnaire $model)
     {
+        $model->load(['questions.questionOptions']);
+
         return Inertia::render('questionnaire/Form', [
             'model' => $model,
             'isNewRecord' => false,
@@ -81,9 +83,9 @@ class QuestionnaireController extends Controller
         Questionnaire $model,
         QuestionnaireAction $action
     ) {
-        $action->update($model, $request);
+        $action->save($request, $model);
 
-        return redirect()->route('questionnaires.edit', $model->id);
+        return redirect()->route('questionnaires.edit', $model->id)->with('success', 'Kuesioner berhasil diperbarui');
     }
 
     /**
