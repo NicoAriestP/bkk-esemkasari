@@ -7,10 +7,15 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import Toast from 'primevue/toast'
+import Dialog from 'primevue/dialog'
+import { useToast } from 'primevue/usetoast'
 import dayjs from 'dayjs'
 import 'dayjs/locale/id'
 
 dayjs.locale('id')
+
+const toast = useToast()
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,6 +32,8 @@ const props = defineProps({
 })
 
 const filters = ref('')
+const selectedQuestionnaire = ref<any>(null)
+const displayDeleteDialog = ref(false)
 
 const openCreatePage = () => {
     router.get(route('questionnaires.create'))
@@ -34,6 +41,38 @@ const openCreatePage = () => {
 
 const openEditPage = (id: number) => {
     router.get(route('questionnaires.edit', id))
+}
+
+const confirmDelete = (questionnaire: any) => {
+    selectedQuestionnaire.value = questionnaire
+    displayDeleteDialog.value = true
+}
+
+const deleteQuestionnaire = () => {
+    if (!selectedQuestionnaire.value) {
+        return
+    }
+
+    router.delete(route('questionnaires.destroy', selectedQuestionnaire.value.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            toast.add({
+                severity: 'success',
+                summary: 'Berhasil',
+                detail: 'Kuesioner berhasil dihapus',
+                life: 5000,
+            })
+            displayDeleteDialog.value = false
+        },
+        onError: () => {
+            toast.add({
+                severity: 'error',
+                summary: 'Gagal',
+                detail: 'Terjadi kesalahan saat menghapus kuesioner',
+                life: 5000,
+            })
+        },
+    })
 }
 
 watch(filters, (newValue) => {
@@ -47,6 +86,7 @@ watch(filters, (newValue) => {
 
 <template>
     <Head title="Kuisioner" />
+    <Toast />
     <AppLayout :breadcrumbs="breadcrumbs">
         <!-- Header Section -->
         <div class="mb-8">
@@ -198,10 +238,10 @@ watch(filters, (newValue) => {
                     header="Aksi"
                     headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
                     bodyClass="py-4 px-6"
-                    class="w-24"
+                    class="w-32"
                 >
                     <template #body="slotProps">
-                        <div class="flex items-center justify-center">
+                        <div class="flex items-center justify-center gap-1">
                             <Button
                                 icon="pi pi-pencil"
                                 severity="warn"
@@ -211,12 +251,71 @@ watch(filters, (newValue) => {
                                 size="small"
                                 v-tooltip.top="'Edit kuisioner'"
                             />
+                            <Button
+                                icon="pi pi-trash"
+                                severity="danger"
+                                @click.stop="confirmDelete(slotProps.data)"
+                                class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                                text
+                                size="small"
+                                v-tooltip.top="'Hapus kuisioner'"
+                            />
                         </div>
                     </template>
                 </Column>
             </DataTable>
         </div>
     </AppLayout>
+
+    <!-- Enhanced Delete Confirmation Dialog -->
+    <Dialog v-model:visible="displayDeleteDialog" modal class="w-full max-w-md mx-4">
+        <template #header>
+            <div class="flex items-center gap-3">
+                <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <i class="pi pi-exclamation-triangle text-red-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Konfirmasi Hapus</h3>
+                    <p class="text-sm text-gray-500">Tindakan ini tidak dapat dibatalkan</p>
+                </div>
+            </div>
+        </template>
+
+        <div class="py-4">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <i class="pi pi-exclamation-triangle text-red-500 text-xl mt-0.5"></i>
+                    <div>
+                        <p class="text-sm text-red-800 font-medium mb-1">
+                            Hapus kuesioner "{{ selectedQuestionnaire?.title }}"?
+                        </p>
+                        <p class="text-sm text-red-700">
+                            Kuesioner ini akan dihapus dari sistem beserta semua pertanyaan dan data terkait.
+                            Pastikan Anda telah mempertimbangkan keputusan ini dengan baik.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <template #footer>
+            <div class="flex justify-end gap-3">
+                <Button
+                    label="Batal"
+                    @click="displayDeleteDialog = false"
+                    class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                    text
+                />
+                <Button
+                    label="Hapus Kuesioner"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    @click="deleteQuestionnaire"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 border-red-600 hover:border-red-700 transition-colors duration-200"
+                />
+            </div>
+        </template>
+    </Dialog>
 </template>
 
 <style>
