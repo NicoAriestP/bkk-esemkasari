@@ -18,7 +18,7 @@ class Questionnaire extends Model
         'due_at'
     ];
 
-    public function questionnaireQuestions()
+    public function questions()
     {
         return $this->hasMany(QuestionnaireQuestion::class);
     }
