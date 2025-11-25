@@ -63,10 +63,10 @@
                     <div class="relative">
                         <Carousel
                             :value="heroImages"
-                            :showThumbnails="false"
                             :showIndicators="true"
                             :autoplayInterval="4000"
-                            class="overflow-hidden rounded-lg shadow-2xl"
+                            circular
+                            class="hero-carousel overflow-hidden rounded-lg shadow-2xl px-2 pt-4"
                         >
                             <template #item="{ data }">
                                 <img :src="data.image" :alt="data.title" class="h-80 w-full object-cover" />
@@ -398,10 +398,10 @@
 
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import { onMounted, onUnmounted, ref } from 'vue';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Carousel from 'primevue/carousel';
-import { onMounted, onUnmounted, ref } from 'vue';
 
 // Define page title
 defineOptions({
@@ -564,11 +564,6 @@ const latestNews = ref([
     },
 ]);
 
-// Methods
-const openNews = (link: string) => {
-    window.open(link, '_blank');
-};
-
 // Smooth scrolling for anchor links
 const handleAnchorClick = (event: Event) => {
     const target = event.target as HTMLAnchorElement;
@@ -599,6 +594,32 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Hero Carousel Custom Styling */
+.hero-carousel :deep(.p-carousel-prev-button),
+.hero-carousel :deep(.p-carousel-next-button) {
+    color: var(--color--neutral-200);
+}
+
+/* Carousel Indicators */
+.hero-carousel :deep(.p-carousel-indicators) {
+    gap: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-carousel :deep(.p-carousel-indicator) {
+    margin: 0 !important;
+}
+
+.hero-carousel :deep(.p-carousel-indicator button) {
+    width: 2.5rem;
+    height: 0.625rem;
+    border-radius: 9999px;
+    cursor: pointer;
+}
+
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
