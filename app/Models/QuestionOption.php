@@ -19,7 +19,7 @@ class QuestionOption extends Model
 
     public function questionnaireQuestion()
     {
-        return $this->belongsTo(QuestionnaireQuestion::class);
+        return $this->belongsTo(QuestionnaireQuestion::class, 'question_id');
     }
 
     public function questionAnswers()
