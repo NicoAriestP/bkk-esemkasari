@@ -8,5 +8,20 @@ use Inertia\Inertia;
 
 class StudentQuestionnaireController extends Controller
 {
-    //
+    public function index(Request $request)
+    {
+        $search = $request->input('search', '');
+
+        $questionnaires = Questionnaire::query()
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', "%$search%");
+            })
+            ->with('createdBy')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('questionnaire/student/List', [
+            'models' => $questionnaires,
+        ]);
+    }
 }
