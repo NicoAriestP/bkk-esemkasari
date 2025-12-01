@@ -13,6 +13,7 @@ use App\Http\Controllers\VacancyStudentController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\DashboardPartnerController;
 use App\Http\Controllers\VacancyApplicationController;
+use App\Http\Controllers\StudentQuestionnaireController;
 use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\HomePageController;
 
@@ -120,6 +121,12 @@ Route::middleware('auth:student')->group(function () {
         Route::get('/', [VacancyStudentController::class, 'index'])->name('index');
         Route::get('/{model}', [VacancyStudentController::class, 'show'])->name('show');
         Route::post('/{model}', [VacancyStudentController::class, 'applyVacancy'])->name('apply');
+    });
+
+    Route::prefix('students/questionnaires')->name('students.questionnaires.')->group(function () {
+        Route::get('/', [StudentQuestionnaireController::class, 'index'])->name('index');
+        Route::get('/{model}', [StudentQuestionnaireController::class, 'show'])->name('show');
+        Route::post('/{model}', [StudentQuestionnaireController::class, 'submitAnswers'])->name('submit');
     });
 });
 
