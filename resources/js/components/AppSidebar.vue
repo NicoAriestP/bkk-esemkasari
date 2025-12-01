@@ -95,7 +95,7 @@ const studentNavItems: NavItem[] = [
     {
         title: 'Kuisioner',
         description: 'Halaman Kuisioner untuk Siswa',
-        href: '/questionnaires/student',
+        href: '/students/questionnaires',
         icon: FileText,
     },
     {
