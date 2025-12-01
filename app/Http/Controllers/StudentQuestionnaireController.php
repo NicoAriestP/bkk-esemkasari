@@ -24,4 +24,13 @@ class StudentQuestionnaireController extends Controller
             'models' => $questionnaires,
         ]);
     }
+
+    public function show(Questionnaire $model)
+    {
+        $model->load('questionnaireQuestions.questionOptions');
+
+        return Inertia::render('questionnaire/student/Show', [
+            'model' => $model,
+        ]);
+    }
 }
