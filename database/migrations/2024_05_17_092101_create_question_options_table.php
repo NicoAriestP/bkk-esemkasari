@@ -30,8 +30,8 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('questionnaire_questions')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
-                
+                ->onDelete('cascade');
+
             $table->string('option_label');
             $table->timestamps();
         });

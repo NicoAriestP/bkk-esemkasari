@@ -30,7 +30,7 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('questionnaires')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onDelete('cascade');
 
             $table->string('question_title');
             $table->string('type', 20);
