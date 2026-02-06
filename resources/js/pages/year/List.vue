@@ -424,7 +424,7 @@ const openStudentClassPage = (model: any) => {
                     <p v-if="form.errors.year" class="text-sm text-red-600">{{ form.errors.year }}</p>
                 </div>
 
-                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <div class="flex justify-end gap-3 pt-4">
                     <Button
                         type="button"
                         label="Batal"
