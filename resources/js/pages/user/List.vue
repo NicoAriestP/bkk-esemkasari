@@ -556,7 +556,7 @@ watch(filters, (newValue) => {
         </div>
 
         <template #footer>
-            <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+            <div class="flex justify-end gap-3 px-6 py-4">
                 <Button
                     label="Batal"
                     @click="dialogVisible = false"
