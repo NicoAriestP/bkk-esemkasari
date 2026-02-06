@@ -424,9 +424,9 @@ const openStudentsPage = (model: any) => {
                         Nama Kelas <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <!-- <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <i class="pi pi-graduation-cap text-gray-400 text-sm"></i>
-                        </div>
+                        </div> -->
                         <InputText
                             v-model="form.name"
                             placeholder="Contoh: XII RPL 1, XII TKJ 2"
@@ -437,7 +437,7 @@ const openStudentsPage = (model: any) => {
                     <p v-if="form.errors.name" class="text-sm text-red-600">{{ form.errors.name }}</p>
                 </div>
 
-                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <div class="flex justify-end gap-3 pt-4">
                     <Button
                         type="button"
                         label="Batal"
