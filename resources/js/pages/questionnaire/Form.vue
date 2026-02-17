@@ -10,8 +10,8 @@ import Button from 'primevue/button';
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
-import Calendar from 'primevue/calendar';
-import Dropdown from 'primevue/dropdown';
+import DatePicker from 'primevue/datepicker';
+import Select from 'primevue/select';
 import Checkbox from 'primevue/checkbox';
 import Tag from 'primevue/tag';
 import Toast from 'primevue/toast';
@@ -64,7 +64,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
 
 const questionTypes = [
     { label: 'Pilihan', value: 'dropdown' as QuestionType, icon: 'pi pi-list', requiresOptions: true },
-    { label: 'Checkbox', value: 'checkbox' as QuestionType, icon: 'pi pi-check-square', requiresOptions: true },
+    { label: 'Kotak Centang', value: 'checkbox' as QuestionType, icon: 'pi pi-check-square', requiresOptions: true },
     { label: 'Isian', value: 'fillable' as QuestionType, icon: 'pi pi-align-left', requiresOptions: false },
     { label: 'Tanggal', value: 'date' as QuestionType, icon: 'pi pi-calendar', requiresOptions: false },
 ];
@@ -300,8 +300,8 @@ const handleSubmit = () => {
                                 <div>
                                     <label for="due_at" class="mb-2 block font-medium text-gray-700">Batas Waktu
                                         Pengisian</label>
-                                    <Calendar id="due_at" v-model="form.due_at" showIcon dateFormat="dd/mm/yy"
-                                        placeholder="Pilih tanggal batas waktu" class="w-full" :minDate="new Date()"
+                                    <DatePicker id="due_at" v-model="form.due_at" show-icon date-format="dd/mm/yy"
+                                        placeholder="Pilih tanggal batas waktu" class="w-full" :min-date="new Date()"
                                         :class="{ 'p-invalid': form.errors.due_at }" />
                                     <small v-if="form.errors.due_at" class="text-red-500">{{ form.errors.due_at
                                         }}</small>
@@ -462,7 +462,7 @@ const handleSubmit = () => {
                                                     <p class="mb-2 text-sm font-medium text-gray-700">Preview:</p>
                                                     <div
                                                         v-if="question.type === 'dropdown' && question.options && question.options.length > 0">
-                                                        <Dropdown :options="question.options" optionLabel="option_label"
+                                                        <Select :options="question.options" optionLabel="option_label"
                                                             placeholder="Pilih jawaban" class="w-full" disabled />
                                                     </div>
                                                     <div v-else-if="question.type === 'checkbox' && question.options && question.options.length > 0"
@@ -484,7 +484,7 @@ const handleSubmit = () => {
                                                             class="w-full" disabled />
                                                     </div>
                                                     <div v-else-if="question.type === 'date'">
-                                                        <Calendar showIcon placeholder="DD/MM/YYYY" class="w-full"
+                                                        <DatePicker show-icon placeholder="DD/MM/YYYY" class="w-full"
                                                             disabled />
                                                     </div>
                                                     <div v-else>
