@@ -21,4 +21,9 @@ class QuestionnaireResponse extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
+    public function questionAnswers()
+    {
+        return $this->hasMany(QuestionAnswer::class, 'response_id');
+    }
 }
