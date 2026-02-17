@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Questionnaire;
+use App\Http\Requests\Questionnaire\SubmitQuestionnaireAnswersFormRequest;
+use App\Actions\Questionnaire\QuestionnaireAction;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class StudentQuestionnaireController extends Controller
 {
@@ -48,10 +51,29 @@ class StudentQuestionnaireController extends Controller
 
     public function show(Questionnaire $model)
     {
-        $model->load('questionnaireQuestions.questionOptions');
+        $model->load('questions.questionOptions');
 
         return Inertia::render('questionnaire/student/Detail', [
             'model' => $model,
         ]);
     }
+
+    public function submitAnswers(SubmitQuestionnaireAnswersFormRequest $request, Questionnaire $model, QuestionnaireAction $action)
+    {
+        try {
+            $action->submitAnswers($request, $model, auth()->guard('student')->id());
+
+            return redirect()
+                ->route('students.questionnaires.index')
+                ->with('success', 'Terima kasih! Jawaban Anda telah berhasil dikirim.');
+
+        } catch (\Exception $e) {
+            Log::error('Error submitting questionnaire answers: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
 }
+

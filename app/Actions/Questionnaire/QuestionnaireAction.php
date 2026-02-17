@@ -8,8 +8,11 @@ use App\Models\Questionnaire;
 use App\Models\QuestionnaireQuestion;
 use App\Models\QuestionOption;
 use App\Models\QuestionAnswer;
+use App\Models\QuestionnaireResponse;
+use App\Enum\QuestionType;
 use App\Http\Requests\Questionnaire\CreateQuestionnaireFormRequest;
 use App\Http\Requests\Questionnaire\EditQuestionnaireFormRequest;
+use App\Http\Requests\Questionnaire\SubmitQuestionnaireAnswersFormRequest;
 
 class QuestionnaireAction
 {
@@ -66,6 +69,78 @@ class QuestionnaireAction
             DB::commit();
 
             return $model;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function submitAnswers(SubmitQuestionnaireAnswersFormRequest $request, Questionnaire $questionnaire, int $studentId): QuestionnaireResponse
+    {
+        // Validate that student hasn't already answered
+        $existingResponse = $questionnaire->responses()
+            ->where('student_id', $studentId)
+            ->exists();
+
+        if ($existingResponse) {
+            throw new \Exception('Anda sudah mengisi kuesioner ini sebelumnya.');
+        }
+
+        // Validate deadline if exists
+        if ($questionnaire->due_at && now()->isAfter($questionnaire->due_at)) {
+            throw new \Exception('Batas waktu pengisian kuesioner telah berakhir.');
+        }
+
+        $validated = $request->validated();
+
+        DB::beginTransaction();
+
+        try {
+            // Create questionnaire response
+            $response = $questionnaire->responses()->create([
+                'student_id' => $studentId,
+                'submitted_at' => now(),
+            ]);
+
+            // Save each answer
+            foreach ($validated['answers'] as $questionId => $answer) {
+                $question = $questionnaire->questions()->find($questionId);
+
+                if (!$question) {
+                    continue;
+                }
+
+                // dd($question->type->value === QuestionType::DATE->value);
+
+                // Handle different answer types
+                if ($question->type->value === QuestionType::CHECKBOX->value && is_array($answer)) {
+                    dd("masuk checkbox");
+                    // For checkbox, create multiple question_answers
+                    foreach ($answer as $selectedOption) {
+                        $response->questionAnswers()->create([
+                            'question_id' => $questionId,
+                            'text_answer' => $selectedOption,
+                        ]);
+                    }
+                } elseif ($question->type->value === QuestionType::DATE->value) {
+                    // For date type, save to date_answer
+                    $response->questionAnswers()->create([
+                        'question_id' => $questionId,
+                        'date_answer' => $answer,
+                    ]);
+
+                } else {
+                    // For other types (dropdown, fillable), save to text_answer
+                    $response->questionAnswers()->create([
+                        'question_id' => $questionId,
+                        'text_answer' => is_array($answer) ? json_encode($answer) : $answer,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return $response;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

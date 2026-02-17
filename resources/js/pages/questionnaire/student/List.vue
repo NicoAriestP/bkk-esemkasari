@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { ref, watch, onMounted } from 'vue';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
+import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
 
 // Import PrimeVue components
@@ -11,6 +12,7 @@ import InputText from "primevue/inputtext";
 import Button from 'primevue/button';
 import Skeleton from 'primevue/skeleton';
 import Tag from 'primevue/tag';
+import Toast from 'primevue/toast';
 
 // dayjs
 import dayjs from 'dayjs';
@@ -19,6 +21,9 @@ import 'dayjs/locale/id';
 
 dayjs.extend(relativeTime);
 dayjs.locale('id');
+
+const toast = useToast();
+const page = usePage();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -118,10 +123,34 @@ watch(searchFilter, (newValue) => {
         replace: true,
     });
 });
+
+// Handle flash messages
+onMounted(() => {
+    const flash = page.props.flash as { success?: string; error?: string };
+
+    if (flash?.success) {
+        toast.add({
+            severity: 'success',
+            summary: 'Berhasil',
+            detail: flash.success,
+            life: 5000,
+        });
+    }
+
+    if (flash?.error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Gagal',
+            detail: flash.error,
+            life: 5000,
+        });
+    }
+});
 </script>
 
 <template>
     <Head title="Daftar Kuesioner" />
+    <Toast />
     <AppLayout :breadcrumbs="breadcrumbs">
         <!-- Enhanced Header Section -->
         <div class="mb-8">
