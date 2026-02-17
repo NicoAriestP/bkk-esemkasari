@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('question_answers', function (Blueprint $table) {
             $table->id();
 
+            $table->foreignId('response_id')
+                ->nullable()
+                ->constrained('questionnaire_responses')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+
             $table->foreignId('created_by')
                 ->nullable()
                 ->constrained('students')
