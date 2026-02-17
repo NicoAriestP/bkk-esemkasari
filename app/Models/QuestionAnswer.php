@@ -10,11 +10,13 @@ class QuestionAnswer extends Model
     use HasFactory;
 
     protected $fillable = [
+        'response_id',
         'created_by',
         'updated_by',
         'question_id',
         'question_option_id',
         'text_answer',
+        'date_answer',
         'is_selected'
     ];
 
@@ -30,6 +32,11 @@ class QuestionAnswer extends Model
     public function questionOption()
     {
         return $this->belongsTo(QuestionOption::class, 'question_option_id');
+    }
+
+    public function response()
+    {
+        return $this->belongsTo(QuestionnaireResponse::class, 'response_id');
     }
 
     public function createdBy()
