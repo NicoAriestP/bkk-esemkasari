@@ -110,11 +110,8 @@ class QuestionnaireAction
                     continue;
                 }
 
-                // dd($question->type->value === QuestionType::DATE->value);
-
                 // Handle different answer types
                 if ($question->type->value === QuestionType::CHECKBOX->value && is_array($answer)) {
-                    dd("masuk checkbox");
                     // For checkbox, create multiple question_answers
                     foreach ($answer as $selectedOption) {
                         $response->questionAnswers()->create([
