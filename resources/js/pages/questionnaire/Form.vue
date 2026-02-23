@@ -84,12 +84,15 @@ const form = useForm<{
 // Initialize questions from model
 onMounted(() => {
     if (props.model.questions && props.model.questions.length > 0) {
-        form.questions = props.model.questions.map((q: QuestionnaireQuestion) => ({
-            question_title: q.question_title,
-            type: q.type,
-            notes: q.notes || '',
-            options: q.questionOptions?.map((o: QuestionOption) => ({ option_label: o.option_label })) || [],
-        }));
+        form.questions = props.model.questions.map((q: QuestionnaireQuestion) => {
+            const rawOptions = q.questionOptions || (q as any).question_options || [];
+            return {
+                question_title: q.question_title,
+                type: q.type,
+                notes: q.notes || '',
+                options: rawOptions.map((o: QuestionOption) => ({ option_label: o.option_label })),
+            };
+        });
     }
 });
 
