@@ -130,7 +130,10 @@ const isFormValid = computed(() => {
             if (!answer || answer.length === 0) return false;
         } else if (question.type === 'date') {
             if (!answer) return false;
+        } else if (question.type === 'dropdown') {
+            if (answer === null || answer === undefined || answer === '') return false;
         } else {
+            // fillable
             if (!answer || answer.trim() === '') return false;
         }
     }
@@ -305,7 +308,7 @@ const handleSubmit = () => {
                                     v-model="answers[question.id]"
                                     :options="question.question_options"
                                     optionLabel="option_label"
-                                    optionValue="option_label"
+                                    optionValue="id"
                                     placeholder="Pilih jawaban"
                                     class="w-full"
                                     :disabled="isDeadlinePassed"
@@ -322,7 +325,7 @@ const handleSubmit = () => {
                                     <Checkbox
                                         v-model="answers[question.id]"
                                         :inputId="`question-${question.id}-option-${option.id}`"
-                                        :value="option.option_label"
+                                        :value="option.id"
                                         :disabled="isDeadlinePassed"
                                     />
                                     <label

@@ -112,25 +112,34 @@ class QuestionnaireAction
 
                 // Handle different answer types
                 if ($question->type->value === QuestionType::CHECKBOX->value && is_array($answer)) {
-                    // For checkbox, create multiple question_answers
-                    foreach ($answer as $selectedOption) {
+                    // For checkbox, create multiple answers with question_option_id
+                    foreach ($answer as $optionId) {
+                        $option = QuestionOption::find($optionId);
                         $response->questionAnswers()->create([
-                            'question_id' => $questionId,
-                            'text_answer' => $selectedOption,
+                            'question_id'        => $questionId,
+                            'question_option_id' => $optionId,
+                            'text_answer'        => $option?->option_label,
                         ]);
                     }
+                } elseif ($question->type->value === QuestionType::DROPDOWN->value) {
+                    // For dropdown, save question_option_id and text_answer with label
+                    $option = QuestionOption::find($answer);
+                    $response->questionAnswers()->create([
+                        'question_id'        => $questionId,
+                        'question_option_id' => $answer,
+                        'text_answer'        => $option?->option_label,
+                    ]);
                 } elseif ($question->type->value === QuestionType::DATE->value) {
                     // For date type, save to date_answer
                     $response->questionAnswers()->create([
                         'question_id' => $questionId,
                         'date_answer' => $answer,
                     ]);
-
                 } else {
-                    // For other types (dropdown, fillable), save to text_answer
+                    // For fillable (free text), save text_answer only
                     $response->questionAnswers()->create([
                         'question_id' => $questionId,
-                        'text_answer' => is_array($answer) ? json_encode($answer) : $answer,
+                        'text_answer' => $answer,
                     ]);
                 }
             }
