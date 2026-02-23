@@ -11,6 +11,7 @@ use App\Http\Requests\Student\CreateStudentFormRequest;
 use App\Http\Requests\Student\EditStudentFormRequest;
 use App\Http\Requests\ImportStudentRequest;
 use App\Actions\Student\StudentAction;
+use App\Http\Requests\StudentImportRequest;
 use App\Imports\StudentsImport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -76,16 +77,11 @@ class StudentController extends Controller
         ]);
     }
 
-    public function import(ImportStudentRequest $request, StudentClass $studentClass)
+    public function import(Year $year, StudentClass $studentClass, StudentImportRequest $request)
     {
-        $studentClassId = $studentClass->id;
-
         try {
-            // Import dengan student_class_id default
-            $import = new StudentsImport($studentClassId);
+            $import = new StudentsImport($studentClass->id);
             $import->import($request->file('file'));
-
-            return back()->with('success', 'Data siswa berhasil diimpor.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
         }

@@ -63,11 +63,11 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
 
         // Remove brackets, spaces, and hyphens
         $phone = preg_replace('/[\(\)\s\-]/', '', $phone);
-        
+
         // Convert (+62) to 62
         $phone = preg_replace('/^\(\+62\)/', '62', $phone);
         $phone = preg_replace('/^\+62/', '62', $phone);
-        
+
         // Convert 0 to 62
         if (strpos($phone, '0') === 0) {
             $phone = '62' . substr($phone, 1);
@@ -86,11 +86,11 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
         }
 
         $gender = strtolower(trim($gender));
-        
+
         if (in_array($gender, ['laki-laki', 'l', 'male', 'pria'])) {
             return 'laki-laki';
         }
-        
+
         if (in_array($gender, ['perempuan', 'p', 'female', 'wanita'])) {
             return 'perempuan';
         }
@@ -113,7 +113,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
                 // Excel serial date
                 return Carbon::createFromFormat('Y-m-d', \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date)->format('Y-m-d'));
             }
-            
+
             // Try common date formats
             $formats = [
                 'm/d/Y',   // 1/15/2005
