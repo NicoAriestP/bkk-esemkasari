@@ -199,14 +199,18 @@ watch(filters, (newValue) => {
                     class="w-44"
                 >
                     <template #body="slotProps">
-                        <div>
-                            <span class="font-medium text-gray-900">
-                                {{ slotProps.data.due_at ? dayjs(slotProps.data.due_at).format('DD MMM YYYY') : '-'}}
-                            </span>
-                            <div v-if="slotProps.data.due_at" class="text-xs text-gray-500">
-                                {{ dayjs(slotProps.data.due_at).format('HH:mm') }}
+                        <div v-if="slotProps.data.due_at" class="flex items-start gap-2">
+                            <i class="pi pi-calendar-clock text-blue-500 mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <span class="font-medium text-gray-900 capitalize">
+                                    {{ dayjs(slotProps.data.due_at).format('dddd, DD MMM YYYY') }}
+                                </span>
+                                <div class="text-xs text-gray-500">
+                                    {{ dayjs(slotProps.data.due_at).format('HH:mm') }} WIB
+                                </div>
                             </div>
                         </div>
+                        <span v-else class="text-gray-400 italic text-xs">Tidak ada batas</span>
                     </template>
                 </Column>
 
