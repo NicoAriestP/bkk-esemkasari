@@ -81,10 +81,11 @@ const handleShare = async () => {
                     </p>
                 </div>
                 <Button
-                    label="Kembali ke Daftar"
+                    label="Kembali"
                     @click="goBack"
                     icon="pi pi-arrow-left"
-                    class="shrink-0 bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 transition-colors duration-200"
+                    class="shrink-0 transition-colors duration-200"
+                    severity="secondary"
                     outlined
                 />
             </div>
