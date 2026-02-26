@@ -247,7 +247,7 @@ onMounted(() => {
 
                                         <!-- Card Footer -->
                                         <div class="px-6 py-4 bg-gray-50/50 border-t border-gray-100">
-                                            <div class="flex items-center justify-between">
+                                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                                 <div class="flex items-center gap-2 text-xs text-gray-500">
                                                     <i class="pi pi-clock"></i>
                                                     <span>Dibuat {{ dayjs(item.created_at).fromNow() }}</span>
@@ -256,7 +256,7 @@ onMounted(() => {
                                                     label="Isi Kuesioner"
                                                     icon="pi pi-arrow-right"
                                                     iconPos="right"
-                                                    class="!bg-purple-600 hover:!bg-purple-700 border-purple-600 hover:border-purple-700 text-white text-sm px-4 py-2 transition-colors duration-200"
+                                                    class="!bg-purple-600 hover:!bg-purple-700 border-purple-600 hover:border-purple-700 text-white text-sm px-4 py-2 transition-colors duration-200 w-full sm:w-auto justify-center"
                                                     size="small"
                                                 />
                                             </div>
