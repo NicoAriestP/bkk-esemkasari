@@ -111,9 +111,9 @@ const getDeadlineStatus = () => {
     if (daysLeft < 0) {
         return { label: 'Sudah Lewat', severity: 'danger' };
     } else if (daysLeft === 0) {
-        return { label: 'Hari Ini', severity: 'warning' };
+        return { label: 'Hari Ini', severity: 'warn' };
     } else if (daysLeft <= 3) {
-        return { label: `${daysLeft} Hari Lagi`, severity: 'warning' };
+        return { label: `${daysLeft} Hari Lagi`, severity: 'warn' };
     } else if (daysLeft <= 7) {
         return { label: `${daysLeft} Hari Lagi`, severity: 'success' };
     } else {
@@ -212,8 +212,8 @@ const handleSubmit = () => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <!-- Header Section -->
         <div class="mb-8">
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex-1">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div class="flex-1 min-w-0">
                     <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl mb-2">
                         {{ model.title }}
                     </h1>
@@ -221,13 +221,15 @@ const handleSubmit = () => {
                         {{ model.description }}
                     </p>
                 </div>
-                <Button
-                    label="Kembali"
-                    icon="pi pi-arrow-left"
-                    severity="secondary"
-                    outlined
-                    @click="router.visit(route('students.questionnaires.index'))"
-                />
+                <div class="flex-shrink-0 hidden sm:block">
+                    <Button
+                        label="Kembali"
+                        icon="pi pi-arrow-left"
+                        severity="secondary"
+                        outlined
+                        @click="router.visit(route('students.questionnaires.index'))"
+                    />
+                </div>
             </div>
         </div>
 
@@ -243,6 +245,7 @@ const handleSubmit = () => {
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-sm font-medium text-gray-700">Batas Waktu Pengisian:</span>
                             <Tag
+                                class="hidden sm:block"
                                 :value="getDeadlineStatus().label"
                                 :severity="getDeadlineStatus().severity as any"
                             />
