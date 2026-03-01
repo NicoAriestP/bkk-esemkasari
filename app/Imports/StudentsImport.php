@@ -35,20 +35,20 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
 
         return new Student([
             'student_class_id' => $this->defaultStudentClassId,
-            'name' => $row['nama'] ?? $row['name'],
-            'nisn' => $row['nisn'],
-            'phone' => $this->cleanPhoneNumber($row['no_telp'] ?? $row['phone']),
-            'email' => $row['email'],
-            'password' => Hash::make($row['password']),
-            'gender' => $this->normalizeGender($row['jenis_kelamin'] ?? $row['gender']),
-            'born_date' => $this->parseDate($row['tanggal_lahir'] ?? $row['born_date']),
-            'height' => $row['tb'] ?? $row['height'],
-            'weight' => $row['bb'] ?? $row['weight'],
-            'province' => $row['provinsi'] ?? $row['province'],
-            'city' => $row['kota'] ?? $row['city'],
-            'address' => $row['alamat'] ?? $row['address'],
-            'is_graduated' => $this->parseBoolean($row['status_lulus'] ?? $row['is_graduated']),
-            'is_married' => $this->parseBoolean($row['status_menikah'] ?? $row['is_married']),
+            'name'             => $row['nama'] ?? $row['name'],
+            'nisn'             => (string) ($row['nisn'] ?? ''),
+            'phone'            => $this->cleanPhoneNumber($row['no_telp'] ?? $row['phone']),
+            'email'            => $row['email'],
+            'password'         => Hash::make((string) ($row['password'] ?? '')),
+            'gender'           => $this->normalizeGender($row['jenis_kelamin'] ?? $row['gender']),
+            'born_date'        => $this->parseDate($row['tanggal_lahir'] ?? $row['born_date']),
+            'height'           => $row['tb'] ?? $row['height'],
+            'weight'           => $row['bb'] ?? $row['weight'],
+            'province'         => $row['provinsi'] ?? $row['province'],
+            'city'             => $row['kota'] ?? $row['city'],
+            'address'          => $row['alamat'] ?? $row['address'],
+            'is_graduated'     => $this->parseBoolean($row['status_lulus'] ?? $row['is_graduated']),
+            'is_married'       => $this->parseBoolean($row['status_menikah'] ?? $row['is_married']),
         ]);
     }
 
@@ -101,37 +101,46 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
     /**
      * Parse date from various formats
      */
-    private function parseDate($date)
+    private function parseDate($date): ?string
     {
         if (empty($date)) {
             return null;
         }
 
         try {
-            // Try to parse different date formats
+            // Excel serial date (numeric)
             if (is_numeric($date)) {
-                // Excel serial date
-                return Carbon::createFromFormat('Y-m-d', \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date)->format('Y-m-d'));
+                $dt = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject((float) $date);
+                return $dt->format('Y-m-d');
             }
 
-            // Try common date formats
+            $date = trim((string) $date);
+
+            // Try strict formats first (handles zero-padded variants)
             $formats = [
-                'm/d/Y',   // 1/15/2005
-                'd/m/Y',   // 15/1/2005
                 'Y-m-d',   // 2005-01-15
+                'd/m/Y',   // 15/01/2005
+                'm/d/Y',   // 01/15/2005
                 'd-m-Y',   // 15-01-2005
                 'm-d-Y',   // 01-15-2005
+                'Y/m/d',   // 2005/01/15
+                'd/m/y',   // 15/01/05
             ];
 
             foreach ($formats as $format) {
-                $parsed = Carbon::createFromFormat($format, $date);
-                if ($parsed && $parsed->format($format) === $date) {
-                    return $parsed->format('Y-m-d');
+                try {
+                    $parsed = Carbon::createFromFormat($format, $date);
+                    if ($parsed !== false) {
+                        return $parsed->format('Y-m-d');
+                    }
+                } catch (\Exception $e) {
+                    continue;
                 }
             }
 
-            // Fallback: try Carbon's flexible parsing
+            // Fallback: Carbon flexible parsing (handles non-zero-padded like 15/1/2005)
             return Carbon::parse($date)->format('Y-m-d');
+
         } catch (\Exception $e) {
             return null;
         }
@@ -160,14 +169,14 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'nama' => 'required|string|max:255',
-            'nisn' => 'required|string|unique:students,nisn|max:20',
-            'email' => 'required|email|unique:students,email|max:255',
-            'password' => 'required|string|min:6',
-            'jenis_kelamin' => 'required|string',
-            'tanggal_lahir' => 'nullable',
-            'tb' => 'nullable|numeric|min:0|max:300',
-            'bb' => 'nullable|numeric|min:0|max:500',
+            'nama'          => 'required|string|max:255',
+            'nisn'          => 'required|max:20|unique:students,nisn',
+            'email'         => 'required|email|unique:students,email|max:255',
+            'password'      => 'required|max:255',
+            'jenis_kelamin' => 'required',
+            'tanggal_lahir' => 'required',
+            'tb'            => 'nullable|numeric|min:0|max:300',
+            'bb'            => 'nullable|numeric|min:0|max:500',
         ];
     }
 
