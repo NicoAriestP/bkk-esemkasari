@@ -162,7 +162,7 @@ const getQuestionTypeIcon = (type: string) => {
     }
 };
 
-// Get question type color
+// Get question type color (for badge)
 const getQuestionTypeColor = (type: string) => {
     switch (type) {
         case 'dropdown': return 'text-blue-600 bg-blue-50 border-blue-200';
@@ -170,6 +170,39 @@ const getQuestionTypeColor = (type: string) => {
         case 'fillable': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
         case 'date': return 'text-purple-600 bg-purple-50 border-purple-200';
         default: return 'text-gray-600 bg-gray-50 border-gray-200';
+    }
+};
+
+// Get question card left border color
+const getQuestionBorderColor = (type: string) => {
+    switch (type) {
+        case 'dropdown': return 'border-blue-500';
+        case 'checkbox': return 'border-green-500';
+        case 'fillable': return 'border-yellow-500';
+        case 'date': return 'border-purple-500';
+        default: return 'border-gray-400';
+    }
+};
+
+// Get question number circle color
+const getQuestionNumberColor = (type: string) => {
+    switch (type) {
+        case 'dropdown': return 'bg-blue-600';
+        case 'checkbox': return 'bg-green-600';
+        case 'fillable': return 'bg-yellow-500';
+        case 'date': return 'bg-purple-600';
+        default: return 'bg-gray-500';
+    }
+};
+
+// Get question card header background
+const getQuestionHeaderBg = (type: string) => {
+    switch (type) {
+        case 'dropdown': return 'bg-blue-50/50';
+        case 'checkbox': return 'bg-green-50/50';
+        case 'fillable': return 'bg-yellow-50/50';
+        case 'date': return 'bg-purple-50/50';
+        default: return 'bg-gray-50/50';
     }
 };
 
@@ -283,22 +316,23 @@ const handleSubmit = () => {
                 <Card
                     v-for="(question, index) in model.questions"
                     :key="question.id"
-                    class="border-l-4 border-purple-500"
+                    class="border-l-4"
+                    :class="getQuestionBorderColor(question.type)"
                 >
                     <template #content>
                         <div class="space-y-4">
                             <!-- Question Header -->
-                            <div class="flex items-start gap-3">
-                                <div class="flex-shrink-0 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-semibold text-sm">
+                            <div class="flex items-start gap-3 rounded-lg p-3 -m-3 mb-1" :class="getQuestionHeaderBg(question.type)">
+                                <div class="flex-shrink-0 w-8 h-8 text-white rounded-full flex items-center justify-center font-semibold text-sm" :class="getQuestionNumberColor(question.type)">
                                     {{ index + 1 }}
                                 </div>
                                 <div class="flex-1">
                                     <div class="flex items-start justify-between gap-3 mb-2">
-                                        <h3 class="text-lg font-semibold text-gray-900 flex-1">
+                                        <h3 class="text-base font-semibold text-gray-900 flex-1">
                                             {{ question.question_title }}
                                             <span class="text-red-500">*</span>
                                         </h3>
-                                        <div class="flex items-center gap-2 px-3 py-1 rounded-lg border" :class="getQuestionTypeColor(question.type)">
+                                        <div class="flex items-center gap-2 px-3 py-1 rounded-lg border flex-shrink-0" :class="getQuestionTypeColor(question.type)">
                                             <i :class="getQuestionTypeIcon(question.type)" class="text-sm"></i>
                                             <span class="text-xs font-medium">{{ getQuestionTypeLabel(question.type) }}</span>
                                         </div>
