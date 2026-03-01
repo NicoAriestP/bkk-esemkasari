@@ -210,18 +210,18 @@ const handleSubmit = () => {
     <Head :title="model.title" />
     <Toast />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <!-- Header Section -->
+        <!-- Enhanced Header Section -->
         <div class="mb-8">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div class="flex-1 min-w-0">
-                    <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl mb-2">
-                        {{ model.title }}
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">
+                        📋 Detail Kuesioner
                     </h1>
-                    <p class="text-gray-600 leading-relaxed">
-                        {{ model.description }}
+                    <p class="mt-1.5 text-sm text-gray-500">
+                        Isi kuesioner berikut dengan jujur dan lengkap
                     </p>
                 </div>
-                <div class="flex-shrink-0 hidden sm:block">
+                <div class="hidden sm:block">
                     <Button
                         label="Kembali"
                         icon="pi pi-arrow-left"
@@ -233,45 +233,49 @@ const handleSubmit = () => {
             </div>
         </div>
 
-        <!-- Deadline Info Card -->
-        <Card v-if="model.due_at" class="mb-6 border-l-4" :class="isDeadlinePassed ? 'border-red-500' : 'border-purple-500'">
-            <template #content>
-                <div class="flex items-center gap-3">
-                    <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
-                        :class="isDeadlinePassed ? 'bg-red-100' : 'bg-purple-100'">
-                        <i class="pi pi-clock text-xl" :class="isDeadlinePassed ? 'text-red-600' : 'text-purple-600'"></i>
+        <!-- Questionnaire Title Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+            <!-- Title & Description -->
+            <div class="px-8 py-6 bg-gradient-to-r from-purple-50 to-indigo-50">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                        <i class="pi pi-file-edit text-white text-lg"></i>
                     </div>
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-sm font-medium text-gray-700">Batas Waktu Pengisian:</span>
-                            <Tag
-                                class="hidden sm:block"
-                                :value="getDeadlineStatus().label"
-                                :severity="getDeadlineStatus().severity as any"
-                            />
-                        </div>
-                        <p class="text-sm text-gray-600">
-                            {{ dayjs(model.due_at).format('dddd, DD MMMM YYYY - HH:mm') }}
+                    <div class="flex-1 min-w-0">
+                        <h2 class="text-xl font-bold text-gray-900 leading-tight mb-2 sm:text-2xl">
+                            {{ model.title }}
+                        </h2>
+                        <p class="text-gray-600 leading-relaxed text-sm">
+                            {{ model.description }}
                         </p>
                     </div>
                 </div>
-            </template>
-        </Card>
+            </div>
 
-        <!-- Deadline Passed Warning -->
-        <Card v-if="isDeadlinePassed" class="mb-6 bg-red-50 border-red-200">
-            <template #content>
-                <div class="flex items-start gap-3">
-                    <i class="pi pi-exclamation-triangle text-red-600 text-xl mt-0.5"></i>
-                    <div>
-                        <h3 class="font-semibold text-red-800 mb-1">Batas Waktu Telah Lewat</h3>
-                        <p class="text-sm text-red-700">
-                            Batas waktu pengisian kuesioner ini telah berakhir. Anda tidak dapat lagi mengirimkan jawaban.
-                        </p>
-                    </div>
+            <!-- Deadline Section -->
+            <div v-if="model.due_at">
+                <!-- Deadline Passed Warning Banner -->
+                <div v-if="isDeadlinePassed" class="px-6 py-3 bg-red-600 flex items-center gap-2">
+                    <i class="pi pi-exclamation-triangle text-white text-sm"></i>
+                    <span class="text-white text-sm font-semibold">Batas waktu pengisian telah berakhir. Anda tidak dapat lagi mengirimkan jawaban.</span>
                 </div>
-            </template>
-        </Card>
+
+                <!-- Deadline Info Row -->
+                <div class="px-8 py-4 border-t flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                    :class="isDeadlinePassed ? 'bg-red-50 border-red-100' : 'bg-gray-50 border-gray-100'">
+                    <div class="flex items-center gap-2 text-sm" :class="isDeadlinePassed ? 'text-red-700' : 'text-gray-600'">
+                        <i class="pi pi-clock"></i>
+                        <span class="font-medium">Batas Waktu Pengisian:</span>
+                        <span>{{ dayjs(model.due_at).format('dddd, DD MMMM YYYY - HH:mm') }}</span>
+                    </div>
+                    <Tag
+                        :value="getDeadlineStatus().label"
+                        :severity="getDeadlineStatus().severity as any"
+                        class="self-start sm:self-auto"
+                    />
+                </div>
+            </div>
+        </div>
 
         <!-- Questions Form -->
         <form @submit.prevent="handleSubmit">
