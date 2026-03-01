@@ -80,14 +80,16 @@ const handleShare = async () => {
                         Informasi lengkap pengumuman dari Bursa Kerja Khusus
                     </p>
                 </div>
-                <Button
-                    label="Kembali"
-                    @click="goBack"
-                    icon="pi pi-arrow-left"
-                    class="shrink-0 transition-colors duration-200"
-                    severity="secondary"
-                    outlined
-                />
+                <div class="hidden sm:block">
+                    <Button
+                        label="Kembali"
+                        @click="goBack"
+                        icon="pi pi-arrow-left"
+                        class="shrink-0 transition-colors duration-200"
+                        severity="secondary"
+                        outlined
+                    />
+                </div>
             </div>
         </div>
 
@@ -164,7 +166,7 @@ const handleShare = async () => {
 
             <!-- Enhanced Footer -->
             <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-200">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-row gap-4 sm:items-center sm:justify-between">
                     <div class="flex items-center gap-2 text-sm text-gray-500">
                         <i class="pi pi-info-circle"></i>
                         <span>Diposting {{ dayjs(props.model.created_at).fromNow() }}</span>
