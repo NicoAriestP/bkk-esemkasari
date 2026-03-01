@@ -987,7 +987,7 @@ watch(filters, (newValue) => {
             </div>
 
             <template #footer>
-                <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+                <div class="flex justify-end gap-3 px-6 py-4">
                     <Button label="Batal" @click="displayImportDialog = false"
                         class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                         :disabled="importLoading" text />
