@@ -1,214 +1,139 @@
-
 # BKK Esemkasari – AI Coding Agent Guide
 
 ## Project Overview
-BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro, built with Laravel 12, Inertia.js, Vue 3, TypeScript, and PrimeVue v4 with Tailwind CSS v4.
+BKK Esemkasari is a job fair management system for SMKN Purwosari Bojonegoro. Stack: **Laravel 12** · **Inertia.js** · **Vue 3** (`<script setup>`, TypeScript) · **PrimeVue v4** · **Tailwind CSS v4**.
 
-**Core Features:**
-- Tracer study questionnaires (multi-answer types)
-- Announcements with VirtualScroller lazy loading
-- Job vacancy screening and application workflow
-- Multi-guard authentication (admin/student/partner)
-- File upload system with auto-organization by model type
+Features: tracer study questionnaires, announcements with lazy loading, job vacancy screening/application workflow, Excel import/export, multi-guard auth (admin/student/partner).
 
-## Architecture & Data Flow
-- **Multi-Guard Auth:**
-  - Admin (`auth:web`): Full CRUD operations
-  - Student (`auth:student`): View announcements, complete tracer study, apply to vacancies
-  - Partner (`auth:partner`): Manage vacancies, screen applications
-  - Route separation: `routes/web.php` uses middleware groups, `routes/auth.php` handles all guards
-  - Frontend guard detection: `usePage().props.auth.activeGuard`
-- **Action-Controller Pattern:**
-  - Business logic in `app/Actions/{Entity}/{Entity}Action.php` (e.g., `StudentAction::save()`)
-  - Controllers delegate to Actions, never handle business logic directly
-  - Actions return models, Controllers handle HTTP responses and redirects
-  - Example: `StudentController@store` calls `StudentAction::save()` for all validation and business logic
-- **Observer Pattern:**
-  - All models use observers in `app/Observers/` extending `BaseObserver`
-  - `BaseObserver` auto-authenticates user ID 1 in console for seeders/migrations
-  - Observers handle created_by/updated_by via `Blameable` trait
-  - Registered in `app/Providers/AppServiceProvider.php`
-- **Data Hierarchy:**
-  - Year → StudentClass → Students (nested educational structure)
-  - Partners → Vacancies → VacancyApplications (job workflow)
-  - Students → TracerStudy Answers (one-to-one per answer type: activity/working/university/entrepreneur)
+---
 
-## Essential Developer Workflows
+## Architecture
 
-### Local Development (Non-Docker)
-```bash
-composer run dev    # Laravel server + queue + Vite HMR (color-coded)
-composer run dev:ssr  # With Inertia SSR + Laravel Pail logs
+### Multi-Guard Auth
+- Guards: `auth:web` (admin), `auth:student`, `auth:partner` — each with its own session driver
+- Shared routes: `middleware('auth:web,student,partner')`; guard-specific logic: `auth()->guard('student')->check()`
+- Frontend guard detection: `usePage().props.auth.activeGuard` → `'web' | 'student' | 'partner'`
+- Single login form at `/login` using `login_as` field to select guard; all auth routes in `routes/auth.php`
+
+### Action-Controller Pattern
+Every entity has `app/Actions/{Entity}/{Entity}Action.php`. Controllers inject the Action and delegate all business logic — they only handle HTTP responses and redirects. FormRequest classes live in `app/Http/Requests/{Entity}/`.
+
+```php
+// Controller: delegate, never implement business logic
+public function store(Year $year, StudentClass $studentClass, CreateStudentFormRequest $request, StudentAction $action)
+{
+    $model = $action->save($request);
+    return redirect()->route('years.student-classes.students.index', [...]);
+}
 ```
 
-### Docker Development with HTTPS
+### Observer Pattern
+All models have observers in `app/Observers/` extending `BaseObserver`. `BaseObserver::__construct()` calls `Auth::loginUsingId(1)` when running in console (needed for seeders/migrations). Observers set `created_by`/`updated_by` via `Blameable` trait. Register new observers in `app/Providers/AppServiceProvider.php`.
+
+### Data Hierarchy & Nested Routes
+- `Year → StudentClass → Students` — deeply nested: `years/{year}/student-classes/{studentClass}/students`
+- `Partners → Vacancies → VacancyApplications`
+- `Students → TracerStudy Answers` (one record per type: activity/working/university/entrepreneur)
+
+### Inertia Page Components
+- Pages in `resources/js/pages/{entity}/` (lowercase), rendered via `Inertia::render('entity/List', [...])`
+- Authenticated pages use `AppLayout`; public pages set `layout: null`
+- All pages receive `BreadcrumbItem[]` as a required prop
+- Shared page props typed as `SharedData` in `resources/js/types/index.d.ts` (includes `auth`, `tinymce`, `ziggy`, `sidebarOpen`)
+
+---
+
+## Developer Workflows
+
 ```bash
-# First-time setup
-./docker/generate-ssl.sh              # Generate self-signed SSL certificate
+# Local (non-Docker)
+composer run dev          # Laravel + queue + Vite HMR (color-coded output)
+composer run dev:ssr      # + Inertia SSR + Pail logs
+composer run test         # Pest tests
+
+# Docker + HTTPS (first-time setup)
+./docker/generate-ssl.sh
 echo "127.0.0.1 bkk-esemkasari.dev" | sudo tee -a /etc/hosts
-docker compose up -d --build          # Start containers
+docker compose up -d --build
 docker exec -it bkk-esemkasari-app php artisan migrate
 docker exec -it bkk-esemkasari-app php artisan storage:link
 
-# Daily workflow
-docker compose up -d                  # Start Docker (if not running)
-npm run dev                           # Start Vite with HTTPS support
-# Access: https://bkk-esemkasari.dev
+# Docker daily workflow
+docker compose up -d
+npm run dev               # Vite on HOST (auto-detects SSL for HTTPS)
+# App: https://bkk-esemkasari.dev | MySQL: localhost:3902
+
+# Frontend tooling
+npm run lint              # ESLint auto-fix
+npm run format            # Prettier format
+npm run build:ssr         # SSR production build
 ```
 
-**Important Docker Notes:**
-- App runs at `https://bkk-esemkasari.dev` (not localhost:8000)
-- Nginx serves Laravel on port 443 (HTTPS) with auto HTTP→HTTPS redirect
-- Vite auto-detects SSL certificates and runs with HTTPS if available
-- MySQL accessible at `localhost:3902` (mapped from container's 3306)
-- Frontend runs on HOST, not in container (npm run dev outside Docker)
-- Fix permissions if needed: `docker exec -it bkk-esemkasari-app chown -R www-data:www-data /var/www/app/storage`
+> Vite runs on HOST (not in container). It auto-detects `docker/ssl/bkk-esemkasari.{crt,key}` via `fs.existsSync()` in `vite.config.ts` and switches to HTTPS/WSS automatically.
 
-### Database & Migrations
-```bash
-# Inside container
-docker exec -it bkk-esemkasari-app php artisan migrate
-docker exec -it bkk-esemkasari-app php artisan db:seed
+---
 
-# Or via bash
-docker exec -it bkk-esemkasari-app bash
-php artisan migrate:fresh --seed
-```
+## Key Conventions
 
-### Frontend
-```bash
-npm run dev           # Vite HMR (auto-detects HTTPS if certs exist)
-npm run build         # Production build
-npm run build:ssr     # SSR build
-npm run lint          # ESLint check + fix
-npm run format        # Prettier format
-```
+### Vue / TypeScript
+- Always `<script setup lang="ts">` — never Options API
+- Import PrimeVue individually: `import Button from 'primevue/button'` (no bulk imports)
+- Date formatting: dayjs with `'dayjs/locale/id'` and `relativeTime` plugin
+- Inertia navigation: `router.get(route('name', params), options)`
+- Define TypeScript types for all backend data shapes in `resources/js/types/`
 
-### Testing
-```bash
-composer run test     # Pest PHP tests
-```
+### Styling
+- Tailwind CSS v4: configured via `@import 'tailwindcss'` + inline theme in `resources/css/app.css`
+- PrimeVue theme: Lara preset, `darkModeSelector: false` (set in `resources/js/app.ts`)
+- Card pattern: `rounded-xl shadow-sm border`; badges are color-coded; always include empty states with icons
 
-## Critical Patterns & Conventions
+### File Uploads (`HasFeaturedFile` trait — never handle storage manually)
+- `$model->updateFile($file)` / `$model->deleteFile()` → stored at `{table}/files/`
+- `$model->updateCvFile($file)` / `$model->deleteCvFile()` → stored at `{table}/cv_files/`
+- `$model->file_url` appended attribute; display filename in Vue: `file_url.split('/').pop()`
 
-### Vue Components
-- **Always use `<script setup>` syntax** - no Options API
-- **Page components**: `resources/js/pages/{Entity}/` with proper `AppLayout` or `layout: null`
-- **Auth guard detection**: `usePage().props.auth.activeGuard` returns 'web'|'student'|'partner'
-- **Breadcrumbs**: Required `BreadcrumbItem[]` prop for all pages
-- **Import PrimeVue components individually**: `import Button from 'primevue/button'` (never bulk import)
-- **Date formatting**: dayjs with `'dayjs/locale/id'` and `relativeTime` plugin
-- **Route navigation**: `router.get(route('name', params), options)` for Inertia
-
-### Styling Philosophy
-- **Tailwind CSS v4**: Uses `@import 'tailwindcss';` with inline theme in `resources/css/app.css`
-- **Utility-first approach**: Always prioritize Tailwind classes over custom CSS
-- **Mobile-responsive**: All layouts must work on mobile (`sm:`, `md:`, `lg:` breakpoints)
-- **Professional UI patterns**: 
-  - Card layouts with rounded-xl, shadow-sm, border
-  - Icon-enhanced columns with color-coded badges
-  - Hover states with transition-colors duration-200
-  - Empty states with descriptive icons and text
-- **PrimeVue Theme**: Lara preset with `darkModeSelector: false` in `app.ts`
-
-### File Upload System
-- **Use `HasFeaturedFile` trait** on models (Announcement, Vacancy, Student)
-- **Methods**: 
-  - `updateFile(UploadedFile $file)` - Stores file, auto-deletes previous
-  - `updateCvFile(UploadedFile $file)` - For CV files
-  - `deleteFile()` - Removes file from storage
-  - `deleteCvFile()` - Removes CV file
-- **File organization**: Auto-organized in `storage/app/public/{table_name}/files/`
-- **Access via attributes**: `$model->file_url` (appended automatically)
-- **Display filename**: Extract with `file_url.split('/').pop()` in Vue
-
-## Specialized Implementation Patterns
-
-### DataTable Lists
+### DataTable (admin lists)
 ```vue
-<DataTable
-    :value="items"
-    paginator
-    :rows="10"
-    :rowsPerPageOptions="[5, 10, 20, 50]"
+<DataTable :value="items" paginator :rows="10" :rowsPerPageOptions="[5,10,20,50]"
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-    currentPageReportTemplate="Menampilkan {first} sampai {last} dari {totalRecords} data"
->
+    currentPageReportTemplate="Menampilkan {first} sampai {last} dari {totalRecords} data">
 ```
-- Responsive pagination with CSS order properties for mobile
-- Professional empty states with icons and descriptive text
-- Icon-enhanced columns for better visual hierarchy
 
-### VirtualScroller (Announcements/Vacancies)
-- **Announcements**: Uses PrimeVue VirtualScroller with `onLazyLoad` event
-- **Vacancies**: Custom Intersection Observer pattern with threshold 0.1
-- **Backend**: Supports `?lazy_load=true&first={offset}` parameters
-- **Skeleton components**: Show during loading states
-- **Search**: Use `preserveState: true, preserveScroll: false, replace: true` in router options
-- **Loader trigger**: `<div ref="loaderTrigger">` at bottom for infinite scroll
+### Lazy Loading (infinite scroll)
+- Announcements: PrimeVue `VirtualScroller` with `onLazyLoad` event
+- Vacancies: custom `IntersectionObserver` on `<div ref="loaderTrigger">` (threshold 0.1)
+- Backend accepts `?lazy_load=true&first={offset}`; search requests use `preserveState: true, preserveScroll: false, replace: true`
 
-### TinyMCE Integration
-- **API key**: Access via `usePage().props.tinymce.api_key`
-- **Consistent toolbar**: `'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | removeformat'`
-- **Content storage**: HTML stored directly in database
-- **Display styling**: Use `.prose` classes with custom styles for v-html content
-- **Image handling**: Uploaded to storage, served via public disk
+### TinyMCE
+- API key: `usePage().props.tinymce.api_key`
+- Toolbar: `'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | removeformat'`
+- Render stored HTML via `v-html` inside `.prose` wrapper
 
-## Multi-Guard Authentication Flow
-- **Route Guards**: `middleware('auth:web,student,partner')` for shared routes
-- **Controller Pattern**: Check `auth()->guard('student')->check()` for guard-specific logic
-- **Frontend Detection**: `usePage().props.auth.activeGuard` determines UI behavior
-- **Login Flow**: Single login form at `/login` with `login_as` parameter determines guard
-- **Session**: Each guard has separate session driver and timeout
+### Excel Import/Export
+- Student import: `maatwebsite/excel`, `app/Imports/StudentsImport.php`, supports CSV/XLS/XLSX
+- Vacancy applicant export: `app/Exports/Vacancy/`, partners export qualified applicants
 
-## Docker SSL/HTTPS Configuration
-- **Self-signed certificates**: Generated via `./docker/generate-ssl.sh` (valid 365 days)
-- **Certificate location**: `docker/ssl/bkk-esemkasari.{crt,key}`
-- **Nginx config**: `docker/nginx-ssl.conf` with SSL settings and security headers
-- **Vite HTTPS**: Auto-detects SSL certs via `fs.existsSync()` check in `vite.config.ts`
-- **HMR**: WebSocket Secure (WSS) protocol for hot module replacement
-- **Security headers**: HSTS, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection
-- **Trust certificate**: Run `./docker/trust-cert.sh` to avoid browser warnings (optional)
-- **Production**: Use Let's Encrypt for CA-signed certificates (see `PRODUCTION-SSL.md`)
+---
 
-## Import/Export Workflows
-- **Student Import**: Excel via `maatwebsite/excel` supporting CSV/XLS/XLSX formats
-- **Vacancy Exports**: Partners can export qualified applicants as Excel
-- **Template System**: Consistent import templates with validation in Action classes
+## Language
+- **UI, validation messages, toast notifications**: Bahasa Indonesia
+- **Code, comments, type names**: English
 
-## Laravel Ecosystem Integration
-- **Laravel 12 Features**: New routing configuration in `bootstrap/app.php`
-- **Middleware Stack**: Custom `HandleInertiaRequests` and `HandleAppearance` middleware
-- **Queue Driver**: Database-based with `jobs` and `job_batches` tables
-- **Storage**: Public disk with `HasFeaturedFile` trait pattern
-- **TinyMCE**: API key configured in `config/tinymce.php`
-- **Ziggy**: Route helper for frontend (`route('name', params)`)
+---
 
-## Language & Communication
-- **User Content**: All Bahasa Indonesia (UI, validation messages, notifications)
-- **Code/Comments**: English for maintainability
-- **Validation Messages**: Bahasa Indonesia in `app/Actions/` and custom Request classes
+## Key Directories
 
-## When Implementing Features
-1. **Follow the Action → Controller → Inertia → Vue flow**
-2. **Create TypeScript types** in `resources/js/types/` for all backend data structures
-3. **Use PrimeVue components consistently**: Button, Card, DataTable, Dialog, Toast, VirtualScroller
-4. **Implement responsive design** with mobile-first approach using Tailwind breakpoints
-5. **Add proper loading states** (skeletons, spinners) and error handling with Toast notifications
-6. **Follow breadcrumb pattern** for navigation consistency across all pages
-7. **Use utility-first styling** with Tailwind CSS before writing custom CSS
-8. **File uploads**: Use `HasFeaturedFile` trait methods, never manual storage handling
-9. **Extract filename display**: Use `file_url.split('/').pop()` for user-friendly file names
-10. **Auth guard awareness**: Always check `activeGuard` for conditional rendering
-
-## Key Files & Directories
-- `app/Actions/` - Business logic layer (Action pattern)
-- `app/Observers/` - Model observers extending `BaseObserver`
-- `app/Traits/HasFeaturedFile.php` - File upload trait with auto-cleanup
-- `resources/js/pages/` - Inertia page components
-- `resources/js/types/` - TypeScript type definitions
-- `docker/nginx-ssl.conf` - Nginx HTTPS configuration
-- `vite.config.ts` - Auto-detects SSL for HTTPS development
-- `routes/web.php` - Multi-guard route definitions
-- `routes/auth.php` - Authentication routes for all guards
-
+| Path | Purpose |
+|------|---------|
+| `app/Actions/` | Business logic (one Action class per entity) |
+| `app/Observers/` | Model observers (all extend `BaseObserver`) |
+| `app/Http/Requests/` | FormRequest validation per entity |
+| `app/Traits/HasFeaturedFile.php` | File upload/cleanup trait |
+| `resources/js/pages/` | Inertia page components (lowercase dirs) |
+| `resources/js/components/` | Shared UI components (`app/`, `ui/`) |
+| `resources/js/composables/` | `useAppearance`, `useInitials` |
+| `resources/js/types/` | TypeScript definitions (`SharedData`, `Auth`, `BreadcrumbItem`) |
+| `routes/web.php` | Multi-guard route groups (deeply nested) |
+| `routes/auth.php` | Auth routes for all guards |
+| `vite.config.ts` | Auto-detects SSL certs for HTTPS dev |
+| `docker/nginx-ssl.conf` | Nginx HTTPS + security headers config |
