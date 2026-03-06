@@ -62,6 +62,7 @@ Route::middleware(['auth:web'])->group(function () {
             // Student Routes (nested under student-classes)
             Route::prefix('{studentClass}/students')->name('students.')->group(function () {
                 Route::get('/', [StudentController::class, 'index'])->name('index');
+                Route::get('/{model}/tracer-study', [StudentController::class, 'tracerStudy'])->name('tracer-study');
                 Route::post('/', [StudentController::class, 'store'])->name('store');
                 Route::put('/{model}', [StudentController::class, 'update'])->name('update');
                 Route::delete('/{model}', [StudentController::class, 'destroy'])->name('destroy');
