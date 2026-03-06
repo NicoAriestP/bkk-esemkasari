@@ -63,7 +63,7 @@ class StudentController extends Controller
 
     public function tracerStudy(Year $year, StudentClass $studentClass, Student $model)
     {
-        return Inertia::render('tracer-study/TracerStudy', $this->getStudentData($model));
+        return Inertia::render('tracerStudy/TracerStudy', $this->getStudentData($model));
     }
 
     public function store(Year $year, StudentClass $studentClass, CreateStudentFormRequest $request, StudentAction $action)
