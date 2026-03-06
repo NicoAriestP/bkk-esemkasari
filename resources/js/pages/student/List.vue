@@ -306,6 +306,16 @@ const openCvFile = (url: string) => {
     window.open(url, '_blank');
 };
 
+const openTracerStudyPage = (studentId: number | undefined) => {
+    if (studentId) {
+        router.get(route('years.student-classes.students.tracer-study', {
+            year: props.year.id,
+            studentClass: props.studentClass.id,
+            model: studentId,
+        }));
+    }
+};
+
 const openEditDialog = (student: any) => {
     form.id = student.id;
     form.student_class_id = student.student_class_id;
@@ -338,6 +348,7 @@ defineExpose({
     updateStudent,
     openCreateDialog,
     openEditDialog,
+    openTracerStudyPage,
 });
 
 // Create a reactive reference specifically for the DatePicker's modelValue.
@@ -578,7 +589,7 @@ watch(filters, (newValue) => {
                                         selectedStudent?.gender === 'laki-laki' ? 'pi pi-mars text-blue-600' : 'pi pi-venus text-pink-600'
                                     ]"></i>
                                     <span class="font-semibold text-gray-900">{{ formatGender(selectedStudent?.gender)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                             <div
@@ -589,7 +600,7 @@ watch(filters, (newValue) => {
                             <div class="flex justify-between items-center py-2">
                                 <span class="text-gray-600 text-sm">Tanggal Lahir</span>
                                 <span class="font-semibold text-gray-900">{{ formatTanggal(selectedStudent?.born_date)
-                                }}</span>
+                                    }}</span>
                             </div>
                         </div>
                     </template>
@@ -676,8 +687,9 @@ watch(filters, (newValue) => {
 
             <template #footer>
                 <div class="flex flex-col gap-3 pt-4">
-                    <Button v-if="selectedStudent?.cv_file_url" label="Download CV" icon="pi pi-download"
-                        class="w-full bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 transition-colors duration-200"
+                    <Button label="Tracer Study" icon="pi pi-graduation-cap" severity="info" class="w-full"
+                        @click="openTracerStudyPage(selectedStudent?.id)" />
+                    <Button v-if="selectedStudent?.cv_file_url" label="Download CV" icon="pi pi-download" class="w-full"
                         @click="openCvFile(selectedStudent?.cv_file_url)" />
                     <Button label="Hapus Siswa" icon="pi pi-trash" severity="danger" class="w-full" outlined
                         @click="confirmDelete" />
@@ -799,7 +811,7 @@ watch(filters, (newValue) => {
                             ]" optionLabel="label" optionValue="value" class="w-full"
                                 :class="{ 'border-red-300': form.errors.gender }" placeholder="Pilih jenis kelamin" />
                             <small v-if="form.errors.gender" class="text-red-600 text-xs">{{ form.errors.gender
-                            }}</small>
+                                }}</small>
                         </div>
                         <div class="space-y-2">
                             <label for="born_date" class="block text-sm font-medium text-gray-700">
@@ -809,7 +821,7 @@ watch(filters, (newValue) => {
                                 :class="{ 'border-red-300': form.errors.born_date }" dateFormat="yy-mm-dd"
                                 placeholder="Pilih tanggal lahir" />
                             <small v-if="form.errors.born_date" class="text-red-600 text-xs">{{ form.errors.born_date
-                            }}</small>
+                                }}</small>
                         </div>
                         <div class="space-y-2 sm:col-span-2">
                             <label for="password" class="block text-sm font-medium text-gray-700">
@@ -819,7 +831,7 @@ watch(filters, (newValue) => {
                                 :class="{ 'border-red-300': form.errors.password }" :feedback="true" toggleMask
                                 placeholder="Masukkan password" />
                             <small v-if="form.errors.password" class="text-red-600 text-xs">{{ form.errors.password
-                            }}</small>
+                                }}</small>
                         </div>
                     </div>
                 </div>
@@ -839,14 +851,14 @@ watch(filters, (newValue) => {
                             <InputText id="height" v-model="form.height" class="w-full"
                                 :class="{ 'border-red-300': form.errors.height }" placeholder="Contoh: 170" />
                             <small v-if="form.errors.height" class="text-red-600 text-xs">{{ form.errors.height
-                            }}</small>
+                                }}</small>
                         </div>
                         <div class="space-y-2">
                             <label for="weight" class="block text-sm font-medium text-gray-700">Berat Badan (kg)</label>
                             <InputText id="weight" v-model="form.weight" class="w-full"
                                 :class="{ 'border-red-300': form.errors.weight }" placeholder="Contoh: 65" />
                             <small v-if="form.errors.weight" class="text-red-600 text-xs">{{ form.errors.weight
-                            }}</small>
+                                }}</small>
                         </div>
                     </div>
                 </div>
@@ -865,7 +877,7 @@ watch(filters, (newValue) => {
                             <InputText id="province" v-model="form.province" class="w-full"
                                 :class="{ 'border-red-300': form.errors.province }" placeholder="Contoh: Jawa Timur" />
                             <small v-if="form.errors.province" class="text-red-600 text-xs">{{ form.errors.province
-                            }}</small>
+                                }}</small>
                         </div>
                         <div class="space-y-2">
                             <label for="city" class="block text-sm font-medium text-gray-700">Kota</label>
@@ -879,7 +891,7 @@ watch(filters, (newValue) => {
                                 :class="{ 'border-red-300': form.errors.address }"
                                 placeholder="Masukkan alamat lengkap" />
                             <small v-if="form.errors.address" class="text-red-600 text-xs">{{ form.errors.address
-                            }}</small>
+                                }}</small>
                         </div>
                     </div>
                 </div>
@@ -904,7 +916,7 @@ watch(filters, (newValue) => {
                                 placeholder="Pilih status kelulusan" />
                             <small v-if="form.errors.is_graduated" class="text-red-600 text-xs">{{
                                 form.errors.is_graduated
-                            }}</small>
+                                }}</small>
                         </div>
                         <div class="space-y-2">
                             <label for="is_married" class="block text-sm font-medium text-gray-700">Status
@@ -916,7 +928,7 @@ watch(filters, (newValue) => {
                                 :class="{ 'border-red-300': form.errors.is_married }"
                                 placeholder="Pilih status pernikahan" />
                             <small v-if="form.errors.is_married" class="text-red-600 text-xs">{{ form.errors.is_married
-                            }}</small>
+                                }}</small>
                         </div>
                     </div>
                 </div>
