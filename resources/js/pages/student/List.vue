@@ -302,6 +302,10 @@ const openCreateDialog = () => {
     dialogVisible.value = true;
 };
 
+const openCvFile = (url: string) => {
+    window.open(url, '_blank');
+};
+
 const openEditDialog = (student: any) => {
     form.id = student.id;
     form.student_class_id = student.student_class_id;
@@ -674,7 +678,7 @@ watch(filters, (newValue) => {
                 <div class="flex flex-col gap-3 pt-4">
                     <Button v-if="selectedStudent?.cv_file_url" label="Download CV" icon="pi pi-download"
                         class="w-full bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 transition-colors duration-200"
-                        @click="window.open(selectedStudent?.cv_file_url, '_blank')" />
+                        @click="openCvFile(selectedStudent?.cv_file_url)" />
                     <Button label="Hapus Siswa" icon="pi pi-trash" severity="danger" class="w-full" outlined
                         @click="confirmDelete" />
                 </div>
