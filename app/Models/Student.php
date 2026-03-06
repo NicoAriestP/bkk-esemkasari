@@ -107,8 +107,7 @@ class Student extends Authenticatable
         );
     }
 
-    public static function getDashboardData()
-    {}
+    public static function getDashboardData() {}
 
     public function studentClass()
     {
@@ -118,6 +117,11 @@ class Student extends Authenticatable
     public function studentActivityAnswer()
     {
         return $this->hasOne(StudentActivityAnswer::class);
+    }
+
+    public function detailActivityAnswer()
+    {
+        return $this->hasOne(DetailActivityAnswer::class);
     }
 
     public function studentUniversityAnswer()
@@ -130,20 +134,16 @@ class Student extends Authenticatable
         return $this->hasOne(StudentWorkingAnswer::class);
     }
 
+    public function studentEntrepreneurAnswer()
+    {
+        return $this->hasOne(StudentEntrepreneurAnswer::class);
+    }
+
     public function feedbackAnswer()
     {
         return $this->hasOne(FeedbackAnswer::class);
     }
 
-    public function detailActivityAnswer()
-    {
-        return $this->hasOne(DetailActivityAnswer::class);
-    }
-
-    public function studentEntrepreneurAnswer()
-    {
-        return $this->hasOne(StudentEntrepreneurAnswer::class);
-    }
 
     public function vacancyApplication()
     {
