@@ -22,6 +22,21 @@ use Carbon\Carbon;
 
 class StudentController extends Controller
 {
+    private function getStudentData(Student $student)
+    {
+        return [
+            'student' => $student,
+            'studentClass' => $student->studentClass,
+            'studentYear' => $student->studentClass->year,
+            'studentActivityAnswer' => $student->studentActivityAnswer,
+            'studentUniversityAnswer' => $student->studentUniversityAnswer,
+            'studentWorkingAnswer' => $student->studentWorkingAnswer,
+            'feedbackAnswer' => $student->feedbackAnswer,
+            'detailActivityAnswer' => $student->detailActivityAnswer,
+            'studentEntrepreneurAnswer' => $student->studentEntrepreneurAnswer,
+        ];
+    }
+
     public function index(Year $year, StudentClass $studentClass, Request $request)
     {
         $search = $request->input('search', '');
@@ -44,6 +59,11 @@ class StudentController extends Controller
             'studentClass' => $studentClass,
             'models' => $students,
         ]);
+    }
+
+    public function tracerStudy(Year $year, StudentClass $studentClass, Student $model)
+    {
+        return Inertia::render('tracer-study/TracerStudy', $this->getStudentData($model));
     }
 
     public function store(Year $year, StudentClass $studentClass, CreateStudentFormRequest $request, StudentAction $action)
