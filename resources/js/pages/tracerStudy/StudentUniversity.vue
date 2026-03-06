@@ -10,6 +10,7 @@ import Select from 'primevue/select';
 // --- Props & Emits untuk v-model ---
 const props = defineProps<{
     modelValue: Record<string, any>
+    readOnly?: boolean
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -53,13 +54,13 @@ const majorRelevanceOptions = [
             <!-- Pertanyaan Nama Perguruan Tinggi -->
             <div class="flex flex-col gap-2">
                 <label for="university-name">Di Perguruan Tinggi mana Anda melanjutkan studi?</label>
-                <InputText id="university-name" v-model="formData.universityName" type="text" placeholder="Contoh: Universitas Indonesia" />
+                <InputText id="university-name" v-model="formData.universityName" type="text" placeholder="Contoh: Universitas Indonesia" :disabled="readOnly" />
             </div>
 
             <!-- Pertanyaan Program Studi -->
             <div class="flex flex-col gap-2">
                 <label for="study-program">Apa Program Studi yang Anda ambil?</label>
-                <InputText id="study-program" v-model="formData.studyProgram" type="text" placeholder="Contoh: Teknik Informatika" />
+                <InputText id="study-program" v-model="formData.studyProgram" type="text" placeholder="Contoh: Teknik Informatika" :disabled="readOnly" />
             </div>
 
             <!-- Pertanyaan Jenjang Pendidikan -->
@@ -72,6 +73,7 @@ const majorRelevanceOptions = [
                     optionValue="key"
                     placeholder="Pilih jenjang pendidikan"
                     class="w-full md:w-1/2"
+                    :disabled="readOnly"
                 />
             </div>
 
@@ -80,7 +82,7 @@ const majorRelevanceOptions = [
                 <p>Apa sumber pembiayaan utama kuliah Anda?</p>
                 <div class="flex flex-col gap-3 mt-1">
                     <div v-for="option in fundingSourceOptions" :key="option.key" class="flex items-center">
-                        <RadioButton v-model="formData.fundingSource" :inputId="option.key" name="funding" :value="option.key" />
+                        <RadioButton v-model="formData.fundingSource" :inputId="option.key" name="funding" :value="option.key" :disabled="readOnly" />
                         <label :for="option.key" class="ml-2">{{ option.text }}</label>
                     </div>
                 </div>
@@ -91,7 +93,7 @@ const majorRelevanceOptions = [
                 <p>Bagaimana tingkat kesesuaian jurusan yang Anda ambil di Perguruan Tinggi dengan jurusan Anda di SMK?</p>
                 <div class="flex flex-col gap-3 mt-1">
                     <div v-for="option in majorRelevanceOptions" :key="option.key" class="flex items-center">
-                        <RadioButton v-model="formData.majorRelevance" :inputId="option.key" name="relevance" :value="option.key" />
+                        <RadioButton v-model="formData.majorRelevance" :inputId="option.key" name="relevance" :value="option.key" :disabled="readOnly" />
                         <label :for="option.key" class="ml-2">{{ option.text }}</label>
                     </div>
                 </div>

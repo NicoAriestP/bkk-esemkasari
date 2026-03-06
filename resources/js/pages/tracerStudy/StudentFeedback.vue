@@ -11,6 +11,7 @@ import Button from 'primevue/button';
 // --- Props & Emits ---
 const props = defineProps<{
     modelValue: Record<string, any>
+    readOnly?: boolean
 }>();
 const emit = defineEmits(['update:modelValue']);
 
@@ -100,7 +101,7 @@ const qualityRatingOptions = [
                 <p>Apa alasan Anda memilih pendidikan di SMK? <small class="text-gray-500">(boleh pilih lebih dari satu)</small></p>
                 <div class="flex flex-col gap-3 mt-1">
                     <div v-for="option in smkReasonOptions" :key="option.key" class="flex items-center">
-                        <Checkbox v-model="formData.smkReasons" :inputId="option.key" name="smkReason" :value="option.text" />
+                        <Checkbox v-model="formData.smkReasons" :inputId="option.key" name="smkReason" :value="option.text" :disabled="readOnly" />
                         <label :for="option.key" class="ml-2">{{ option.text }}</label>
                     </div>
                      <div class="flex items-center">
@@ -115,7 +116,7 @@ const qualityRatingOptions = [
                 <p>Berapa total durasi/lama Anda melaksanakan Prakerin/PKL sewaktu di SMK?</p>
                 <div class="flex flex-col gap-3 mt-1">
                     <div v-for="option in pklDurationOptions" :key="option.key" class="flex items-center">
-                        <RadioButton v-model="formData.pklDuration" :inputId="option.key" name="pklDuration" :value="option.key" />
+                        <RadioButton v-model="formData.pklDuration" :inputId="option.key" name="pklDuration" :value="option.key" :disabled="readOnly" />
                         <label :for="option.key" class="ml-2">{{ option.text }}</label>
                     </div>
                 </div>
@@ -128,7 +129,7 @@ const qualityRatingOptions = [
                     <p class="mb-3">a. Kualitas tempat Prakerin/PKL</p>
                     <div class="flex flex-wrap gap-x-6 gap-y-3">
                         <div v-for="option in qualityRatingOptions" :key="option.key" class="flex items-center">
-                            <RadioButton v-model="formData.pklQuality.location" :inputId="`loc-${option.key}`" name="pklLocation" :value="option.key" />
+                            <RadioButton v-model="formData.pklQuality.location" :inputId="`loc-${option.key}`" name="pklLocation" :value="option.key" :disabled="readOnly" />
                             <label :for="`loc-${option.key}`" class="ml-2">{{ option.text }}</label>
                         </div>
                     </div>
@@ -137,7 +138,7 @@ const qualityRatingOptions = [
                     <p class="mb-3">b. Kesesuaian tugas Prakerin/PKL dengan bidang/program keahlian</p>
                     <div class="flex flex-wrap gap-x-6 gap-y-3">
                         <div v-for="option in qualityRatingOptions" :key="option.key" class="flex items-center">
-                            <RadioButton v-model="formData.pklQuality.taskRelevance" :inputId="`task-${option.key}`" name="pklTask" :value="option.key" />
+                            <RadioButton v-model="formData.pklQuality.taskRelevance" :inputId="`task-${option.key}`" name="pklTask" :value="option.key" :disabled="readOnly" />
                             <label :for="`task-${option.key}`" class="ml-2">{{ option.text }}</label>
                         </div>
                     </div>
@@ -146,7 +147,7 @@ const qualityRatingOptions = [
                     <p class="mb-3">c. Bimbingan selama Prakerin/PKL</p>
                     <div class="flex flex-wrap gap-x-6 gap-y-3">
                         <div v-for="option in qualityRatingOptions" :key="option.key" class="flex items-center">
-                            <RadioButton v-model="formData.pklQuality.guidance" :inputId="`guid-${option.key}`" name="pklGuidance" :value="option.key" />
+                            <RadioButton v-model="formData.pklQuality.guidance" :inputId="`guid-${option.key}`" name="pklGuidance" :value="option.key" :disabled="readOnly" />
                             <label :for="`guid-${option.key}`" class="ml-2">{{ option.text }}</label>
                         </div>
                     </div>
@@ -155,7 +156,7 @@ const qualityRatingOptions = [
                     <p class="mb-3">d. Monitoring/kunjungan guru selama Prakerin/PKL</p>
                     <div class="flex flex-wrap gap-x-6 gap-y-3">
                         <div v-for="option in qualityRatingOptions" :key="option.key" class="flex items-center">
-                            <RadioButton v-model="formData.pklQuality.monitoring" :inputId="`mon-${option.key}`" name="pklMonitoring" :value="option.key" />
+                            <RadioButton v-model="formData.pklQuality.monitoring" :inputId="`mon-${option.key}`" name="pklMonitoring" :value="option.key" :disabled="readOnly" />
                             <label :for="`mon-${option.key}`" class="ml-2">{{ option.text }}</label>
                         </div>
                     </div>
@@ -166,11 +167,11 @@ const qualityRatingOptions = [
                 <p>Apakah Anda memiliki sertifikat kompetensi yang dikeluarkan oleh industri/Lembaga Sertifikasi Profesi (LSP) saat menempuh pendidikan di SMK?</p>
                 <div class="flex items-center gap-6">
                     <div class="flex items-center">
-                        <RadioButton v-model="formData.hasCertificate" inputId="certYes" name="hasCert" value="Ya" />
+                        <RadioButton v-model="formData.hasCertificate" inputId="certYes" name="hasCert" value="Ya" :disabled="readOnly" />
                         <label for="certYes" class="ml-2">Ya</label>
                     </div>
                     <div class="flex items-center">
-                        <RadioButton v-model="formData.hasCertificate" inputId="certNo" name="hasCert" value="Tidak" />
+                        <RadioButton v-model="formData.hasCertificate" inputId="certNo" name="hasCert" value="Tidak" :disabled="readOnly" />
                         <label for="certNo" class="ml-2">Tidak</label>
                     </div>
                 </div>
@@ -181,19 +182,19 @@ const qualityRatingOptions = [
                     <label>Tuliskan nama sertifikat kompetensi yang dimiliki!</label>
                     <small class="text-gray-500 -mt-2">(Misal: Sertifikat Keahlian Teknik Komputer Jaringan)</small>
                     <div v-for="(cert, index) in formData.certificates" :key="cert.id" class="flex items-center gap-2">
-                        <InputText v-model="cert.name" class="flex-grow" placeholder="Nama sertifikat..." />
+                        <InputText v-model="cert.name" class="flex-grow" placeholder="Nama sertifikat..." :disabled="readOnly" />
                         <Button
                             icon="pi pi-plus"
                             severity="success"
                             @click="addCertificate"
-                            v-if="index === formData.certificates.length - 1"
+                            v-if="index === formData.certificates.length - 1 && !readOnly"
                             aria-label="Tambah Sertifikat"
                         />
                          <Button
                             icon="pi pi-trash"
                             severity="danger"
                             @click="removeCertificate(cert.id)"
-                            v-if="formData.certificates.length > 1"
+                            v-if="formData.certificates.length > 1 && !readOnly"
                             aria-label="Hapus Sertifikat"
                         />
                     </div>

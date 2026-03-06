@@ -10,6 +10,7 @@ import Select from 'primevue/select';
 // --- Props & Emits ---
 const props = defineProps<{
     modelValue: Record<string, any>
+    readOnly?: boolean
 }>();
 const emit = defineEmits(['update:modelValue']);
 
@@ -42,13 +43,13 @@ const businessIncomeOptions = [
             <!-- Pertanyaan Nama Usaha -->
             <div class="flex flex-col gap-2">
                 <label for="business-name">Apa nama usaha yang Anda rintis?</label>
-                <InputText id="business-name" v-model="formData.businessName" type="text" placeholder="Contoh: Maju Jaya Digital Printing" />
+                <InputText id="business-name" v-model="formData.businessName" type="text" placeholder="Contoh: Maju Jaya Digital Printing" :disabled="readOnly" />
             </div>
 
             <!-- Pertanyaan Bidang Usaha -->
             <div class="flex flex-col gap-2">
                 <label for="business-field">Apa bidang usaha Anda?</label>
-                <InputText id="business-field" v-model="formData.businessField" type="text" placeholder="Contoh: Percetakan, Kuliner, Jasa Digital" />
+                <InputText id="business-field" v-model="formData.businessField" type="text" placeholder="Contoh: Percetakan, Kuliner, Jasa Digital" :disabled="readOnly" />
             </div>
 
             <!-- Pertanyaan Skala Usaha -->
@@ -61,6 +62,7 @@ const businessIncomeOptions = [
                     optionValue="key"
                     placeholder="Pilih skala usaha"
                     class="w-full md:w-1/2"
+                    :disabled="readOnly"
                 />
             </div>
 
@@ -69,7 +71,7 @@ const businessIncomeOptions = [
                 <p>Berapa rata-rata pendapatan bersih (keuntungan) usaha Anda per bulan?</p>
                 <div class="flex flex-col gap-3 mt-1">
                     <div v-for="option in businessIncomeOptions" :key="option.key" class="flex items-center">
-                        <RadioButton v-model="formData.businessIncome" :inputId="option.key" name="income" :value="option.key" />
+                        <RadioButton v-model="formData.businessIncome" :inputId="option.key" name="income" :value="option.key" :disabled="readOnly" />
                         <label :for="option.key" class="ml-2">{{ option.text }}</label>
                     </div>
                 </div>

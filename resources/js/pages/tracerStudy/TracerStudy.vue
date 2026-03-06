@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { ref, watch, computed } from 'vue';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { useToast } from 'primevue/usetoast';
 
 // Import komponen untuk setiap step
@@ -21,6 +21,9 @@ import Toast from 'primevue/toast';
 
 // Inisialisasi Toast
 const toast = useToast();
+
+const page = usePage<SharedData>();
+const isReadOnly = computed(() => !!page.props.auth.user);
 
 // --- Props dari Controller ---
 const props = defineProps({
@@ -254,15 +257,16 @@ const workTypeOptions = ref([
                                     optionValue="value"
                                     placeholder="Pilih status"
                                     class="w-full"
+                                    :disabled="isReadOnly"
                                 />
                             </div>
                             <div class="space-y-2">
                                 <label for="province" class="block text-sm font-medium text-gray-700">Provinsi</label>
-                                <InputText id="province" v-model="form.province" placeholder="Masukkan provinsi" class="w-full" />
+                                <InputText id="province" v-model="form.province" placeholder="Masukkan provinsi" class="w-full" :disabled="isReadOnly" />
                             </div>
                             <div class="space-y-2">
                                 <label for="city" class="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
-                                <InputText id="city" v-model="form.city" placeholder="Masukkan kota" class="w-full" />
+                                <InputText id="city" v-model="form.city" placeholder="Masukkan kota" class="w-full" :disabled="isReadOnly" />
                             </div>
                         </div>
 
@@ -270,11 +274,11 @@ const workTypeOptions = ref([
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div class="space-y-2">
                                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                                <InputText id="email" v-model="form.email" type="email" placeholder="contoh@email.com" class="w-full" />
+                                <InputText id="email" v-model="form.email" type="email" placeholder="contoh@email.com" class="w-full" :disabled="isReadOnly" />
                             </div>
                             <div class="space-y-2">
                                 <label for="phone" class="block text-sm font-medium text-gray-700">No. HP</label>
-                                <InputText id="phone" v-model="form.phone" placeholder="08123456789" class="w-full" />
+                                <InputText id="phone" v-model="form.phone" placeholder="08123456789" class="w-full" :disabled="isReadOnly" />
                             </div>
                         </div>
 
@@ -282,24 +286,25 @@ const workTypeOptions = ref([
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div class="space-y-2">
                                 <label for="weight" class="block text-sm font-medium text-gray-700">Berat Badan (kg)</label>
-                                <InputText id="weight" v-model="form.weight" type="number" placeholder="60" class="w-full" />
+                                <InputText id="weight" v-model="form.weight" type="number" placeholder="60" class="w-full" :disabled="isReadOnly" />
                             </div>
                             <div class="space-y-2">
                                 <label for="height" class="block text-sm font-medium text-gray-700">Tinggi Badan (cm)</label>
-                                <InputText id="height" v-model="form.height" type="number" placeholder="170" class="w-full" />
+                                <InputText id="height" v-model="form.height" type="number" placeholder="170" class="w-full" :disabled="isReadOnly" />
                             </div>
                         </div>
 
                         <!-- Row 4: Address -->
                         <div class="space-y-2">
                             <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
-                            <Textarea id="address" v-model="form.address" rows="3" placeholder="Masukkan alamat lengkap..." class="w-full" autoResize />
+                            <Textarea id="address" v-model="form.address" rows="3" placeholder="Masukkan alamat lengkap..." class="w-full" autoResize :disabled="isReadOnly" />
                         </div>
 
-                        <!-- Row 5: CV Upload -->
+                        <!-- Row 5: CV -->
                         <div class="space-y-3">
-                            <label class="block text-sm font-medium text-gray-700">Upload CV Terbaru</label>
-                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors duration-200">
+                            <label class="block text-sm font-medium text-gray-700">{{ isReadOnly ? 'CV Siswa' : 'Upload CV Terbaru' }}</label>
+                            <!-- Upload UI (hanya untuk siswa) -->
+                            <div v-if="!isReadOnly" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors duration-200">
                                 <input ref="fileInput" type="file" accept=".pdf,.doc,.docx" @change="handleFileChange" class="hidden" />
                                 <div class="space-y-3">
                                     <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
@@ -315,6 +320,18 @@ const workTypeOptions = ref([
                                             <span class="text-sm font-medium">{{ getFileName(form.cv_file) }}</span>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <!-- Tampilan CV read-only (untuk staff) -->
+                            <div v-else>
+                                <div v-if="props.student?.cv_file_url" class="flex items-center gap-2 p-4 border border-gray-200 rounded-xl bg-gray-50">
+                                    <i class="pi pi-file text-blue-600 text-xl"></i>
+                                    <a :href="props.student.cv_file_url" target="_blank" class="text-blue-600 font-medium hover:underline text-sm">
+                                        {{ getFileName(props.student.cv_file_url) }}
+                                    </a>
+                                </div>
+                                <div v-else class="p-4 text-sm text-gray-500 bg-gray-50 rounded-xl border border-gray-200">
+                                    Belum ada CV yang diupload
                                 </div>
                             </div>
                         </div>
@@ -337,11 +354,11 @@ const workTypeOptions = ref([
                             <h4 class="font-semibold text-lg text-gray-900">Apakah Anda sedang melanjutkan studi?</h4>
                             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors duration-200" :class="{ 'border-blue-500 bg-blue-50': studentActivityData.isStudying === 'Ya' }">
-                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyYes" name="isStudying" value="Ya" />
+                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyYes" name="isStudying" value="Ya" :disabled="isReadOnly" />
                                     <label for="studyYes" class="ml-3 text-gray-700 font-medium cursor-pointer">Ya, sedang kuliah</label>
                                 </div>
                                 <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors duration-200" :class="{ 'border-blue-500 bg-blue-50': studentActivityData.isStudying === 'Tidak' }">
-                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyNo" name="isStudying" value="Tidak" />
+                                    <RadioButton v-model="studentActivityData.isStudying" inputId="studyNo" name="isStudying" value="Tidak" :disabled="isReadOnly" />
                                     <label for="studyNo" class="ml-3 text-gray-700 font-medium cursor-pointer">Tidak melanjutkan studi</label>
                                 </div>
                             </div>
@@ -353,11 +370,11 @@ const workTypeOptions = ref([
                                 <h4 class="font-semibold text-lg text-gray-900">Apakah Anda sedang bekerja?</h4>
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-green-300 transition-colors duration-200 bg-white" :class="{ 'border-green-500 bg-green-50': studentActivityData.isWorking === 'Ya' }">
-                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workYes" name="isWorking" value="Ya" />
+                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workYes" name="isWorking" value="Ya" :disabled="isReadOnly" />
                                         <label for="workYes" class="ml-3 text-gray-700 font-medium cursor-pointer">Ya, sedang bekerja</label>
                                     </div>
                                     <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-green-300 transition-colors duration-200 bg-white" :class="{ 'border-green-500 bg-green-50': studentActivityData.isWorking === 'Tidak' }">
-                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workNo" name="isWorking" value="Tidak" />
+                                        <RadioButton v-model="studentActivityData.isWorking" inputId="workNo" name="isWorking" value="Tidak" :disabled="isReadOnly" />
                                         <label for="workNo" class="ml-3 text-gray-700 font-medium cursor-pointer">Tidak bekerja</label>
                                     </div>
                                 </div>
@@ -373,7 +390,7 @@ const workTypeOptions = ref([
                                 </p>
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <div v-for="option in workTypeOptions" :key="option" class="flex items-center p-3 border border-yellow-200 rounded-lg hover:border-yellow-400 transition-colors duration-200 bg-white" :class="{ 'border-yellow-500 bg-yellow-50': studentActivityData.workType === option }">
-                                        <RadioButton v-model="studentActivityData.workType" :inputId="option" name="workType" :value="option" />
+                                        <RadioButton v-model="studentActivityData.workType" :inputId="option" name="workType" :value="option" :disabled="isReadOnly" />
                                         <label :for="option" class="ml-3 text-gray-700 font-medium cursor-pointer">{{ option }}</label>
                                     </div>
                                 </div>
@@ -395,7 +412,7 @@ const workTypeOptions = ref([
                     </div>
 
                     <div class="p-6">
-                        <ActivityDetails v-model="activityDetailsData" />
+                        <ActivityDetails v-model="activityDetailsData" :readOnly="isReadOnly" />
                     </div>
                 </div>
             </div>
@@ -412,7 +429,7 @@ const workTypeOptions = ref([
                     </div>
 
                     <div class="p-6">
-                        <StudentFeedback v-model="feedbackData" />
+                        <StudentFeedback v-model="feedbackData" :readOnly="isReadOnly" />
                     </div>
                 </div>
             </div>
@@ -441,7 +458,7 @@ const workTypeOptions = ref([
                             class="flex-1 sm:flex-none min-w-32"
                         />
                         <Button
-                            v-else
+                            v-else-if="!isReadOnly"
                             label="Selesai"
                             icon="pi pi-check"
                             severity="success"

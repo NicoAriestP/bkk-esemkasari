@@ -13,6 +13,7 @@ import StudentEntrepreneur from './StudentEntrepreneur.vue';
 // --- Props & Emits ---
 const props = defineProps<{
     modelValue: Record<string, any>
+    readOnly?: boolean
 }>();
 const emit = defineEmits(['update:modelValue']);
 
@@ -50,7 +51,7 @@ const activityOptions = [
                     <p class="font-semibold text-lg">Apa aktivitas utama Anda saat ini?</p>
                     <div class="mt-2 flex flex-col gap-4">
                         <div v-for="option in activityOptions" :key="option.value" class="flex items-center">
-                            <RadioButton v-model="formData.mainActivity" :inputId="option.value" name="mainActivity" :value="option.value" />
+                            <RadioButton v-model="formData.mainActivity" :inputId="option.value" name="mainActivity" :value="option.value" :disabled="readOnly" />
                             <label :for="option.value" class="ml-2">{{ option.label }}</label>
                         </div>
                     </div>
@@ -60,15 +61,15 @@ const activityOptions = [
 
         <!-- Tampilkan komponen yang sesuai dan hubungkan dengan v-model -->
         <template v-if="formData.mainActivity === 'bekerja'">
-            <StudentWorking v-model="formData.workingData" />
+            <StudentWorking v-model="formData.workingData" :readOnly="readOnly" />
         </template>
 
         <template v-if="formData.mainActivity === 'kuliah'">
-            <StudentUniversity v-model="formData.universityData" />
+            <StudentUniversity v-model="formData.universityData" :readOnly="readOnly" />
         </template>
 
         <template v-if="formData.mainActivity === 'wirausaha'">
-            <StudentEntrepreneur v-model="formData.entrepreneurData" />
+            <StudentEntrepreneur v-model="formData.entrepreneurData" :readOnly="readOnly" />
         </template>
 
         <div v-if="formData.mainActivity === 'belum'" class="p-4 text-center bg-blue-50 border-l-4 border-blue-400 text-blue-700 rounded-r-lg">
