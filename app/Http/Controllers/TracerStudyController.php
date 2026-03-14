@@ -36,7 +36,7 @@ class TracerStudyController extends Controller
 
     public function tracerStudy()
     {
-        return Inertia::render('tracerStudy/TracerStudy', $this->getStudentData());
+        return Inertia::render('tracerStudy/student/TracerStudy', $this->getStudentData());
     }
 
     public function saveTracerStudy(TracerStudyAction $tracerStudyAction, SaveTracerStudyFormRequest $request)
