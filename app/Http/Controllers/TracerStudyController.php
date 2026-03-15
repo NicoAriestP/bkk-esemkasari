@@ -14,6 +14,7 @@ use App\Models\DetailActivityAnswer;
 use App\Models\StudentEntrepreneurAnswer;
 use App\Http\Requests\TracerStudy\SaveTracerStudyFormRequest;
 use App\Actions\TracerStudy\TracerStudyAction;
+use App\Support\TracerStudyOptions;
 
 class TracerStudyController extends Controller
 {
@@ -31,6 +32,7 @@ class TracerStudyController extends Controller
             'feedbackAnswer' => $student->feedbackAnswer,
             'detailActivityAnswer' => $student->detailActivityAnswer,
             'studentEntrepreneurAnswer' => $student->studentEntrepreneurAnswer,
+            'tracerStudyOptions' => TracerStudyOptions::all(),
         ];
     }
 
