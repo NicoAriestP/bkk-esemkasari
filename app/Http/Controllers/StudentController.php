@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Support\TracerStudyOptions;
 
 class StudentController extends Controller
 {
@@ -34,6 +35,7 @@ class StudentController extends Controller
             'feedbackAnswer' => $student->feedbackAnswer,
             'detailActivityAnswer' => $student->detailActivityAnswer,
             'studentEntrepreneurAnswer' => $student->studentEntrepreneurAnswer,
+            'tracerStudyOptions' => TracerStudyOptions::all(),
         ];
     }
 
@@ -63,7 +65,7 @@ class StudentController extends Controller
 
     public function tracerStudyDetail(Year $year, StudentClass $studentClass, Student $model)
     {
-        return Inertia::render('tracerStudy/student/TracerStudy', $this->getStudentData($model));
+        return Inertia::render('tracerStudy/user/TracerStudy', $this->getStudentData($model));
     }
 
     public function store(Year $year, StudentClass $studentClass, CreateStudentFormRequest $request, StudentAction $action)
