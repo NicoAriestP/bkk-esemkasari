@@ -3,6 +3,7 @@
 namespace App\Actions\TracerStudy;
 
 use App\Http\Requests\TracerStudy\SaveTracerStudyFormRequest;
+use App\Enum\TracerStudy\DetailActivityMainOption;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
@@ -55,7 +56,7 @@ class TracerStudyAction
             $mainActivity = $detailActivityData['mainActivity'] ?? null;
 
             // 2. Simpan data yang relevan dan HAPUS data yang tidak relevan lagi
-            if ($mainActivity === 'bekerja' && !empty($validated['student_working_answers']) && $validated['student_working_answers'] !== '{}') {
+            if ($mainActivity === DetailActivityMainOption::WORKING->value && !empty($validated['student_working_answers']) && $validated['student_working_answers'] !== '{}') {
                 $student->studentWorkingAnswer()->updateOrCreate(
                     ['student_id' => $student->id],
                     ['answers' => $validated['student_working_answers']]
@@ -64,7 +65,7 @@ class TracerStudyAction
                 $student->studentUniversityAnswer()->delete();
                 $student->studentEntrepreneurAnswer()->delete();
 
-            } elseif ($mainActivity === 'kuliah' && !empty($validated['student_university_answers']) && $validated['student_university_answers'] !== '{}') {
+            } elseif ($mainActivity === DetailActivityMainOption::UNIVERSITY->value && !empty($validated['student_university_answers']) && $validated['student_university_answers'] !== '{}') {
                 $student->studentUniversityAnswer()->updateOrCreate(
                     ['student_id' => $student->id],
                     ['answers' => $validated['student_university_answers']]
@@ -73,7 +74,7 @@ class TracerStudyAction
                 $student->studentWorkingAnswer()->delete();
                 $student->studentEntrepreneurAnswer()->delete();
 
-            } elseif ($mainActivity === 'wirausaha' && !empty($validated['student_entrepreneur_answers']) && $validated['student_entrepreneur_answers'] !== '{}') {
+            } elseif ($mainActivity === DetailActivityMainOption::ENTREPRENEUR->value && !empty($validated['student_entrepreneur_answers']) && $validated['student_entrepreneur_answers'] !== '{}') {
                 $student->studentEntrepreneurAnswer()->updateOrCreate(
                     ['student_id' => $student->id],
                     ['answers' => $validated['student_entrepreneur_answers']]
