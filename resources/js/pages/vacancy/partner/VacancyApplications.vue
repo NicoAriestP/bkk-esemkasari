@@ -282,7 +282,7 @@ watch(filters, (newValue) => {
                         </template>
                     </Column>
 
-                    <Column field="student.gender" header="Gender">
+                    <Column field="student.gender" header="Jenis Kelamin">
                         <template #body="{ data }">
                             <div class="flex items-center gap-2">
                                 <i
