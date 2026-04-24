@@ -47,3 +47,6 @@ RUN chown -R www-data:www-data /var/www/app \
 EXPOSE 9000
 
 CMD ["php-fpm"]
+
+# Note: Ensure when run artisan commands, they are executed as www-data user to avoid permission issues for storage and cache directories. For example:
+# Example: docker exec -it --user www-data <container_name> php artisan migrate
