@@ -13,6 +13,7 @@ use App\Http\Requests\ImportStudentRequest;
 use App\Actions\Student\StudentAction;
 use App\Http\Requests\StudentImportRequest;
 use App\Imports\StudentsImport;
+use App\Exports\Student\StudentsExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -108,6 +109,13 @@ class StudentController extends Controller
             return back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
         }
     }
+
+    public function export(Year $year, StudentClass $studentClass)
+    {
+        return (new StudentsExport($studentClass))
+            ->download("Export Data Siswa - {$studentClass->name} - {$year->name} " . Carbon::now()->format('l, d-m-Y H-i') . ".xlsx");
+    }
+
 
     public function dashboard(Request $request)
     {

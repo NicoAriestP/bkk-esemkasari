@@ -77,7 +77,7 @@ const splitButtonItems = [
         label: 'Export',
         icon: 'pi pi-download',
         command: () => {
-            // exportStudent();
+            exportStudent();
         },
     },
 ];
@@ -194,6 +194,21 @@ const submitImport = () => {
             },
         },
     );
+};
+
+const exportStudent = () => {
+    const targetWindow = window.top ?? window;
+    targetWindow.location.href = route('years.student-classes.students.export', {
+        year: props.year.id,
+        studentClass: props.studentClass.id,
+    });
+
+    toast.add({
+        severity: 'info',
+        summary: 'Sedang memproses',
+        detail: 'Ekspor data siswa sedang diproses. Silakan tunggu.',
+        life: 3000
+    });
 };
 
 const deleteStudent = () => {

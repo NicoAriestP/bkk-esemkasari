@@ -67,7 +67,7 @@ Route::middleware(['auth:web'])->group(function () {
                 Route::put('/{model}', [StudentController::class, 'update'])->name('update');
                 Route::delete('/{model}', [StudentController::class, 'destroy'])->name('destroy');
                 Route::post('/import', [StudentController::class, 'import'])->name('import');
-                Route::post('/export', [StudentController::class, 'export'])->name('export');
+                Route::get('/export', [StudentController::class, 'export'])->name('export');
             });
         });
     });
