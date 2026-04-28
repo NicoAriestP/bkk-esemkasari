@@ -53,19 +53,32 @@ const formData = computed({
 });
 
 
+// --- Helper: Generate next ID based on array length ---
+const getNextCertificateId = (): number => {
+    if (!Array.isArray(formData.value.certificates)) {
+        return 1;
+    }
+    return formData.value.certificates.length + 1;
+};
+
 // --- Fungsi untuk menambah & menghapus sertifikat ---
 const addCertificate = () => {
     if (!Array.isArray(formData.value.certificates)) {
         formData.value.certificates = [];
     }
-    formData.value.certificates.push({ id: Date.now(), name: '' });
+    formData.value.certificates.push({ id: getNextCertificateId(), name: '' });
 };
 
-const removeCertificate = (id: number) => {
-    formData.value.certificates = formData.value.certificates.filter((cert: { id: number }) => cert.id !== id);
+const removeCertificate = (index: number) => {
+    formData.value.certificates.splice(index, 1);
     if (formData.value.certificates.length === 0) {
         addCertificate();
     }
+    // Re-index all certificate IDs to ensure sequential numbering (1, 2, 3, ...)
+    formData.value.certificates = formData.value.certificates.map((cert: any, idx: number) => ({
+        ...cert,
+        id: idx + 1,
+    }));
 };
 
 // Watcher untuk mereset daftar sertifikat jika user memilih "Tidak"
@@ -161,7 +174,7 @@ watch(() => formData.value.hasCertificate, (newValue) => {
                 <div class="flex flex-col gap-3">
                     <label>Tuliskan nama sertifikat kompetensi yang dimiliki!</label>
                     <small class="text-gray-500 -mt-2">(Misal: Sertifikat Keahlian Teknik Komputer Jaringan)</small>
-                    <div v-for="(cert, index) in formData.certificates" :key="cert.id" class="flex items-center gap-2">
+                    <div v-for="(cert, index) in formData.certificates" :key="`cert-${cert.id}-${index}`" class="flex items-center gap-2">
                         <InputText v-model="cert.name" class="flex-grow" placeholder="Nama sertifikat..." />
                         <Button
                             icon="pi pi-plus"
@@ -170,10 +183,10 @@ watch(() => formData.value.hasCertificate, (newValue) => {
                             v-if="index === formData.certificates.length - 1"
                             aria-label="Tambah Sertifikat"
                         />
-                         <Button
+                        <Button
                             icon="pi pi-trash"
                             severity="danger"
-                            @click="removeCertificate(cert.id)"
+                            @click="removeCertificate(index)"
                             v-if="formData.certificates.length > 1"
                             aria-label="Hapus Sertifikat"
                         />
