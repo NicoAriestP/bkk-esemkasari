@@ -113,7 +113,7 @@ class StudentController extends Controller
     public function export(Year $year, StudentClass $studentClass)
     {
         return (new StudentsExport($studentClass))
-            ->download("Export Data Siswa - {$studentClass->name} - {$year->name} " . Carbon::now()->format('l, d-m-Y H-i') . ".xlsx");
+            ->download("Export Data Siswa - {$studentClass->name} - {$year->year} " . Carbon::now()->format('l, d-m-Y H-i') . ".xlsx");
     }
 
 
