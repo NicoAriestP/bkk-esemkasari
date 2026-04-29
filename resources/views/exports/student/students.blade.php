@@ -20,8 +20,8 @@
             <td colspan="7" align="right">Jumlah Siswa: {{ $students->count() }}</td>
         </tr>
         <tr>
-            <td colspan="8">Tahun Angkatan: {{ $students->first()->studentClass->year->year ?? '-' }}</td>
-            <td colspan="7" align="right">Kelas: {{ $students->first()->studentClass->name ?? '-' }}</td>
+            <td colspan="8">Tahun Angkatan: {{ $studentClass->year->year ?? '-' }}</td>
+            <td colspan="7" align="right">Kelas: {{ $studentClass->name ?? '-' }}</td>
         </tr>
     </table>
     <table>
