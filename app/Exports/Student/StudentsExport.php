@@ -30,7 +30,6 @@ class StudentsExport implements FromView
         return view('exports.student.students', [
             'studentClass' => $this->studentClass->load('year'),
             'students' => Student::query()
-                ->with('studentClass.year')
                 ->where('student_class_id', $this->studentClass->id)
                 ->get(),
         ]);
