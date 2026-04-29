@@ -76,6 +76,9 @@ const businessScaleLabels = computed<Record<string, string>>(
 const businessIncomeLabels = computed<Record<string, string>>(
 	() => (props.tracerStudyOptions as GenericObject)?.businessIncome?.labels || {},
 );
+const workTypeLabels = computed<Record<string, string>>(
+	() => (props.tracerStudyOptions as GenericObject)?.workType?.labels || {},
+);
 const smkReasonLabels = computed<Record<string, string>>(
 	() => (props.tracerStudyOptions as GenericObject)?.smkReason?.labels || {},
 );
@@ -188,7 +191,7 @@ const mappedCertificates = computed(() => {
 
 				<div class="mt-4 border-t border-slate-100 pt-4 text-sm">
 					<p class="text-slate-500">Jenis Pekerjaan</p>
-					<p class="font-medium text-slate-800">{{ displayValue(studentActivityData.workType) }}</p>
+					<p class="font-medium text-slate-800">{{ mapSingle(studentActivityData.workType, workTypeLabels) }}</p>
 				</div>
 			</section>
 
