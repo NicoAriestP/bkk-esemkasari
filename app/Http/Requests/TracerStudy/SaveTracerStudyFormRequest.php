@@ -20,8 +20,10 @@ use App\Enum\TracerStudy\StudentWorkingSalaryOption;
 use App\Enum\TracerStudy\StudentWorkTypeOption;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Validator;
 use JsonException;
+use App\Models\Student;
 
 class SaveTracerStudyFormRequest extends FormRequest
 {
@@ -54,6 +56,27 @@ class SaveTracerStudyFormRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {
+            // Validasi duplikat file CV
+            if ($this->hasFile('cv_file')) {
+                $file = $this->file('cv_file');
+                $fileName = $file->getClientOriginalName();
+                $cvFilePath = "students/cv_files/$fileName";
+                $disk = config('filesystems.default', 'public');
+                $currentStudent = Auth::user();
+
+                // Cek apakah file dengan nama ini sudah ada di storage
+                if (Storage::disk($disk)->exists($cvFilePath)) {
+                    // Query: siapa yang punya cv_file path ini?
+                    $cvOwner = Student::where('cv_file', $cvFilePath)->first();
+
+                    // Jika file ada dan dimiliki oleh student lain, reject
+                    if ($cvOwner && $cvOwner->id !== $currentStudent->id) {
+                        $validator->errors()->add('cv_file', 'File dengan nama ini sudah digunakan oleh siswa lain. Silakan ganti nama file CV Anda dengan format: "CV - Nama Lengkap.pdf" untuk menghindari duplikat.');
+                    }
+                    // Jika file ada dan dimiliki oleh student yang sama, allow (akan di-replace)
+                }
+            }
+
             $studentActivity = $this->decodeJsonField($validator, 'student_activity_answers');
             $detailActivity = $this->decodeJsonField($validator, 'detail_activity_answers');
             $working = $this->decodeJsonField($validator, 'student_working_answers', true);
