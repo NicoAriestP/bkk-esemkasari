@@ -314,6 +314,16 @@ const feedbackOptions = ref({
                         <!-- Row 5: CV Upload -->
                         <div class="space-y-3">
                             <label class="block text-sm font-medium text-gray-700">Upload CV Terbaru</label>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3 text-sm text-blue-800">
+                                <div class="flex gap-2">
+                                    <i class="pi pi-info-circle flex-shrink-0 text-blue-600"></i>
+                                    <div>
+                                        <p class="font-medium mb-1">Format Nama File CV :</p>
+                                        <p class="text-blue-700 font-mono">"CV - Nama Lengkap.pdf"</p>
+                                        <p class="text-blue-600 text-xs mt-1">Contoh: "CV - John Doe.pdf"</p>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors duration-200">
                                 <input ref="fileInput" type="file" accept=".pdf,.doc,.docx" @change="handleFileChange" class="hidden" />
                                 <div class="space-y-3">
@@ -322,7 +332,7 @@ const feedbackOptions = ref({
                                     </div>
                                     <div>
                                         <Button label="Pilih File CV" icon="pi pi-folder-open" outlined @click="fileInput?.click()" />
-                                        <p class="text-sm text-gray-500 mt-2">Format: PDF, DOC, DOCX (Max. 5MB)</p>
+                                        <p class="text-sm text-gray-500 mt-2">Format: PDF (Max. 2MB)</p>
                                     </div>
                                     <div v-if="form.cv_file" class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
                                         <div class="flex items-center gap-2 text-green-700">
