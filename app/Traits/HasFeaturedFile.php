@@ -80,6 +80,10 @@ trait HasFeaturedFile
             ['disk' => config('filesystems.default', 'public')]
         );
 
+        if (!$path) {
+            throw new \RuntimeException("Gagal menyimpan file. Periksa permission storage dan disk space.");
+        }
+
         $this->fill(['file' => $path])->save();
     }
 
@@ -88,8 +92,8 @@ trait HasFeaturedFile
         $folder = $this->getCvFileSaveFolder();
 
         // Delete previous file if exists
-        if ($this->file) {
-            $previousFile = str_replace(Storage::url('/'), '', $this->file);
+        if ($this->cv_file) {
+            $previousFile = str_replace(Storage::url('/'), '', $this->cv_file);
             Storage::disk(config('filesystems.default', 'public'))->delete($previousFile);
         }
 
@@ -100,6 +104,10 @@ trait HasFeaturedFile
             $fileName,
             ['disk' => config('filesystems.default', 'public')]
         );
+
+        if (!$path) {
+            throw new \RuntimeException("Gagal menyimpan file CV. Periksa permission storage dan disk space.");
+        }
 
         $this->fill(['cv_file' => $path])->save();
     }
