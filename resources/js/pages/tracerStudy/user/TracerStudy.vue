@@ -49,6 +49,15 @@ const pklDurationLabels = computed<Record<string, string>>(
 const qualityRatingLabels = computed<Record<string, string>>(
 	() => (props.tracerStudyOptions as GenericObject)?.pklQuality?.labels || {},
 );
+const taskRelevanceLabels = computed<Record<string, string>>(
+	() => (props.tracerStudyOptions as GenericObject)?.pklTaskRelevance?.labels || {},
+);
+const guidanceLabels = computed<Record<string, string>>(
+	() => (props.tracerStudyOptions as GenericObject)?.pklGuidance?.labels || {},
+);
+const monitoringLabels = computed<Record<string, string>>(
+	() => (props.tracerStudyOptions as GenericObject)?.pklMonitoring?.labels || {},
+);
 const salaryLabels = computed<Record<string, string>>(
 	() => (props.tracerStudyOptions as GenericObject)?.salary?.labels || {},
 );
@@ -116,7 +125,12 @@ const mappedHowFoundJob = computed(() => {
 	return list;
 });
 
-const mappedSmkReasons = computed(() => mapList(feedbackData.value.smkReasons, smkReasonLabels.value));
+const mappedSmkReasons = computed(() => {
+	const reasons = mapList(feedbackData.value.smkReasons, smkReasonLabels.value);
+	return Array.isArray(feedbackData.value.smkReasons)
+		? reasons.filter((reason, index) => feedbackData.value.smkReasons[index] !== 'smk-other')
+		: reasons;
+});
 const mappedCertificates = computed(() => {
 	if (!Array.isArray(feedbackData.value.certificates)) return [];
 
@@ -240,6 +254,7 @@ const mappedCertificates = computed(() => {
 					<p class="mb-2 text-sm text-slate-500">Alasan memilih pendidikan di SMK</p>
 					<div v-if="mappedSmkReasons.length" class="flex flex-wrap gap-2">
 						<span v-for="reason in mappedSmkReasons" :key="reason" class="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-200">{{ reason }}</span>
+						<span v-if="feedbackData.smkReasons?.includes('smk-other') && feedbackData.otherSmkReasonText" class="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-200">Lainnya: {{ feedbackData.otherSmkReasonText }}</span>
 					</div>
 					<p v-else class="text-sm font-medium text-slate-700">-</p>
 				</div>
@@ -248,9 +263,9 @@ const mappedCertificates = computed(() => {
 					<div><p class="text-slate-500">Durasi PKL</p><p class="font-medium text-slate-800">{{ mapSingle(feedbackData.pklDuration, pklDurationLabels) }}</p></div>
 					<div><p class="text-slate-500">Sertifikat Kompetensi</p><p class="font-medium text-slate-800">{{ displayValue(feedbackData.hasCertificate) }}</p></div>
 					<div><p class="text-slate-500">Kualitas Tempat PKL</p><p class="font-medium text-slate-800">{{ mapSingle(feedbackData.pklQuality?.location, qualityRatingLabels) }}</p></div>
-					<div><p class="text-slate-500">Kesesuaian Tugas PKL</p><p class="font-medium text-slate-800">{{ mapSingle(feedbackData.pklQuality?.taskRelevance, qualityRatingLabels) }}</p></div>
-					<div><p class="text-slate-500">Bimbingan Selama PKL</p><p class="font-medium text-slate-800">{{ mapSingle(feedbackData.pklQuality?.guidance, qualityRatingLabels) }}</p></div>
-					<div><p class="text-slate-500">Monitoring Guru</p><p class="font-medium text-slate-800">{{ mapSingle(feedbackData.pklQuality?.monitoring, qualityRatingLabels) }}</p></div>
+				<div><p class="text-slate-500">Kesesuaian Tugas PKL</p><p class="font-medium text-slate-800">{{ mapSingle(feedbackData.pklQuality?.taskRelevance, taskRelevanceLabels) }}</p></div>
+				<div><p class="text-slate-500">Bimbingan Selama PKL</p><p class="font-medium text-slate-800">{{ mapSingle(feedbackData.pklQuality?.guidance, guidanceLabels) }}</p></div>
+				<div><p class="text-slate-500">Monitoring Guru</p><p class="font-medium text-slate-800">{{ mapSingle(feedbackData.pklQuality?.monitoring, monitoringLabels) }}</p></div>
 				</div>
 
 				<div class="mt-4 border-t border-slate-100 pt-4">
