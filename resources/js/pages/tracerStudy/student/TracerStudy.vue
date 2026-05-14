@@ -61,7 +61,23 @@ const stepItems = ref([{ label: 'Data Lulusan' }, { label: 'Detail Aktivitas' },
 const fileInput = ref<HTMLInputElement | null>(null);
 
 // --- Form State dengan useForm ---
-const form = useForm({
+const form = useForm<{
+    is_married: boolean;
+    province: string;
+    city: string;
+    email: string;
+    phone: string;
+    address: string;
+    height: string;
+    weight: string;
+    cv_file: File | null;
+    student_activity_answers: string;
+    detail_activity_answers: string;
+    student_working_answers: string;
+    student_university_answers: string;
+    student_entrepreneur_answers: string;
+    student_feedback_answers: string;
+}>({
     is_married: props.student?.is_married ?? false,
     province: props.student?.province ?? '',
     city: props.student?.city ?? '',
@@ -70,7 +86,7 @@ const form = useForm({
     address: props.student?.address ?? '',
     height: props.student?.height ?? '',
     weight: props.student?.weight ?? '',
-    cv_file: props.student?.cv_file ?? null,
+    cv_file: null,
     student_activity_answers: '',
     detail_activity_answers: '',
     student_working_answers: '',
@@ -111,6 +127,8 @@ const getFileName = (file: File | string | null | undefined): string => {
     return file.name;
 };
 
+const currentCvFileName = () => getFileName(form.cv_file) || props.student?.cv_file_name || '';
+
 watch(() => studentActivityData.value.isStudying, () => {
     studentActivityData.value.isWorking = null;
     studentActivityData.value.workType = '';
@@ -146,6 +164,11 @@ const saveTracerStudy = () => {
     form.student_university_answers = JSON.stringify(activityDetailsData.value.universityData);
     form.student_entrepreneur_answers = JSON.stringify(activityDetailsData.value.entrepreneurData);
     form.student_feedback_answers = JSON.stringify(feedbackData.value);
+
+    // Jika cv_file bukan File object (string path dari db), reset menjadi null
+    if (form.cv_file && !(form.cv_file instanceof File)) {
+        form.cv_file = null;
+    }
 
     form.post(route('tracer-study.store'), {
         preserveScroll: true,
@@ -334,10 +357,10 @@ const feedbackOptions = ref({
                                         <Button label="Pilih File CV" icon="pi pi-folder-open" outlined @click="fileInput?.click()" />
                                         <p class="text-sm text-gray-500 mt-2">Format: PDF (Max. 2MB)</p>
                                     </div>
-                                    <div v-if="form.cv_file" class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                                    <div v-if="form.cv_file || props.student?.cv_file_name" class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
                                         <div class="flex items-center gap-2 text-green-700">
                                             <i class="pi pi-check-circle"></i>
-                                            <span class="text-sm font-medium">{{ getFileName(form.cv_file) }}</span>
+                                            <span class="text-sm font-medium">{{ currentCvFileName() }}</span>
                                         </div>
                                     </div>
                                 </div>
