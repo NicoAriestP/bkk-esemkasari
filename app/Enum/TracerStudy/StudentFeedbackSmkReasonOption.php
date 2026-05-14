@@ -9,6 +9,7 @@ enum StudentFeedbackSmkReasonOption: string
     case R3 = 'r3';
     case R4 = 'r4';
     case R5 = 'r5';
+    case R_OTHER = 'smk-other';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum StudentFeedbackSmkReasonOption: string
             self::R3 => 'Diajak teman',
             self::R4 => 'Keinginan orang tua/keluarga',
             self::R5 => 'Tidak diterima di sekolah lain',
+            self::R_OTHER => 'Lainnya',
         };
     }
 
