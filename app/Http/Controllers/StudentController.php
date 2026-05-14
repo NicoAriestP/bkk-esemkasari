@@ -14,6 +14,7 @@ use App\Actions\Student\StudentAction;
 use App\Http\Requests\StudentImportRequest;
 use App\Imports\StudentsImport;
 use App\Exports\Student\StudentsExport;
+use App\Exports\Student\TracerStudyExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -114,6 +115,12 @@ class StudentController extends Controller
     {
         return (new StudentsExport($studentClass))
             ->download("Export Data Siswa - {$studentClass->name} - {$year->year} " . Carbon::now()->format('l, d-m-Y H-i') . ".xlsx");
+    }
+
+    public function exportTracerStudy(Year $year, StudentClass $studentClass)
+    {
+        return (new TracerStudyExport($studentClass, true))
+            ->download("Export Tracer Study Siswa - {$studentClass->name} - {$year->year} " . Carbon::now()->format('l, d-m-Y H-i') . ".xlsx");
     }
 
 
