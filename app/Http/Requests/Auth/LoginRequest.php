@@ -27,13 +27,24 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
         $guard = $this->getGuardName();
+        $email = $this->input('email');
+
+        if (! $this->userExistsForGuard($guard, $email)) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => trans('Email tidak ditemukan.'),
+            ]);
+        }
 
         if (! Auth::guard($guard)->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
+
             throw ValidationException::withMessages([
-                'email' => trans('Email tidak cocok dengan password yang diberikan atau akun tidak ditemukan.'),
+                'password' => trans('Password salah.'),
             ]);
         }
+
         RateLimiter::clear($this->throttleKey());
     }
 
@@ -72,6 +83,21 @@ class LoginRequest extends FormRequest
             default:
                 return 'web';
         }
+    }
+
+    protected function userExistsForGuard(string $guard, string $email): bool
+    {
+        $provider = Auth::guard($guard)->getProvider();
+
+        if (! method_exists($provider, 'getModel')) {
+            return false;
+        }
+
+        $modelClass = $provider->getModel();
+
+        return $modelClass::query()
+            ->where('email', $email)
+            ->exists();
     }
 
     /**
