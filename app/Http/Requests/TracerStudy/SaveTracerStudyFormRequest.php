@@ -9,6 +9,9 @@ use App\Enum\TracerStudy\StudentEntrepreneurBusinessScaleOption;
 use App\Enum\TracerStudy\StudentFeedbackCertificateOwnership;
 use App\Enum\TracerStudy\StudentFeedbackPklDurationOption;
 use App\Enum\TracerStudy\StudentFeedbackPklQualityOption;
+use App\Enum\TracerStudy\StudentFeedbackPklGuidanceOption;
+use App\Enum\TracerStudy\StudentFeedbackPklMonitoringOption;
+use App\Enum\TracerStudy\StudentFeedbackPklTaskRelevanceOption;
 use App\Enum\TracerStudy\StudentFeedbackSmkReasonOption;
 use App\Enum\TracerStudy\StudentUniversityEducationLevelOption;
 use App\Enum\TracerStudy\StudentUniversityFundingSourceOption;
@@ -151,6 +154,17 @@ class SaveTracerStudyFormRequest extends FormRequest
                             true,
                         );
                     }
+
+                    if (in_array('smk-other', $feedback['smkReasons'], true)) {
+                        $otherSmkReasonText = $feedback['otherSmkReasonText'] ?? null;
+
+                        if (! is_string($otherSmkReasonText) || trim($otherSmkReasonText) === '') {
+                            $validator->errors()->add(
+                                'student_feedback_answers.otherSmkReasonText',
+                                'Kolom alasan lainnya wajib diisi jika memilih Lainnya.'
+                            );
+                        }
+                    }
                 }
 
                 if (isset($feedback['pklQuality']) && ! is_array($feedback['pklQuality'])) {
@@ -159,9 +173,9 @@ class SaveTracerStudyFormRequest extends FormRequest
 
                 if (isset($feedback['pklQuality']) && is_array($feedback['pklQuality'])) {
                     $this->validateEnumValue($validator, 'student_feedback_answers.pklQuality.location', $feedback['pklQuality']['location'] ?? null, StudentFeedbackPklQualityOption::values());
-                    $this->validateEnumValue($validator, 'student_feedback_answers.pklQuality.taskRelevance', $feedback['pklQuality']['taskRelevance'] ?? null, StudentFeedbackPklQualityOption::values());
-                    $this->validateEnumValue($validator, 'student_feedback_answers.pklQuality.guidance', $feedback['pklQuality']['guidance'] ?? null, StudentFeedbackPklQualityOption::values());
-                    $this->validateEnumValue($validator, 'student_feedback_answers.pklQuality.monitoring', $feedback['pklQuality']['monitoring'] ?? null, StudentFeedbackPklQualityOption::values());
+                    $this->validateEnumValue($validator, 'student_feedback_answers.pklQuality.taskRelevance', $feedback['pklQuality']['taskRelevance'] ?? null, StudentFeedbackPklTaskRelevanceOption::values());
+                    $this->validateEnumValue($validator, 'student_feedback_answers.pklQuality.guidance', $feedback['pklQuality']['guidance'] ?? null, StudentFeedbackPklGuidanceOption::values());
+                    $this->validateEnumValue($validator, 'student_feedback_answers.pklQuality.monitoring', $feedback['pklQuality']['monitoring'] ?? null, StudentFeedbackPklMonitoringOption::values());
                 }
             }
         });
