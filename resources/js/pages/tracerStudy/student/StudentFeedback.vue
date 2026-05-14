@@ -19,6 +19,8 @@ const smkReasonOptions = computed(() => props.feedbackOptions?.smkReasonOptions 
 const pklDurationOptions = computed(() => props.feedbackOptions?.pklDurationOptions || []);
 const qualityRatingOptions = computed(() => props.feedbackOptions?.qualityRatingOptions || []);
 const certificateOwnershipOptions = computed(() => props.feedbackOptions?.certificateOwnershipOptions || []);
+const smkReasonMainOptions = computed(() => smkReasonOptions.value.filter((option) => option.key !== 'smk-other'));
+const smkReasonOtherOption = computed(() => smkReasonOptions.value.find((option) => option.key === 'smk-other'));
 
 // Inisialisasi data secara defensif untuk mencegah error
 watch(() => props.modelValue, (currentValue) => {
@@ -27,6 +29,7 @@ watch(() => props.modelValue, (currentValue) => {
     if (needsUpdate) {
         const completeData = {
             smkReasons: currentValue?.smkReasons || [],
+            otherSmkReasonText: currentValue?.otherSmkReasonText || '',
             pklDuration: currentValue?.pklDuration || null,
             pklQuality: {
                 location: null,
@@ -69,8 +72,8 @@ const addCertificate = () => {
     formData.value.certificates.push({ id: getNextCertificateId(), name: '' });
 };
 
-const removeCertificate = (index: number) => {
-    formData.value.certificates.splice(index, 1);
+const removeCertificate = (index: number | string) => {
+    formData.value.certificates.splice(Number(index), 1);
     if (formData.value.certificates.length === 0) {
         addCertificate();
     }
@@ -88,6 +91,12 @@ watch(() => formData.value.hasCertificate, (newValue) => {
     }
 });
 
+watch(() => formData.value.smkReasons, (newValue) => {
+    if (newValue && !newValue.includes('smk-other')) {
+        formData.value.otherSmkReasonText = '';
+    }
+}, { deep: true });
+
 </script>
 
 <template>
@@ -97,13 +106,21 @@ watch(() => formData.value.hasCertificate, (newValue) => {
             <div class="flex flex-col gap-3">
                 <p>Apa alasan Anda memilih pendidikan di SMK? <small class="text-gray-500">(boleh pilih lebih dari satu)</small></p>
                 <div class="flex flex-col gap-3 mt-1">
-                    <div v-for="option in smkReasonOptions" :key="option.key" class="flex items-center">
+                    <div v-for="option in smkReasonMainOptions" :key="option.key" class="flex items-center">
                         <Checkbox v-model="formData.smkReasons" :inputId="option.key" name="smkReason" :value="option.key" />
                         <label :for="option.key" class="ml-2">{{ option.text }}</label>
                     </div>
-                     <div class="flex items-center">
-                        <Checkbox disabled inputId="r-other" />
-                        <label for="r-other" class="ml-2 text-gray-400">Lainnya</label>
+                    <div class="flex items-center flex-wrap gap-2 mt-2">
+                        <div class="flex items-center">
+                            <Checkbox v-model="formData.smkReasons" inputId="smk-other" name="smkReason" value="smk-other" />
+                            <label for="smk-other" class="ml-2">{{ smkReasonOtherOption?.text || 'Lainnya' }}, tuliskan</label>
+                        </div>
+                        <InputText
+                            v-model="formData.otherSmkReasonText"
+                            class="flex-grow w-full sm:w-auto"
+                            :disabled="!formData.smkReasons?.includes('smk-other')"
+                            placeholder="Tuliskan alasan lainnya di sini..."
+                        />
                     </div>
                 </div>
             </div>
