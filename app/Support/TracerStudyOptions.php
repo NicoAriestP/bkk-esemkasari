@@ -9,6 +9,9 @@ use App\Enum\TracerStudy\StudentEntrepreneurBusinessScaleOption;
 use App\Enum\TracerStudy\StudentFeedbackCertificateOwnership;
 use App\Enum\TracerStudy\StudentFeedbackPklDurationOption;
 use App\Enum\TracerStudy\StudentFeedbackPklQualityOption;
+use App\Enum\TracerStudy\StudentFeedbackPklGuidanceOption;
+use App\Enum\TracerStudy\StudentFeedbackPklMonitoringOption;
+use App\Enum\TracerStudy\StudentFeedbackPklTaskRelevanceOption;
 use App\Enum\TracerStudy\StudentFeedbackSmkReasonOption;
 use App\Enum\TracerStudy\StudentUniversityEducationLevelOption;
 use App\Enum\TracerStudy\StudentUniversityFundingSourceOption;
@@ -39,6 +42,9 @@ final class TracerStudyOptions
             'smkReason' => self::group(StudentFeedbackSmkReasonOption::class),
             'pklDuration' => self::group(StudentFeedbackPklDurationOption::class),
             'pklQuality' => self::group(StudentFeedbackPklQualityOption::class),
+            'pklGuidance' => self::group(StudentFeedbackPklGuidanceOption::class),
+            'pklMonitoring' => self::group(StudentFeedbackPklMonitoringOption::class),
+            'pklTaskRelevance' => self::group(StudentFeedbackPklTaskRelevanceOption::class),
             'certificateOwnership' => self::group(StudentFeedbackCertificateOwnership::class),
         ];
     }
