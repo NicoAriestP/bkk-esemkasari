@@ -54,6 +54,7 @@ class Student extends Authenticatable
         'is_graduated_label',
         'is_married_label',
         'cv_file_url',
+        'cv_file_name',
         'age',
     ];
 
@@ -103,6 +104,15 @@ class Student extends Authenticatable
         return Attribute::make(
             get: fn() => $this->cv_file
                 ? Storage::disk(config('filesystems.default', 'public'))->url($this->cv_file)
+                : null,
+        );
+    }
+
+    public function cvFileName(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->cv_file
+                ? basename($this->cv_file)
                 : null,
         );
     }
