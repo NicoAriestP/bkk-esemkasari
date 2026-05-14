@@ -62,12 +62,19 @@ Route::middleware(['auth:web'])->group(function () {
             // Student Routes (nested under student-classes)
             Route::prefix('{studentClass}/students')->name('students.')->group(function () {
                 Route::get('/', [StudentController::class, 'index'])->name('index');
-                Route::get('/{model}/tracer-study', [StudentController::class, 'tracerStudyDetail'])->name('tracer-study');
+                Route::get('/{model}/tracer-study', [StudentController::class, 'tracerStudyDetail'])
+                    ->whereNumber('model')
+                    ->name('tracer-study');
                 Route::post('/', [StudentController::class, 'store'])->name('store');
-                Route::put('/{model}', [StudentController::class, 'update'])->name('update');
-                Route::delete('/{model}', [StudentController::class, 'destroy'])->name('destroy');
+                Route::put('/{model}', [StudentController::class, 'update'])
+                    ->whereNumber('model')
+                    ->name('update');
+                Route::delete('/{model}', [StudentController::class, 'destroy'])
+                    ->whereNumber('model')
+                    ->name('destroy');
                 Route::post('/import', [StudentController::class, 'import'])->name('import');
                 Route::get('/export', [StudentController::class, 'export'])->name('export');
+                Route::get('/export/tracer-study', [StudentController::class, 'exportTracerStudy'])->name('export.tracer-study');
             });
         });
     });
