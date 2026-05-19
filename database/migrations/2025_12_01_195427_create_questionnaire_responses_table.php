@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('questionnaire_responses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('questionnaire_id')->constrained();
-            $table->foreignId('student_id')->constrained();
+            $table->foreignId('questionnaire_id')
+                ->constrained('questionnaires')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('student_id')
+                ->constrained('students')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->timestamp('submitted_at')->nullable();
             $table->timestamps();
         });
