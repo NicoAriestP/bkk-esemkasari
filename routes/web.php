@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardPartnerController;
 use App\Http\Controllers\VacancyApplicationController;
 use App\Http\Controllers\StudentQuestionnaireController;
 use App\Http\Controllers\QuestionnaireController;
+use App\Http\Controllers\QuestionnaireResponseController;
 use App\Http\Controllers\HomePageController;
 
 // Route::get('/', function () {
@@ -87,6 +88,15 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/{model}/edit', [QuestionnaireController::class, 'edit'])->name('edit');
         Route::put('/{model}', [QuestionnaireController::class, 'update'])->name('update');
         Route::delete('/{model}', [QuestionnaireController::class, 'destroy'])->name('destroy');
+
+        // Questionnaire Responses Routes (nested under questionnaires)
+        Route::prefix('{model}/responses')->name('responses.')->group(function () {
+            Route::get('/', [QuestionnaireResponseController::class, 'index'])->name('index');
+            Route::get('/export', [QuestionnaireResponseController::class, 'export'])->name('export');
+            Route::get('/{year}/{studentClass}/{student}', [QuestionnaireResponseController::class, 'show'])
+                ->whereNumber('year', 'studentClass', 'student')
+                ->name('show');
+        });
     });
 
     // Partner Management Routes
