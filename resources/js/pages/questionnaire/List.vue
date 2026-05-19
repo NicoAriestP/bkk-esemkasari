@@ -43,6 +43,10 @@ const openEditPage = (id: number) => {
     router.get(route('questionnaires.edit', id))
 }
 
+const openResponsesPage = (id: number) => {
+    router.get(route('questionnaires.responses.index', id))
+}
+
 const confirmDelete = (questionnaire: any) => {
     selectedQuestionnaire.value = questionnaire
     displayDeleteDialog.value = true
@@ -135,7 +139,7 @@ watch(filters, (newValue) => {
                 row-hover
                 :rows="10"
                 :rows-per-page-options="[10, 20, 50, 100]"
-                @rowClick="(event: any) => openEditPage(event.data.id)"
+                @rowClick="(event: any) => openResponsesPage(event.data.id)"
                 tableStyle="min-width: 100%"
                 paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 currentPageReportTemplate="Menampilkan {first} - {last} dari {totalRecords} data"
@@ -242,10 +246,19 @@ watch(filters, (newValue) => {
                     header="Aksi"
                     headerClass="bg-gray-50 text-gray-700 font-semibold text-sm py-4 px-6"
                     bodyClass="py-4 px-6"
-                    class="w-32"
+                    class="w-40"
                 >
                     <template #body="slotProps">
                         <div class="flex items-center justify-center gap-1">
+                            <Button
+                                icon="pi pi-eye"
+                                severity="info"
+                                @click.stop="openResponsesPage(slotProps.data.id)"
+                                class="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors duration-200"
+                                text
+                                size="small"
+                                v-tooltip.top="'Lihat respons'"
+                            />
                             <Button
                                 icon="pi pi-pencil"
                                 severity="warn"
