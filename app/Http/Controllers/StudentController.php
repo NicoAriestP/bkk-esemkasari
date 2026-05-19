@@ -123,7 +123,6 @@ class StudentController extends Controller
             ->download("Export Tracer Study Siswa - {$studentClass->name} - {$year->year} " . Carbon::now()->format('l, d-m-Y H-i') . ".xlsx");
     }
 
-
     public function dashboard(Request $request)
     {
         $dashboardData = Student::getDashboardData();
