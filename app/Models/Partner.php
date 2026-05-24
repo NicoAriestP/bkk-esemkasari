@@ -51,26 +51,45 @@ class Partner extends Authenticatable
         return $this->hasMany(Vacancy::class);
     }
 
-    public static function getDashboardData()
+    public static function getDashboardData(int $months = 1)
     {
-        // Data 7 bulan terakhir untuk chart
+        $months = max($months, 1);
+        $days = $months * 30;
+        $startDate = now()->subDays($days);
+        $endDate = now();
+
+        // Get all data within the range for current partner
+        $vacancies = Vacancy::where('created_by', auth('partner')->user()->id)
+            ->whereBetween('created_at', [$startDate, $endDate])->get();
+
+        $applications = VacancyApplication::whereHas('vacancy', function ($query) {
+            $query->where('created_by', auth('partner')->user()->id);
+        })->whereBetween('created_at', [$startDate, $endDate])->get();
+
+        // Group by month for display
         $monthlyStats = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $monthStart = now()->subMonths($i)->startOfMonth();
-            $monthEnd = now()->subMonths($i)->endOfMonth();
-
-            $vacanciesCount = Vacancy::where('created_by', auth('partner')->user()->id)
-                ->whereBetween('created_at', [$monthStart, $monthEnd])
-                ->count();
-
-            $applicationsCount = VacancyApplication::whereHas('vacancy', function ($query) {
-                $query->where('created_by', auth('partner')->user()->id);
-            })->whereBetween('created_at', [$monthStart, $monthEnd])->count();
+        $monthsToShow = new \DateTime($startDate);
+        while ($monthsToShow < new \DateTime($endDate)) {
+            $monthStart = \Carbon\Carbon::instance($monthsToShow)->startOfMonth();
+            $monthEnd = \Carbon\Carbon::instance($monthsToShow)->endOfMonth();
 
             $monthlyStats[] = [
                 'month' => $monthStart->format('Y-m-d'),
-                'vacancies' => $vacanciesCount,
-                'applications' => $applicationsCount
+                'vacancies' => $vacancies->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
+                'applications' => $applications->whereBetween('created_at', [$monthStart, $monthEnd])->count()
+            ];
+
+            $monthsToShow->modify('first day of next month');
+        }
+
+        // Ensure current month is always included
+        $currentMonthStart = now()->startOfMonth();
+        $currentMonthEnd = now()->endOfMonth();
+        if (!$monthlyStats || $monthlyStats[count($monthlyStats) - 1]['month'] !== $currentMonthStart->format('Y-m-d')) {
+            $monthlyStats[] = [
+                'month' => $currentMonthStart->format('Y-m-d'),
+                'vacancies' => $vacancies->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->count(),
+                'applications' => $applications->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->count()
             ];
         }
 
@@ -98,6 +117,7 @@ class Partner extends Authenticatable
                 })->where('status', 'qualified')->count(),
             ],
             'monthlyStats' => $monthlyStats,
+            'monthlyRange' => $months,
         ];
 
         return $dashboardData;

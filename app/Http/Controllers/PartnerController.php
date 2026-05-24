@@ -69,7 +69,8 @@ class PartnerController extends Controller
 
     public function dashboard(Request $request)
     {
-        $dashboardData = Partner::getDashboardData();
+        $months = (int) $request->input('months', 1);
+        $dashboardData = Partner::getDashboardData($months);
 
         return Inertia::render('dashboard/DashboardPartner', [
             'dashboardData' => $dashboardData

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 // PrimeVue Components
@@ -10,6 +10,7 @@ import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Chart from 'primevue/chart';
+import Select from 'primevue/select';
 import Tag from 'primevue/tag';
 
 // dayjs for date formatting
@@ -31,6 +32,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const page = usePage() as any;
+const currentPartnerName = computed(() => page.props.auth.partner?.name || page.props.auth.user?.name || 'Mitra DU/DI');
+
 // Computed properties for dashboard metrics
 const totalVacancies = computed(() => props.dashboardData.totalVacancies || 0);
 const totalApplicants = computed(() => props.dashboardData.totalApplicants || 0);
@@ -40,6 +44,15 @@ const recentVacancies = computed(() => props.dashboardData.recentVacancies || []
 const recentApplications = computed(() => props.dashboardData.recentApplications || []);
 const applicationStats = computed(() => props.dashboardData.applicationStats || {});
 const monthlyStats = computed(() => props.dashboardData.monthlyStats || []);
+const selectedMonthlyRange = computed(() => props.dashboardData.monthlyRange || 7);
+
+const monthlyRangeOptions = [
+    { label: '1 Bulan', value: 1 },
+    { label: '3 Bulan', value: 3 },
+    { label: '6 Bulan', value: 6 },
+    { label: '12 Bulan', value: 12 },
+    { label: '24 Bulan', value: 24 },
+];
 
 // Chart configuration
 const chartData = computed(() => ({
@@ -109,6 +122,10 @@ const formatDate = (date: string) => {
 const formatDateTime = (date: string) => {
     return dayjs(date).format('DD MMM YYYY, HH:mm');
 };
+
+const updateMonthlyRange = (months: number) => {
+    router.get('/partners/dashboard', { months }, { preserveState: true, preserveScroll: true, replace: true });
+};
 </script>
 
 <template>
@@ -118,7 +135,7 @@ const formatDateTime = (date: string) => {
         <div class="space-y-6">
             <!-- Welcome Section -->
             <div class="rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
-                <h1 class="mb-2 text-2xl font-bold">Selamat Datang, Mitra DU/DI!</h1>
+                <h1 class="mb-2 text-2xl font-bold">Selamat Datang, {{ currentPartnerName }}!</h1>
                 <p class="text-blue-100">Kelola lowongan kerja dan pantau pelamar dari satu dashboard</p>
             </div>
 
@@ -190,9 +207,17 @@ const formatDateTime = (date: string) => {
                 <!-- Application Statistics Chart -->
                 <Card class="lg:col-span-2">
                     <template #title>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <h3 class="text-lg font-semibold">Statistik Bulanan</h3>
-                            <Button icon="pi pi-refresh" text rounded size="small" />
+                            <Select
+                                :modelValue="selectedMonthlyRange"
+                                :options="monthlyRangeOptions"
+                                optionLabel="label"
+                                optionValue="value"
+                                class="w-40"
+                                placeholder="Pilih rentang"
+                                @update:modelValue="updateMonthlyRange"
+                            />
                         </div>
                     </template>
                     <template #content>
@@ -277,7 +302,7 @@ const formatDateTime = (date: string) => {
             <!-- Application Status Overview -->
             <Card>
                 <template #title>
-                    <h3 class="text-lg font-semibold">Status Aplikasi</h3>
+                    <h3 class="text-lg font-semibold">Status Seleksi Lamaran</h3>
                 </template>
                 <template #content>
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
