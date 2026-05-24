@@ -11,16 +11,10 @@ use App\Http\Controllers\YearController;
 use App\Http\Controllers\VacancyPartnerController;
 use App\Http\Controllers\VacancyStudentController;
 use App\Http\Controllers\TracerStudyController;
-use App\Http\Controllers\DashboardPartnerController;
-use App\Http\Controllers\VacancyApplicationController;
 use App\Http\Controllers\StudentQuestionnaireController;
 use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\QuestionnaireResponseController;
 use App\Http\Controllers\HomePageController;
-
-// Route::get('/', function () {
-//     return Inertia::render('Welcome');
-// })->name('home');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
@@ -30,12 +24,13 @@ Route::controller(HomePageController::class)->group(function () {
     Route::get('/', 'index')->name('home');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth:web,student,partner', 'verified'])->name('dashboard');
-
 // Admin Routes
 Route::middleware(['auth:web'])->group(function () {
+    // User (Staff) Dashboard Routes
+    Route::prefix('/dashboard')->name('dashboard')->group(function () {
+        Route::get('/', [UserController::class, 'dashboard']);
+    });
+
     // Announcement Routes
     Route::prefix('announcements')->name('announcements.')->group(function () {
         Route::get('/', [AnnouncementController::class, 'index'])->name('index');
