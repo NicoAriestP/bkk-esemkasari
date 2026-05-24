@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
+use App\Actions\User\UserAction;
 use App\Http\Requests\User\CreateUserFormRequest;
 use App\Http\Requests\User\EditUserFormRequest;
-use App\Actions\User\UserAction;
 
 class UserController extends Controller
 {
@@ -50,5 +50,14 @@ class UserController extends Controller
         $model->delete();
 
         return redirect()->route('users.index');
+    }
+
+    public function dashboard(Request $request)
+    {
+        $months = (int) $request->input('months', 1);
+
+        return Inertia::render('dashboard/DashboardUser', [
+            'dashboardData' => User::getDashboardData($months),
+        ]);
     }
 }
