@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 // PrimeVue Components
@@ -9,10 +9,6 @@ import Card from 'primevue/card';
 import Button from 'primevue/button';
 import Badge from 'primevue/badge';
 import Chart from 'primevue/chart';
-import Tag from 'primevue/tag';
-import ProgressBar from 'primevue/progressbar';
-import Avatar from 'primevue/avatar';
-import Divider from 'primevue/divider';
 
 // dayjs for date formatting
 import dayjs from 'dayjs';
@@ -33,8 +29,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const page = usePage() as any;
+const currentStudentName = computed(() => page.props.auth.student?.name || 'Siswa');
+
 // Computed properties for dashboard data
-const studentProfile = computed(() => props.dashboardData.studentProfile || {});
 const totalApplications = computed(() => props.dashboardData.totalApplications || 0);
 const pendingApplications = computed(() => props.dashboardData.pendingApplications || 0);
 const qualifiedApplications = computed(() => props.dashboardData.qualifiedApplications || 0);
@@ -44,7 +42,6 @@ const myApplications = computed(() => props.dashboardData.myApplications || []);
 const announcements = computed(() => props.dashboardData.announcements || []);
 const tracerStudyStatus = computed(() => props.dashboardData.tracerStudyStatus || {});
 const applicationStats = computed(() => props.dashboardData.applicationStats || []);
-const graduationStatus = computed(() => props.dashboardData.graduationStatus || {});
 
 // Chart configuration for application timeline
 const applicationChartData = computed(() => ({
@@ -102,19 +99,6 @@ const formatDateTime = (date: string) => {
     return dayjs(date).format('DD MMM YYYY, HH:mm');
 };
 
-const getApplicationProgress = () => {
-    const total = totalApplications.value;
-    if (total === 0) return 0;
-    return Math.round((qualifiedApplications.value / total) * 100);
-};
-
-const getGraduationStatusSeverity = (isGraduated: boolean) => {
-    return isGraduated ? 'success' : 'warning';
-};
-
-const getGraduationStatusLabel = (isGraduated: boolean) => {
-    return isGraduated ? 'Sudah Lulus' : 'Belum Lulus';
-};
 </script>
 
 <template>
@@ -123,25 +107,11 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="space-y-6">
             <!-- Welcome Section -->
-            <div class="bg-gradient-to-r from-green-600 to-green-800 rounded-lg p-6 text-white">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-2xl font-bold mb-2">Selamat Datang, {{ studentProfile.name }}!</h1>
-                        <p class="text-green-100">{{ studentProfile.student_class?.name }} - {{ studentProfile.student_class?.year?.year }}</p>
-                        <div class="flex items-center space-x-4 mt-2">
-                            <span class="text-sm">NISN: {{ studentProfile.nisn }}</span>
-                            <Tag
-                                :value="getGraduationStatusLabel(graduationStatus.is_graduated)"
-                                :severity="getGraduationStatusSeverity(graduationStatus.is_graduated)"
-                                size="small"
-                            />
-                        </div>
-                    </div>
-                    <Avatar
-                        :label="studentProfile.name?.charAt(0) || 'S'"
-                        class="bg-white text-green-600 w-16 h-16 text-2xl"
-                    />
-                </div>
+            <div class="rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+                <h1 class="mb-2 text-2xl font-bold">Selamat Datang, {{ currentStudentName }}!</h1>
+                <p class="text-blue-100">
+                    Pantau seluruh layanan karir dan informasi penting dari satu dashboard.
+                </p>
             </div>
 
             <!-- Quick Stats Cards -->
@@ -208,9 +178,9 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
             </div>
 
             <!-- Charts and Quick Actions Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 gap-6">
                 <!-- Application Timeline Chart -->
-                <Card class="lg:col-span-2">
+                <Card>
                     <template #title>
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-semibold">Riwayat Lamaran</h3>
@@ -223,57 +193,10 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                         </div>
                     </template>
                 </Card>
-
-                <!-- Quick Actions & Progress -->
-                <Card>
-                    <template #title>
-                        <h3 class="text-lg font-semibold">Aksi Cepat</h3>
-                    </template>
-                    <template #content>
-                        <div class="space-y-3">
-                            <Button
-                                label="Cari Lowongan"
-                                icon="pi pi-search"
-                                class="w-full"
-                                @click="router.visit('/students/vacancies')"
-                            />
-                            <Button
-                                label="Riwayat Lamaran"
-                                icon="pi pi-history"
-                                severity="secondary"
-                                class="w-full"
-                                @click="router.visit('/students/vacancies')"
-                            />
-                            <Button
-                                label="Pengumuman"
-                                icon="pi pi-bell"
-                                severity="info"
-                                class="w-full"
-                                @click="router.visit('students/announcements')"
-                            />
-
-                            <Divider />
-
-                            <div class="text-center">
-                                <p class="text-sm text-gray-600 mb-2">Tingkat Keberhasilan</p>
-                                <div class="mb-2">
-                                    <ProgressBar
-                                        :value="getApplicationProgress()"
-                                        :show-value="false"
-                                        class="h-2"
-                                    />
-                                </div>
-                                <p class="text-xs text-gray-500">
-                                    {{ getApplicationProgress() }}% dari {{ totalApplications }} lamaran
-                                </p>
-                            </div>
-                        </div>
-                    </template>
-                </Card>
             </div>
 
             <!-- Content Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6">
                 <!-- Recent Vacancies -->
                 <Card>
                     <template #title>
@@ -370,7 +293,7 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                                 label="Lihat Semua"
                                 text
                                 size="small"
-                                @click="router.visit('students/announcements')"
+                                @click="router.visit('/students/announcements')"
                             />
                         </div>
                     </template>
@@ -380,7 +303,7 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                                 v-for="announcement in announcements"
                                 :key="announcement.id"
                                 class="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                                @click="router.visit(`students/announcements/${announcement.id}`)"
+                                @click="router.visit(`/students/announcements/${announcement.id}`)"
                             >
                                 <h4 class="font-medium text-gray-900 mb-1">{{ announcement.title }}</h4>
                                 <p class="text-sm text-gray-600 mb-2">{{ announcement.excerpt }}</p>
@@ -427,28 +350,6 @@ const getGraduationStatusLabel = (isGraduated: boolean) => {
                 </Card>
             </div>
 
-            <!-- Profile Completion -->
-            <Card>
-                <template #title>
-                    <h3 class="text-lg font-semibold">Profil Saya</h3>
-                </template>
-                <template #content>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="text-center p-4 bg-blue-50 rounded-lg">
-                            <div class="text-lg font-bold text-blue-600">{{ studentProfile.student_class?.name }}</div>
-                            <div class="text-sm text-blue-800">Kelas</div>
-                        </div>
-                        <div class="text-center p-4 bg-green-50 rounded-lg">
-                            <div class="text-lg font-bold text-green-600">{{ studentProfile.student_class?.year?.year }}</div>
-                            <div class="text-sm text-green-800">Tahun Angkatan</div>
-                        </div>
-                        <div class="text-center p-4 bg-purple-50 rounded-lg">
-                            <div class="text-lg font-bold text-purple-600">{{ studentProfile.age }} tahun</div>
-                            <div class="text-sm text-purple-800">Umur</div>
-                        </div>
-                    </div>
-                </template>
-            </Card>
         </div>
     </AppLayout>
 </template>
