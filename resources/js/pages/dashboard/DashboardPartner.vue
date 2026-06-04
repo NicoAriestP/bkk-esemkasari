@@ -136,7 +136,7 @@ const updateMonthlyRange = (months: number) => {
             <!-- Welcome Section -->
             <div class="rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
                 <h1 class="mb-2 text-2xl font-bold">Selamat Datang, {{ currentPartnerName }}!</h1>
-                <p class="text-blue-100">Kelola lowongan kerja dan pantau pelamar dari satu dashboard</p>
+                <p class="text-blue-100">Pantau lowongan kerja dan pelamar dari satu dashboard</p>
             </div>
 
             <!-- Statistics Cards -->
