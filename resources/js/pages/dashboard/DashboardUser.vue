@@ -8,7 +8,6 @@ import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Chart from 'primevue/chart';
 import Select from 'primevue/select';
-import Tag from 'primevue/tag';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
@@ -48,8 +47,10 @@ const recentQuestionnaires = computed(() => props.dashboardData.recentQuestionna
 const recentTracerStudyStudents = computed(() => props.dashboardData.recentTracerStudyStudents || []);
 const recentPartners = computed(() => props.dashboardData.recentPartners || []);
 const monthlyStats = computed(() => props.dashboardData.monthlyStats || []);
+const detailActivityMonthlyStats = computed(() => props.dashboardData.detailActivityMonthlyStats || []);
 const studentStatusStats = computed(() => props.dashboardData.studentStatusStats || {});
 const selectedMonthlyRange = computed(() => props.dashboardData.monthlyRange || 7);
+const selectedDetailMonthlyRange = computed(() => props.dashboardData.detailMonthlyRange || 7);
 
 const monthlyRangeOptions = [
     { label: '1 Bulan', value: 1 },
@@ -105,18 +106,61 @@ const monthlyActivityChartData = computed(() => ({
     ],
 }));
 
+const detailActivityChartData = computed(() => ({
+    labels: detailActivityMonthlyStats.value.map((stat: any) => dayjs(stat.month).format('MMM YYYY')),
+    datasets: [
+        {
+            label: 'Bekerja',
+            data: detailActivityMonthlyStats.value.map((stat: any) => stat.working),
+            backgroundColor: 'rgba(14, 165, 233, 0.82)',
+            borderRadius: 12,
+        },
+        {
+            label: 'Kuliah',
+            data: detailActivityMonthlyStats.value.map((stat: any) => stat.university),
+            backgroundColor: 'rgba(16, 185, 129, 0.82)',
+            borderRadius: 12,
+        },
+        {
+            label: 'Wirausaha',
+            data: detailActivityMonthlyStats.value.map((stat: any) => stat.entrepreneur),
+            backgroundColor: 'rgba(245, 158, 11, 0.82)',
+            borderRadius: 12,
+        },
+        {
+            label: 'Belum Bekerja / Belum Melanjutkan Studi',
+            data: detailActivityMonthlyStats.value.map((stat: any) => stat.notYet),
+            backgroundColor: 'rgba(239, 68, 68, 0.82)',
+            borderRadius: 12,
+        },
+    ],
+}));
+
 const studentStatusChartData = computed(() => ({
     labels: ['Lulus', 'Belum Lulus', 'Tracer Study Selesai', 'Tracer Study Belum'],
     datasets: [
         {
-            label: 'Jumlah Siswa',
-            data: [
-                studentStatusStats.value.graduatedStudents || graduatedStudents.value,
-                studentStatusStats.value.pendingGraduationStudents || Math.max(totalStudents.value - graduatedStudents.value, 0),
-                studentStatusStats.value.tracerStudyCompletedStudents || tracerStudyCompletedStudents.value,
-                studentStatusStats.value.pendingTracerStudents || pendingTracerStudents.value,
-            ],
-            backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+            label: 'Lulus',
+            data: [studentStatusStats.value.graduatedStudents || graduatedStudents.value, 0, 0, 0],
+            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            borderRadius: 12,
+        },
+        {
+            label: 'Belum Lulus',
+            data: [0, studentStatusStats.value.pendingGraduationStudents || Math.max(totalStudents.value - graduatedStudents.value, 0), 0, 0],
+            backgroundColor: 'rgba(245, 158, 11, 0.8)',
+            borderRadius: 12,
+        },
+        {
+            label: 'Tracer Study Selesai',
+            data: [0, 0, studentStatusStats.value.tracerStudyCompletedStudents || tracerStudyCompletedStudents.value, 0],
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderRadius: 12,
+        },
+        {
+            label: 'Tracer Study Belum',
+            data: [0, 0, 0, studentStatusStats.value.pendingTracerStudents || pendingTracerStudents.value],
+            backgroundColor: 'rgba(239, 68, 68, 0.8)',
             borderRadius: 12,
         },
     ],
@@ -140,6 +184,17 @@ const chartOptions = {
     },
 };
 
+const lineChartOptions = {
+    ...chartOptions,
+    scales: {
+        ...chartOptions.scales,
+        x: {
+            offset: false,
+            bounds: 'data' as const,
+        },
+    },
+};
+
 const formatDate = (date: string) => dayjs(date).format('DD MMM YYYY');
 
 const formatDateTime = (date: string) => dayjs(date).format('DD MMM YYYY, HH:mm');
@@ -147,7 +202,11 @@ const formatDateTime = (date: string) => dayjs(date).format('DD MMM YYYY, HH:mm'
 const quickNavigate = (path: string) => router.visit(path);
 
 const updateMonthlyRange = (months: number) => {
-    router.get('/dashboard', { months }, { preserveState: true, preserveScroll: true, replace: true });
+    router.get('/dashboard', { months, detail_months: selectedDetailMonthlyRange.value }, { preserveState: true, preserveScroll: true, replace: true });
+};
+
+const updateDetailMonthlyRange = (months: number) => {
+    router.get('/dashboard', { months: selectedMonthlyRange.value, detail_months: months }, { preserveState: true, preserveScroll: true, replace: true });
 };
 </script>
 
@@ -257,7 +316,7 @@ const updateMonthlyRange = (months: number) => {
                 </Card>
             </div>
 
-            <div class="grid gap-6 xl:grid-cols-5">
+            <div class="grid gap-6 xl:grid-cols-6">
                 <Card class="xl:col-span-3">
                     <template #title>
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
@@ -269,19 +328,35 @@ const updateMonthlyRange = (months: number) => {
                     </template>
                     <template #content>
                         <div class="h-96">
-                            <Chart type="line" :data="monthlyActivityChartData" :options="chartOptions"
+                            <Chart type="line" :data="monthlyActivityChartData" :options="lineChartOptions"
                                 class="h-full" />
                         </div>
                     </template>
                 </Card>
 
-                <Card class="xl:col-span-2">
+                <Card class="xl:col-span-3">
                     <template #title>
                         <h3 class="text-lg font-semibold">Status Siswa & Tracer Study</h3>
                     </template>
                     <template #content>
                         <div class="h-96">
                             <Chart type="bar" :data="studentStatusChartData" :options="chartOptions" class="h-full" />
+                        </div>
+                    </template>
+                </Card>
+
+                <Card class="xl:col-span-6">
+                    <template #title>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                            <h3 class="text-lg font-semibold">Aktivitas Utama Siswa / Alumni</h3>
+                            <Select :modelValue="selectedDetailMonthlyRange" :options="monthlyRangeOptions"
+                                optionLabel="label" optionValue="value" class="w-40" placeholder="Pilih rentang"
+                                @update:modelValue="updateDetailMonthlyRange" />
+                        </div>
+                    </template>
+                    <template #content>
+                        <div class="h-96">
+                            <Chart type="bar" :data="detailActivityChartData" :options="chartOptions" class="h-full" />
                         </div>
                     </template>
                 </Card>
@@ -363,8 +438,8 @@ const updateMonthlyRange = (months: number) => {
                 <Card>
                     <template #title>
                         <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-semibold">Siswa Tracer Study Terbaru</h3>
-                            <Button label="Lihat Data" text size="small" @click="quickNavigate('/years')" />
+                            <h3 class="text-lg font-semibold">Siswa Responden Tracer Study Terbaru</h3>
+                            <Button label="Lihat Data Siswa" text size="small" @click="quickNavigate('/years')" />
                         </div>
                     </template>
                     <template #content>
@@ -382,8 +457,6 @@ const updateMonthlyRange = (months: number) => {
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 flex-shrink-0">
-                                    <Tag :value="student.is_graduated ? 'Lulus' : 'Belum Lulus'"
-                                        :severity="student.is_graduated ? 'success' : 'warning'" />
                                     <Button icon="pi pi-eye" rounded text severity="info" size="small"
                                         @click="quickNavigate(`/years/${student.student_class?.year_id}/student-classes/${student.student_class?.id}/students/${student.id}/tracer-study`)"
                                         v-tooltip.top="'Detail siswa'" />

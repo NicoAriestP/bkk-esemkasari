@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enum\TracerStudy\DetailActivityMainOption;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -51,52 +52,71 @@ class User extends Authenticatable
         ];
     }
 
-    public static function getDashboardData(int $months = 1)
+    private static function buildMonthlySeries(\Carbon\Carbon $startDate, \Carbon\Carbon $endDate, callable $resolver): array
     {
-        $months = max($months, 1);
-        $days = $months * 30;
-        $startDate = now()->subDays($days);
-        $endDate = now();
-
-        // Get all data within the range
-        $announcements = Announcement::whereBetween('created_at', [$startDate, $endDate])->get();
-        $questionnaires = Questionnaire::whereBetween('created_at', [$startDate, $endDate])->get();
-        $responses = QuestionnaireResponse::whereBetween('submitted_at', [$startDate, $endDate])->get();
-        $students = Student::whereBetween('created_at', [$startDate, $endDate])->get();
-        $partners = Partner::whereBetween('created_at', [$startDate, $endDate])->get();
-
-        // Group by month for display
-        $monthlyStats = [];
+        $stats = [];
         $monthsToShow = new \DateTime($startDate);
+
         while ($monthsToShow < new \DateTime($endDate)) {
             $monthStart = \Carbon\Carbon::instance($monthsToShow)->startOfMonth();
             $monthEnd = \Carbon\Carbon::instance($monthsToShow)->endOfMonth();
 
-            $monthlyStats[] = [
+            $stats[] = array_merge([
                 'month' => $monthStart->format('Y-m-d'),
-                'announcements' => $announcements->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
-                'questionnaires' => $questionnaires->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
-                'responses' => $responses->whereBetween('submitted_at', [$monthStart, $monthEnd])->count(),
-                'students' => $students->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
-                'partners' => $partners->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
-            ];
+            ], $resolver($monthStart, $monthEnd));
 
             $monthsToShow->modify('first day of next month');
         }
 
-        // Ensure current month is always included
         $currentMonthStart = now()->startOfMonth();
         $currentMonthEnd = now()->endOfMonth();
-        if (!$monthlyStats || $monthlyStats[count($monthlyStats) - 1]['month'] !== $currentMonthStart->format('Y-m-d')) {
-            $monthlyStats[] = [
+        if (!$stats || $stats[count($stats) - 1]['month'] !== $currentMonthStart->format('Y-m-d')) {
+            $stats[] = array_merge([
                 'month' => $currentMonthStart->format('Y-m-d'),
-                'announcements' => $announcements->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->count(),
-                'questionnaires' => $questionnaires->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->count(),
-                'responses' => $responses->whereBetween('submitted_at', [$currentMonthStart, $currentMonthEnd])->count(),
-                'students' => $students->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->count(),
-                'partners' => $partners->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->count(),
-            ];
+            ], $resolver($currentMonthStart, $currentMonthEnd));
         }
+
+        return $stats;
+    }
+
+    public static function getDashboardData(int $months = 1, int $detailMonths = 1)
+    {
+        $months = max($months, 1);
+        $detailMonths = max($detailMonths, 1);
+        $days = $months * 30;
+        $startDate = now()->subDays($days);
+        $endDate = now();
+        $detailDays = $detailMonths * 30;
+        $detailStartDate = now()->subDays($detailDays);
+        $detailEndDate = now();
+
+        // Group by month for display
+        $monthlyStats = self::buildMonthlySeries($startDate, $endDate, function (\Carbon\Carbon $monthStart, \Carbon\Carbon $monthEnd) {
+            return [
+                'announcements' => Announcement::whereBetween('created_at', [$monthStart, $monthEnd])->count(),
+                'questionnaires' => Questionnaire::whereBetween('created_at', [$monthStart, $monthEnd])->count(),
+                'responses' => QuestionnaireResponse::whereBetween('submitted_at', [$monthStart, $monthEnd])->count(),
+                'students' => Student::whereBetween('created_at', [$monthStart, $monthEnd])->count(),
+                'partners' => Partner::whereBetween('created_at', [$monthStart, $monthEnd])->count(),
+            ];
+        });
+
+        $detailActivityMonthlyStats = self::buildMonthlySeries($detailStartDate, $detailEndDate, function (\Carbon\Carbon $monthStart, \Carbon\Carbon $monthEnd) {
+            return [
+                'working' => DetailActivityAnswer::whereBetween('created_at', [$monthStart, $monthEnd])
+                    ->whereJsonContains('answers->mainActivity', DetailActivityMainOption::WORKING->value)
+                    ->count(),
+                'university' => DetailActivityAnswer::whereBetween('created_at', [$monthStart, $monthEnd])
+                    ->whereJsonContains('answers->mainActivity', DetailActivityMainOption::UNIVERSITY->value)
+                    ->count(),
+                'entrepreneur' => DetailActivityAnswer::whereBetween('created_at', [$monthStart, $monthEnd])
+                    ->whereJsonContains('answers->mainActivity', DetailActivityMainOption::ENTREPRENEUR->value)
+                    ->count(),
+                'notYet' => DetailActivityAnswer::whereBetween('created_at', [$monthStart, $monthEnd])
+                    ->whereJsonContains('answers->mainActivity', DetailActivityMainOption::NOT_YET->value)
+                    ->count(),
+            ];
+        });
 
         $totalStudents = Student::count();
         $graduatedStudents = Student::where('is_graduated', true)->count();
@@ -127,23 +147,43 @@ class User extends Authenticatable
             'tracerStudyCompletedStudents' => $tracerStudyCompletedStudents,
             'pendingTracerStudents' => $pendingTracerStudents,
             'totalPartners' => Partner::count(),
-            'recentAnnouncements' => Announcement::with('createdBy')->latest()->take(5)->get(),
-            'recentQuestionnaires' => Questionnaire::with('createdBy')->withCount('responses')->latest()->take(5)->get(),
-            'recentTracerStudyStudents' => Student::with([
-                'studentClass.year',
-                'studentActivityAnswer',
-                'studentUniversityAnswer',
-                'studentWorkingAnswer',
-                'studentEntrepreneurAnswer'
-            ])->where(function ($query) {
+            'recentAnnouncements' => Announcement::query()
+                ->select(['id', 'title', 'created_by', 'created_at'])
+                ->with(['createdBy:id,name'])
+                ->latest()
+                ->take(5)
+                ->get(),
+            'recentQuestionnaires' => Questionnaire::query()
+                ->select(['id', 'title', 'created_by', 'due_at', 'created_at'])
+                ->with(['createdBy:id,name'])
+                ->withCount('responses')
+                ->latest()
+                ->take(5)
+                ->get(),
+            'recentTracerStudyStudents' => Student::query()
+                ->select(['id', 'name', 'nisn', 'student_class_id', 'is_graduated'])
+                ->with([
+                    'studentClass:id,year_id,name',
+                    'studentClass.year:id,year',
+                ])
+                ->where(function ($query) {
                 $query->whereHas('studentActivityAnswer')
                     ->orWhereHas('studentUniversityAnswer')
                     ->orWhereHas('studentWorkingAnswer')
                     ->orWhereHas('studentEntrepreneurAnswer');
-            })->latest()->take(5)->get(),
-            'recentPartners' => Partner::latest()->take(5)->get(),
+                })
+                ->latest()
+                ->take(5)
+                ->get(),
+            'recentPartners' => Partner::query()
+                ->select(['id', 'name', 'email', 'phone', 'address', 'created_at'])
+                ->latest()
+                ->take(5)
+                ->get(),
             'monthlyStats' => $monthlyStats,
+            'detailActivityMonthlyStats' => $detailActivityMonthlyStats,
             'monthlyRange' => $months,
+            'detailMonthlyRange' => $detailMonths,
             'studentStatusStats' => [
                 'graduatedStudents' => $graduatedStudents,
                 'pendingGraduationStudents' => max($totalStudents - $graduatedStudents, 0),

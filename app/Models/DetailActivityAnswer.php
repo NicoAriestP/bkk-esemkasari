@@ -11,6 +11,10 @@ class DetailActivityAnswer extends Model
 
     protected $table = 'detail_activity_answers';
 
+    protected $casts = [
+        'answers' => 'array',
+    ];
+
     protected $fillable = [
         'student_id',
         'answers',

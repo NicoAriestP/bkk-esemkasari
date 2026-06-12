@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use App\Models\User;
 use App\Actions\User\UserAction;
@@ -55,9 +56,15 @@ class UserController extends Controller
     public function dashboard(Request $request)
     {
         $months = (int) $request->input('months', 1);
+        $detailMonths = (int) $request->input('detail_months', $months);
+        $cacheKey = sprintf('dashboard:user:months=%d:detail_months=%d', $months, $detailMonths);
+
+        $dashboardData = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($months, $detailMonths) {
+            return User::getDashboardData($months, $detailMonths);
+        });
 
         return Inertia::render('dashboard/DashboardUser', [
-            'dashboardData' => User::getDashboardData($months),
+            'dashboardData' => $dashboardData,
         ]);
     }
 }
